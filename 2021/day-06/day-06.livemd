@@ -1,0 +1,151 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Advent of Code 2021, Day 6
+
+## Short problem summary
+
+A school of fish reproduce according to the following rules:
+
+* Every fish has an "internal timer"
+* The timer decrements by one every day
+* If the timer is at 0, the timer is instead reset to 6, 
+  and a new fish with an internal timer of 8 is added to the school
+
+Questions:
+
+1. How many fish are in the school after 80 days?
+2. How many fish are in the school after 256 days?
+
+## Setting up
+
+The initial input is a list of fish, represented by the initial value of their internal timer:
+
+```elixir
+school =
+  with {:ok, data} <- File.read("day-06/input.txt") do
+    data
+    |> String.trim()
+    |> String.split(",")
+    |> Enum.map(&String.to_integer/1)
+  end
+```
+
+```output
+[5, 4, 3, 5, 1, 1, 2, 1, 2, 1, 3, 2, 3, 4, 5, 1, 2, 4, 3, 2, 5, 1, 4, 2, 1, 1, 2, 5, 4, 4, 4, 1, 5,
+ 4, 5, 2, 1, 2, 5, 5, 4, 1, 3, 1, 4, 2, 4, 2, 5, 1, ...]
+```
+
+Every fish with the same starting internal timer will reproduce at the same time, 
+as will all of the children of those fish and their children, and so forth,
+so we don't need to track individual fish; we just need to group the fish based on
+their starting internal timer and track those groups throughout the simulation.
+
+```elixir
+starting_state = Enum.frequencies(school)
+```
+
+```output
+%{1 => 88, 2 => 45, 3 => 54, 4 => 52, 5 => 61}
+```
+
+Every time a day passes, the following things happen:
+
+* All the internal timers decrement by 1
+* The group of fish with an internal timer of -1 is reset to 6
+  (added to any existing fish whose timers are already at 6),
+  and an equal-sized group of fish with internal timer 8 is added
+
+```elixir
+defmodule Day06 do
+  def next_day(state) do
+    with one_day_older <- Enum.into(state, %{}, fn {k, v} -> {k - 1, v} end),
+         {n, s} <- Map.pop(one_day_older, -1, 0) do
+      Map.update(s, 6, n, &(&1 + n))
+      |> Map.put(8, n)
+    end
+  end
+end
+
+day1 = Day06.next_day(starting_state)
+```
+
+```output
+%{0 => 88, 1 => 45, 2 => 54, 3 => 52, 4 => 61, 6 => 0, 8 => 0}
+```
+
+After the first day there's not any fish old enough to reproduce yet, but after the second day,
+
+```elixir
+day2 = Day06.next_day(day1)
+```
+
+```output
+%{0 => 45, 1 => 54, 2 => 52, 3 => 61, 5 => 0, 6 => 88, 7 => 0, 8 => 88}
+```
+
+The 88 fish whose timers were at 0 have rolled over to 6 and created 88 more fish with timers at 8.
+
+## Solution
+
+Now we just need to apply the transformation function the necessary number
+of times and sum up the total population in the end:
+
+```elixir
+part1_state =
+  Enum.reduce(
+    Enum.to_list(1..80),
+    starting_state,
+    fn _, acc -> Day06.next_day(acc) end
+  )
+  |> IO.inspect()
+  |> Enum.reduce(0, fn {_, v}, acc -> v + acc end)
+```
+
+```output
+%{
+  0 => 24572,
+  1 => 43660,
+  2 => 30525,
+  3 => 48458,
+  4 => 41318,
+  5 => 47697,
+  6 => 57731,
+  7 => 23218,
+  8 => 33738
+}
+```
+
+```output
+350917
+```
+
+Identically for part 2,
+
+```elixir
+part2_state =
+  Enum.reduce(
+    Enum.to_list(1..256),
+    starting_state,
+    fn _, acc -> Day06.next_day(acc) end
+  )
+  |> IO.inspect()
+  |> Enum.reduce(0, fn {_, v}, acc -> v + acc end)
+```
+
+```output
+%{
+  0 => 139170477178,
+  1 => 162618979933,
+  2 => 169389497028,
+  3 => 188231720546,
+  4 => 207908029672,
+  5 => 217769615201,
+  6 => 252681772250,
+  7 => 117023886952,
+  8 => 138124736869
+}
+```
+
+```output
+1592918715629
+```

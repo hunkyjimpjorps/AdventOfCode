@@ -1,0 +1,138 @@
+<!-- vim: set syntax=markdown: -->
+<!-- livebook:{"persist_outputs":true} -->
+
+# Advent of Code 2021, Day 9
+
+## Short problem summary
+
+
+
+**Part 1.** Find the total "risk level" of all the local minima on a relief map, represented by a 
+100 $\times$ 100 array of integers from 1 to 9.  Only orthogonal neighbors count.
+The risk level is the elevation plus one.
+
+**Part 2.** Find the product of the areas of the three largest basins on the relief map.  Basins are regions
+bordered by the edges of the map or by points with elevation 9.
+Again, only orthogonal neighbors count.
+
+## Setup
+
+I'm using [Nx](https://github.com/elixir-nx/nx/tree/main/nx#readme) tensors
+since this problem will require a lot of arbitrary indexing.
+
+```elixir
+Mix.install([
+  {:nx, "~> 0.1.0-dev", github: "elixir-nx/nx", sparse: "nx", override: true}
+])
+```
+
+```output
+:ok
+```
+
+Bringing in the data as a new 2D tensor:
+
+```elixir
+floor =
+  with {:ok, data} <- File.read("input.txt") do
+    data
+    |> String.trim()
+    |> String.split("\n")
+    |> Enum.flat_map(&String.graphemes/1)
+    |> Enum.map(&String.to_integer/1)
+    |> Enum.chunk_every(100)
+    |> Nx.tensor(names: [:y, :x])
+  end
+```
+
+```output
+#Nx.Tensor<
+  s64[y: 100][x: 100]
+  [
+    [7, 6, 5, 9, 9, 9, 1, 0, 9, 8, 9, 9, 9, 8, 7, 6, 5, 7, 9, 9, 1, 0, 1, 2, 9, 8, 7, 9, 9, 9, 9, 8, 7, 6, 4, 3, 2, 1, 2, 3, 4, 5, 9, 8, 7, 4, 3, 4, 5, 5, ...],
+    ...
+  ]
+>
+```
+
+## Part 1
+
+For a given coordinate $(x, y)$, we want to examine its orthogonal neighbors, 
+but only the ones that exist within the map.
+
+```elixir
+defmodule Day09.Part1 do
+  def neighbors({x, y}) do
+    [{x + 1, y}, {x - 1, y}, {x, y + 1}, {x, y - 1}]
+    |> Enum.filter(fn {x, y} -> x >= 0 && x < 100 && y >= 0 && y < 100 end)
+  end
+end
+```
+
+```output
+{:module, Day09.Part1, <<70, 79, 82, 49, 0, 0, 7, ...>>, {:neighbors, 1}}
+```
+
+Now scan the whole array to check each cell's neighbors, 
+and return the "risk level" for each local minimum, then accumulate the sum.
+
+```elixir
+risk_level =
+  for x <- 0..99,
+      y <- 0..99,
+      reduce: 0 do
+    acc ->
+      Day09.Part1.neighbors({x, y})
+      |> Enum.all?(fn {xn, yn} -> floor[x][y] < floor[xn][yn] end)
+      |> if(do: acc + Nx.to_number(floor[x][y]) + 1, else: acc)
+  end
+```
+
+```output
+591
+```
+
+## Part 2
+
+Now we need to recursively walk outwards from each previously-unwalked point
+until we can't walk any further.  An agent will keep track of the visited points.
+
+```elixir
+defmodule Day09.Part2 do
+  def walkable?({x, y} = coords, tensor, pid) do
+    Nx.to_number(tensor[x][y]) < 9 && not Agent.get(pid, fn m -> Map.has_key?(m, coords) end)
+  end
+
+  def walk_it(coords, tensor, pid) do
+    if walkable?(coords, tensor, pid) do
+      Agent.update(pid, fn m -> Map.put(m, coords, true) end)
+
+      for c <- Day09.Part1.neighbors(coords) do
+        walk_it(c, tensor, pid)
+      end
+      |> Enum.reduce(1, fn x, acc -> acc + x end)
+    else
+      0
+    end
+  end
+end
+```
+
+```output
+{:module, Day09.Part2, <<70, 79, 82, 49, 0, 0, 11, ...>>, {:walk_it, 3}}
+```
+
+```elixir
+{:ok, tracker} = Agent.start_link(fn -> %{} end)
+
+for x <- 0..99, y <- 0..99 do
+  Day09.Part2.walk_it({x, y}, floor, tracker)
+end
+|> Enum.sort(:desc)
+|> Enum.take(3)
+|> Enum.reduce(fn x, acc -> acc * x end)
+```
+
+```output
+1113424
+```

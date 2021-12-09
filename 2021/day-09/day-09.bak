@@ -1,0 +1,60 @@
+#lang racket
+
+(require threading
+         "../jj-aoc.rkt")
+
+(define data
+  (for/vector ([l (in-lines (open-day 9))]
+               #:unless (equal? l ""))
+    (~>> l
+         string->list
+         (map (λ~>> ~a string->number))
+         list->vector)))
+
+(define max-rows (vector-length data))
+(define max-cols (vector-length (vector-ref data 0)))
+(define-values (min-rows min-cols) (values 0 0))
+
+(define (vector2d-ref vec coord)
+  (match-define `(,r ,c) coord)
+  (~> vec
+      (vector-ref r)
+      (vector-ref c)))
+
+(define (adjacent coords)
+  (match-define `(,r ,c) coords)
+  `((,(add1 r) ,c)
+    (,(sub1 r) ,c)
+    (,r ,(add1 c))
+    (,r ,(sub1 c))))
+
+(define (valid-coordinate coord)
+  (match-define `(,r ,c) coord)
+  (and (>= r min-rows)
+       (< r max-rows)
+       (>= c min-cols)
+       (< c max-cols)))
+
+(define (check-adjacent vec coord)
+  (define x (vector2d-ref vec coord))
+  (for*/and ([neighbor (in-list (adjacent coord))]
+             #:when (valid-coordinate neighbor))
+    (x . < . (vector2d-ref vec neighbor))))
+
+;; part 1
+(for*/sum ([r (in-range min-rows max-rows)]
+           [c (in-range min-cols max-cols)]
+           [x (in-value (vector2d-ref data `(,r ,c)))]
+           #:when (check-adjacent data `(,r ,c)))
+  (add1 x))
+
+;; part 2
+(define visited (make-hash))
+(define (flood-fill vec coord)
+  (if (and (< (vector2d-ref vec coord) 9)
+           (not (hash-has-key? visited coord)))
+      ((hash-set! visited coord 'visited)
+       (add1 (for/sum [(neighbor (in-list (adjacent coord)))
+                       #:when (valid-coordinate neighbor)]
+               (flood-fill vec neighbor))))
+      0))
