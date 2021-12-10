@@ -1,3 +1,4 @@
 .elixir_ls/*
 .cache/*
 *.bak
+input
