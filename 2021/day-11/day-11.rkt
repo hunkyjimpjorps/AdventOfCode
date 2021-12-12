@@ -69,7 +69,7 @@
 
 ;; part 2
 (for/fold ([octopi octopus-data]
-           [synchro-step #f] #:result synchro-step)
+           [synchro-step 0] #:result synchro-step)
           ([step (in-naturals 1)])
   (define-values [next-state
                   flashes-from-this-state]
