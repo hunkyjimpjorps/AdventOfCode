@@ -1,4 +1,5 @@
 .elixir_ls/*
 .cache/*
+compiled/*
 *.bak
 input
