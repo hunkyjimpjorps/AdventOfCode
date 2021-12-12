@@ -48,4 +48,5 @@
 
 ;; part 2
 (~> (look-for-next-cave #:only-one-visit? #f)
-  length)
+  length
+  time)
