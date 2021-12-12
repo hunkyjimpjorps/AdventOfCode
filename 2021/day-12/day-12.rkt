@@ -21,25 +21,25 @@
                 '()))
 
 ;; part 1
-(define (backtracking-allowed? next prevs)
+(define (backtracking-disallowed? next prevs)
   (and (equal? (string-downcase next) next)
        (member next prevs)))
 
 (define (look-for-next-cave
          [path-list '("start")]
-         #:two-visits? [visit-used-up? #t])
+         #:only-one-visit? [visit-used-up? #t])
   (define current-cave (car path-list))
   (cond
     [(equal? current-cave "end") (list path-list)]
     [else
      (~>> (for/list ([next-path (in-list (hash-ref edges-hash current-cave null))]
-                     #:unless (equal? next-path "start")
-                     #:when (not (and (backtracking-allowed? next-path path-list)
-                                      visit-used-up?)))
+                     #:when (and (not (equal? next-path "start"))
+                                 (not (and (backtracking-disallowed? next-path path-list)
+                                           visit-used-up?))))
             (look-for-next-cave
              (cons next-path path-list)
-             #:two-visits? (or (backtracking-allowed? next-path path-list)
-                               visit-used-up?)))
+             #:only-one-visit? (or (backtracking-disallowed? next-path path-list)
+                                   visit-used-up?)))
           (apply append))]))
 
 (~> (look-for-next-cave)
@@ -47,6 +47,5 @@
   time)
 
 ;; part 2
-(~> (look-for-next-cave #:two-visits? #f)
-  length
-  time)
+(~> (look-for-next-cave #:only-one-visit? #f)
+  length)
