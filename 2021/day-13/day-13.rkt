@@ -13,11 +13,11 @@
 (define-values (points-list folds-list) (splitf-at data (λ~> (equal? "") not)))
 
 (define pts
-  (for/set ([p (in-list points-list)])
-    (~> p
-      (string-split ",")
-      (map string->number _)
-      (apply make-pt _))))
+  (for/set ([pt (in-list points-list)])
+    (~> pt
+        (string-split ",")
+        (map string->number _)
+        (apply make-pt _))))
 
 (define folds
   (for/list ([f (in-list (rest folds-list))])
@@ -29,10 +29,10 @@
 (define (fold-over f pts)
   (define dir (fold-dir f))
   (define loc (fold-loc f))
-  (for/set ([p (in-set pts)])
+  (for/set ([pt (in-set pts)])
     (cond
-      [(> (hash-ref p dir) loc) (hash-update p dir (λ (l) (- (* 2 loc) l)))]
-      [else p])))
+      [(> (hash-ref pt dir) loc) (hash-update pt dir (λ (l) (- (* 2 loc) l)))]
+      [else pt])))
 
 ;; part 1
 (~>> pts
@@ -40,14 +40,19 @@
      set-count)
 
 ;; part 2
-(define final-fold
-  (for/fold ([p pts])
+(define final-pts
+  (for/fold ([pt pts])
             ([f (in-list folds)])
-    (fold-over f p)))
+    (fold-over f pt)))
 
-(for/list ([y (in-range 6)])
-  (~>> (for/list ([x (in-range 39)])
-         (if (set-member? final-fold (hash 'x x 'y y))
+(define (max-dim pts dim)
+  (~>> (for/list ([pt (in-set pts)])
+         (hash-ref pt dim))
+       (apply max)))
+
+(for ([y (in-inclusive-range 0 (max-dim final-pts 'y))])
+  (~>> (for/list ([x (in-inclusive-range 0 (max-dim final-pts 'x))])
+         (if (set-member? final-pts (hash 'x x 'y y))
              #\█
              #\space))
        (apply string)
