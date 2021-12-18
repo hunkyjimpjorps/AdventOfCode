@@ -279,16 +279,6 @@ We repeat the same steps as before: building the graph,
 using Dijkstra's algorithm and summing up the risks along the best path.
 
 ```elixir
-get_lowest_risk_path = fn nodes ->
-  with {{min_c, _}, {max_c, _}} <- Enum.min_max_by(nodes, fn {{i, j}, _} -> i + j end) do
-    nodes
-    |> then(make_graph)
-    |> Graph.dijkstra(min_c, max_c)
-    |> tl()
-    |> Enum.reduce(0, fn coord, sum -> sum + Map.get(nodes, coord) end)
-  end
-end
-
 get_lowest_risk_path.(expanded_floor_nodes)
 ```
 
