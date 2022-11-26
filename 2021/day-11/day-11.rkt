@@ -9,11 +9,8 @@
        (apply append)))
 
 (define octopus-data
-  (~>> (for/list ([l (in-lines (open-day 11 2021))]
-                  #:unless (equal? l ""))
-         (~>> l
-              string->list
-              (map (λ~>> ~a string->number))))
+  (~>> (for/list ([l (in-lines (open-day 11 2021))] #:unless (equal? l ""))
+         (~>> l string->list (map (λ~>> ~a string->number))))
        (apply append)
        (map cons coords)
        make-hash))
@@ -23,24 +20,18 @@
 
 (define (adjacent-to coord)
   (match-define (cons r c) coord)
-  (for*/list ([row (in-list '(-1 0 1))]
-              [col (in-list '(-1 0 1))]
-              #:unless (= 0 row col))
+  (for*/list ([row (in-list '(-1 0 1))] [col (in-list '(-1 0 1))] #:unless (= 0 row col))
     (cons (+ r row) (+ c col))))
 
 (define (simulate-octopi-step data)
   (define flashed-this-step (mutable-set))
-  
-  (let look-for-more-flashes
-    ([octopi (for/hash ([(k v) data])
-               (values k (add1 v)))]
-     [flashes-so-far 0])
-    (define-values (next-octopus-update
-                    flashes-this-update)
+
+  (let look-for-more-flashes ([octopi (for/hash ([(k v) data])
+                                        (values k (add1 v)))]
+                              [flashes-so-far 0])
+    (define-values (next-octopus-update flashes-this-update)
       (for*/fold ([octopi octopi] [flashes 0])
-                 ([(p x) (in-hash octopi)]
-                  #:when (> x 9)
-                  #:unless (set-member? flashed-this-step p))
+                 ([(p x) (in-hash octopi)] #:when (> x 9) #:unless (set-member? flashed-this-step p))
         (set-add! flashed-this-step p)
         (define flashed-octopi
           (for*/fold ([o (hash-set octopi p 0)])
@@ -48,32 +39,18 @@
                       #:when (hash-has-key? o adj)
                       #:unless (set-member? flashed-this-step adj))
             (hash-update o adj add1)))
-        (values flashed-octopi
-                (add1 flashes))))
+        (values flashed-octopi (add1 flashes))))
     (if (> flashes-this-update 0)
-        (look-for-more-flashes next-octopus-update
-                               (+ flashes-so-far
-                                  flashes-this-update))
-        (values next-octopus-update
-                flashes-so-far))))
+        (look-for-more-flashes next-octopus-update (+ flashes-so-far flashes-this-update))
+        (values next-octopus-update flashes-so-far))))
 
 ;; part 1
-(for/fold ([octopi octopus-data]
-           [total-flashes 0] #:result total-flashes)
-          ([step (in-range 100)])
-  (define-values [next-state
-                  flashes-from-this-state]
-    (simulate-octopi-step octopi))
-  (values next-state
-          (+ total-flashes flashes-from-this-state)))
+(for/fold ([octopi octopus-data] [total-flashes 0] #:result total-flashes) ([step (in-range 100)])
+  (define-values [next-state flashes-from-this-state] (simulate-octopi-step octopi))
+  (values next-state (+ total-flashes flashes-from-this-state)))
 
 ;; part 2
-(for/fold ([octopi octopus-data]
-           [synchro-step 0] #:result synchro-step)
-          ([step (in-naturals 1)])
-  (define-values [next-state
-                  flashes-from-this-state]
-    (simulate-octopi-step octopi))
+(for/fold ([octopi octopus-data] [synchro-step 0] #:result synchro-step) ([step (in-naturals 1)])
+  (define-values [next-state flashes-from-this-state] (simulate-octopi-step octopi))
   #:final (= flashes-from-this-state 100)
-  (values next-state
-          step))
+  (values next-state step))

@@ -1,36 +1,32 @@
 #lang racket
 (require "../../jj-aoc.rkt"
-         threading
-         racket/hash)
+         threading)
 
 (struct pixel (i j) #:transparent)
 
 (define-values (raw-enhancement raw-image)
-  (~> (open-day 20 2021)
-    port->string
-    (string-split "\n\n")
-    (apply values _)))
+  (~> (open-day 20 2021) port->string (string-split "\n\n") (apply values _)))
 
-(define (char->pixel c) (if (char=? #\# c) 'light 'dark))
-(define (pixel->char c) (if (equal? 'light c) #\# #\.))
+(define (char->pixel c)
+  (if (char=? #\# c) 'light 'dark))
+(define (pixel->char c)
+  (if (equal? 'light c) #\# #\.))
 
 (define enhancement-algorithm
   (for/hash ([(c i) (in-indexed (~> raw-enhancement (string-replace "\n" "")))])
     (values i (char->pixel c))))
 
 (define image-hash
-  (for*/hash ([(row i) (in-indexed (string-split raw-image "\n"))]
-              [(c j) (in-indexed row)])
+  (for*/hash ([(row i) (in-indexed (string-split raw-image "\n"))] [(c j) (in-indexed row)])
     (values (pixel i j) (char->pixel c))))
 
 (define (window->new-pixel p ps bg)
   (match-define (pixel i j) p)
-  (~> (for*/list ([di '(-1 0 1)]
-                  [dj '(-1 0 1)])
+  (~> (for*/list ([di '(-1 0 1)] [dj '(-1 0 1)])
         (if (equal? 'dark (hash-ref ps (pixel (+ i di) (+ j dj)) bg)) #\0 #\1))
-    (apply string _)
-    (string->number _ 2)
-    (hash-ref enhancement-algorithm _)))
+      (apply string _)
+      (string->number _ 2)
+      (hash-ref enhancement-algorithm _)))
 
 (define (pad-hash ps bg)
   (define coords (hash-keys ps))
@@ -51,16 +47,13 @@
 ;; the infinite background flips colors every other enhancement step
 ;; instead of trying to account for this algorithmically I just hardcoded it in
 (~> image-hash
-  (enhance-image 'dark)
-  (enhance-image 'light)
-  hash-values
-  (count (curry equal? 'light) _))
+    (enhance-image 'dark)
+    (enhance-image 'light)
+    hash-values
+    (count (curry equal? 'light) _))
 
 ;; part 2
-(~> (for/fold ([img image-hash])
-              ([_ (in-range 25)])
-      (~> img
-        (enhance-image 'dark)
-        (enhance-image 'light)))
-  hash-values
-  (count (curry equal? 'light) _))
+(~> (for/fold ([img image-hash]) ([_ (in-range 25)])
+      (~> img (enhance-image 'dark) (enhance-image 'light)))
+    hash-values
+    (count (curry equal? 'light) _))

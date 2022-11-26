@@ -1,7 +1,6 @@
 #lang racket
 (require advent-of-code
          threading
-         (only-in awesome-list transpose)
          (only-in algorithms chunks-of))
 
 (define data
@@ -9,17 +8,9 @@
              #:unless (equal? l ""))
     l))
 
-(define call-sheet
-  (~> data
-      car
-      (string-split ",")
-      (map string->number _)))
+(define call-sheet (~> data car (string-split ",") (map string->number _)))
 (define bingo-cards
-  (~> data
-      cdr
-      (map string-split _)
-      (map (λ (row) (map string->number row)) _)
-      (chunks-of 5)))
+  (~> data cdr (map string-split _) (map (λ (row) (map string->number row)) _) (chunks-of 5)))
 
 (define test-card (first bingo-cards))
 
@@ -29,7 +20,7 @@
       (if (eq? col call) 'X col))))
 
 (define (check-card card)
-  (for/or ([row (in-sequences card (transpose card))])
+  (for/or ([row (in-sequences card (apply map list card))])
     (equal? row '(X X X X X))))
 
 (define (multiply-by-last-call n call)
@@ -47,8 +38,7 @@
                           (apply + _)))
             ([call (in-list calls)])
     #:break (check current-cards)
-    (values (for/list ([card (in-list current-cards)]
-                       #:unless (exception card))
+    (values (for/list ([card (in-list current-cards)] #:unless (exception card))
               (mark-card card call))
             call)))
 
@@ -57,6 +47,5 @@
 ;; part 2
 (evaluate-cards bingo-cards
                 call-sheet
-                (λ (cards) (and (= (length cards) 1)
-                                (check-card (first cards))))
+                (λ (cards) (and (= (length cards) 1) (check-card (first cards))))
                 check-card)

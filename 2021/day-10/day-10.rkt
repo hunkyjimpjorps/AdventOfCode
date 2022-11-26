@@ -4,8 +4,7 @@
          threading
          "../../jj-aoc.rkt")
 
-(define chunks
-  (port->lines (open-day 10 2021)))
+(define chunks (port->lines (open-day 10 2021)))
 
 (define (opening-bracket? c)
   (member c (string->list "([{<")))
@@ -16,10 +15,8 @@
 (define (parse-brackets lst [acc '()])
   (cond
     [(empty? lst) acc]
-    [(opening-bracket? (first lst))
-     (parse-brackets (rest lst) (cons (first lst) acc))]
-    [(matching-brackets? (first acc) (first lst))
-     (parse-brackets (rest lst) (rest acc))]
+    [(opening-bracket? (first lst)) (parse-brackets (rest lst) (cons (first lst) acc))]
+    [(matching-brackets? (first acc) (first lst)) (parse-brackets (rest lst) (rest acc))]
     [else (get-score (first lst))]))
 
 ;; part 1
@@ -39,8 +36,7 @@
 
 ;; part 2
 (define (completion-score lst)
-  (for/fold ([score 0])
-            ([c (in-list lst)])
+  (for/fold ([score 0]) ([c (in-list lst)])
     (define val
       (match (string c)
         ["(" 1]
@@ -58,4 +54,4 @@
                  [score (in-value (score-incomplete-string chunk))]
                  #:when (> score 0))
        score)
-     (median < ))
+     (median <))

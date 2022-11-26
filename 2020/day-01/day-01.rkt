@@ -2,10 +2,7 @@
 (require "../../jj-aoc.rkt"
          threading)
 
-(define entries
-  (~>> (open-day 01 2020)
-       (port->list read)
-       list->set))
+(define entries (~>> (open-day 01 2020) (port->list read) list->set))
 
 ;; part 1
 (define (look-for-complement xs)

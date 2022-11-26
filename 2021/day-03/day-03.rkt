@@ -9,31 +9,20 @@
 
 ;; part 1
 (define most-common-bits
-  (for*/list ([row (in-list (apply map list data))]
-              [len (in-value (length data))])
-    (if (> (count (λ (c) (char=? #\1 c)) row) (/ len 2))
-        #\1
-        #\0)))
+  (for*/list ([row (in-list (apply map list data))] [len (in-value (length data))])
+    (if (> (count (λ (c) (char=? #\1 c)) row) (/ len 2)) #\1 #\0)))
 (define (bit-list->number lst)
-  (~> lst
-      (apply string _)
-      (string->number _ 2)))
+  (~> lst (apply string _) (string->number _ 2)))
 
-(define gamma
-  (bit-list->number most-common-bits))
-(define epsilon
-  (~> most-common-bits
-      (map (λ (c) (if (char=? c #\1) #\0 #\1)) _)
-      bit-list->number))
+(define gamma (bit-list->number most-common-bits))
+(define epsilon (~> most-common-bits (map (λ (c) (if (char=? c #\1) #\0 #\1)) _) bit-list->number))
 
 (* gamma epsilon)
 
 ;; part 2
 (define (rating-search data comparison)
-  (for/fold ([candidates data]
-             #:result (bit-list->number (first candidates)))
-            ([bit (in-list most-common-bits)]
-             [bit-index (in-range 0 (length most-common-bits))])
+  (for/fold ([candidates data] #:result (bit-list->number (first candidates)))
+            ([bit (in-list most-common-bits)] [bit-index (in-range 0 (length most-common-bits))])
     #:break (= 1 (length candidates))
     (define keep-bit
       (~> candidates

@@ -4,25 +4,20 @@
 
 (define data
   (for/list ([l (in-lines (open-aoc-input (find-session) 2021 5 #:cache (string->path "./cache")))])
-    (~> l
-        (string-replace " -> " ",")
-        (string-split ",")
-        (map string->number _))))
+    (~> l (string-replace " -> " ",") (string-split ",") (map string->number _))))
 
 (define (trace-line! x y vec)
   (define linear-coord (+ y (* 1000 x)))
-  (vector-set! vec
-               linear-coord
-               (+ 1 (vector-ref vec linear-coord))))
+  (vector-set! vec linear-coord (+ 1 (vector-ref vec linear-coord))))
 
 (define/match (orthogonal? coord-pair)
   [((or (list n _ n _) (list _ n _ n))) #t]
   [(_) #f])
 
-(define-values (orthogonal-lines diagonal-lines)
-  (partition orthogonal? data))
+(define-values (orthogonal-lines diagonal-lines) (partition orthogonal? data))
 
-(define (dir a b) (if (< a b) 1 -1))
+(define (dir a b)
+  (if (< a b) 1 -1))
 
 (define (trace-orthogonal! coord-pairs tracer result)
   (for ([coord-pair (in-list coord-pairs)])
@@ -37,8 +32,7 @@
 (define (trace-diagonal! coord-pairs tracer result)
   (for ([coord-pair (in-list coord-pairs)])
     (match-define (list x1 y1 x2 y2) coord-pair)
-    (for ([x (inclusive-range x1 x2 (dir x1 x2))]
-          [y (inclusive-range y1 y2 (dir y1 y2))])
+    (for ([x (inclusive-range x1 x2 (dir x1 x2))] [y (inclusive-range y1 y2 (dir y1 y2))])
       (tracer x y result))))
 
 ;; part 1

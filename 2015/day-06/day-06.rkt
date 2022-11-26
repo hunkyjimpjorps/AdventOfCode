@@ -10,7 +10,8 @@
 (define instructions
   (for/list ([l (in-lines (open-day 6 2015))])
     (~>> l
-         (regexp-match #px"(turn on|toggle|turn off) (\\d{1,3}),(\\d{1,3}) through (\\d{1,3}),(\\d{1,3})")
+         (regexp-match
+          #px"(turn on|toggle|turn off) (\\d{1,3}),(\\d{1,3}) through (\\d{1,3}),(\\d{1,3})")
          rest
          make-instruction)))
 
@@ -30,8 +31,7 @@
     (for ([y (inclusive-range (instruction-y1 inst) (instruction-y2 inst))])
       (vector2d-modify! light-grid x y (using inst)))))
 
-(define light-grid
-  (make-vector (* 1000 1000) #false))
+(define light-grid (make-vector (* 1000 1000) #false))
 (for ([i (in-list instructions)])
   (modify-light-grid i light-grid todo))
 (vector-count identity light-grid)
@@ -43,8 +43,7 @@
     ['|turn off| (λ (x) (max 0 (sub1 x)))]
     ['|toggle| (curry + 2)]))
 
-(define dimmable-grid
-  (make-vector (* 1000 1000) 0))
+(define dimmable-grid (make-vector (* 1000 1000) 0))
 (for ([i (in-list instructions)])
   (modify-light-grid i dimmable-grid todo-dimmer))
 (apply + (vector->list dimmable-grid))
