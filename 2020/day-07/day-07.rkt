@@ -1,10 +1,10 @@
 #lang racket
-(require "../../jj-aoc.rkt"
+(require advent-of-code
          threading
          rebellion/collection/entry
          rebellion/collection/multidict)
 
-(define raw-rules (~> (open-day 7 2020) (port->string) (string-split "\n")))
+(define raw-rules (~> (open-aoc-input (find-session) 2020 7) (port->string) (string-split "\n")))
 
 (define (split-rule r)
   (match-define (list head tail) (string-split (string-trim r #px" bags?.") " bags contain "))
@@ -20,10 +20,9 @@
 (define rules-multidict
   (for*/multidict ([ln (in-list raw-rules)] #:do [(match-define (list* from tos) (split-rule ln))]
                                             [to (in-list tos)])
-    (entry from to)))
+                  (entry from to)))
 
 ;; part 1
-
 (define (bags-that-eventually-contain target)
   (for/fold ([holders (set)]) ([rule (in-multidict-entries rules-multidict)])
     (match rule
@@ -31,14 +30,17 @@
        (set-union (set-add holders outside) (bags-that-eventually-contain outside))]
       [_ holders])))
 
-(time (set-count (bags-that-eventually-contain '|shiny gold|)))
+(define part-1 (set-count (bags-that-eventually-contain '|shiny gold|)))
+(~a "Part 1: " part-1)
+;; (aoc-submit (find-session) 2020 7 1 part-1)
 
 ;; part 2
-
 (define (bags-that-are-contained-by target)
   (for/sum ([holding (in-multidict-entries rules-multidict)])
            (match holding
              [(entry (== target) (list held n)) (+ n (* n (bags-that-are-contained-by held)))]
              [_ 0])))
 
-(time (bags-that-are-contained-by '|shiny gold|))
+(define part-2 (bags-that-are-contained-by '|shiny gold|))
+(~a "Part 2: " part-2)
+;; (aoc-submit (find-session) 2020 7 1 part-2)
