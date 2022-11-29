@@ -18,14 +18,47 @@
   (for/list ([p (in-list passports)] #:when (valid-passport? p))
     (~> p string-split (map (curryr string-split ":") _) flatten (apply hash _))))
 
-(define (valid-byr p)
+(define (between x low high)
+  (and (x . >= . low) (x . <= . high)))
+
+(define (valid-byr? p)
   (define year (string->number (hash-ref p "byr")))
-  (and (<= year 1920) (>= year 2002)))
+  (between year 1920 2002))
 
-(define (valid-iyr p)
+(define (valid-iyr? p)
   (define year (string->number (hash-ref p "iyr")))
-  (and (<= year 2010) (>= year 2020)))
+  (between year 2010 2020))
 
-(define (valid-eyr p)
-  (define year (string->number (hash-ref p "iyr")))
-  (and (<= year 2020) (>= year 2030)))
+(define (valid-eyr? p)
+  (define year (string->number (hash-ref p "eyr")))
+  (between year 2020 2030))
+
+(define (valid-hgt? p)
+  (define height (hash-ref p "hgt"))
+  (cond
+    [(string-suffix? height "cm")
+     (let ([h (string->number (string-trim height "cm"))]) (between h 150 193))]
+    [(string-suffix? height "in")
+     (let ([h (string->number (string-trim height "in"))]) (between h 59 76))]
+    [else #false]))
+
+(define (valid-hcl? p)
+  (define color (hash-ref p "hcl"))
+  (regexp-match #px"^#[0-9a-f]{6}$" color))
+
+(define (valid-ecl? p)
+  (member (hash-ref p "ecl") (list "amb" "blu" "brn" "gry" "grn" "hzl" "oth")))
+
+(define (valid-pid? p)
+  (regexp-match #px"^\\d{9}$" (hash-ref p "pid")))
+
+(define (valid-stricter-passport? p)
+  (and (valid-byr? p)
+       (valid-iyr? p)
+       (valid-eyr? p)
+       (valid-hgt? p)
+       (valid-hcl? p)
+       (valid-ecl? p)
+       (valid-pid? p)))
+
+(count valid-stricter-passport? passport-fields)
