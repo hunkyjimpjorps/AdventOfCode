@@ -1,6 +1,13 @@
 :- use_module(library(yall)).
 :- use_module(library(apply)).
 
+output_solutions :-
+    get_data(Games),
+    part1_total(Games, Part1),
+    write(Part1), nl, !,
+    part2_total(Games, Part2),
+    write(Part2), nl.
+
 % Facts
 
 game(X, X, draw). 
@@ -30,10 +37,10 @@ bonus(lose, 0).
 bonus(draw, 3).
 bonus(win, 6). 
 
-% Predicates
+% Rules
 
 get_data(Result) :- 
-    setup_call_cleanup(open("2022/day-02/input", read, In),
+    setup_call_cleanup(open("2022/day-02/prolog-input.txt", read, In),
         (read_string(In, _, Str),
             split_string(Str, "\n", "\s\t\n", Lines),
             maplist([In, Out] >> split_string(In, "\s", "", Out), Lines, Result)),
@@ -44,24 +51,22 @@ score_game(MyMove, Result, Score) :-
     bonus(MyMove, Y),
     Score is X + Y.
 
-part_1_score([Them, Me], Score) :-
+part1_score([Them, Me], Score) :-
     opponent_move(Them, TheirMove),
     assume_move(Me, MyMove),
     game(MyMove, TheirMove, Result),
     score_game(MyMove, Result, Score).
 
-part_1_total(Total) :-
-    get_data(Games),
-    maplist(part_1_score, Games, Scores),
+part1_total(Games, Total) :-
+    maplist(part1_score, Games, Scores),
     sum_list(Scores, Total).
 
-part_2_score([Them, Outcome], Score) :-
+part2_score([Them, Outcome], Score) :-
     opponent_move(Them, TheirMove),
     assume_outcome(Outcome, Result),
     game(MyMove, TheirMove, Result),
     score_game(MyMove, Result, Score).
 
-part_2_total(Total) :-
-    get_data(Games),
-    maplist(part_2_score, Games, Scores),
+part2_total(Games, Total) :-
+    maplist(part2_score, Games, Scores),
     sum_list(Scores, Total).
