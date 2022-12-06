@@ -1,7 +1,6 @@
 #lang racket
 
 (require advent-of-code
-         (only-in relation ->list ->set)
          (only-in algorithms sliding))
 
 (define buffer (fetch-aoc-input (find-session) 2022 6))
@@ -11,7 +10,7 @@
     (case type
       [(start-of-packet) 4]
       [(start-of-message) 14]))
-  (for/first ([chunk (in-list (sliding (->list data) n))]
+  (for/first ([chunk (in-list (sliding (string->list data) n))]
               [i (in-naturals n)]
               #:unless (check-duplicates chunk))
     i))
