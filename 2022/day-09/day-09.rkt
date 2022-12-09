@@ -14,11 +14,12 @@
            _)))
 
 (define (move-head p dir)
-  (match* (p dir)
-    [((posn x y) 'U) (posn x (add1 y))]
-    [((posn x y) 'D) (posn x (sub1 y))]
-    [((posn x y) 'R) (posn (add1 x) y)]
-    [((posn x y) 'L) (posn (sub1 x) y)]))
+  (match-define (posn x y) p)
+  (match dir
+    ['U (posn x (add1 y))]
+    ['D (posn x (sub1 y))]
+    ['R (posn (add1 x) y)]
+    ['L (posn (sub1 x) y)]))
 
 (define (avg n m)
   (/ (+ n m) 2))
