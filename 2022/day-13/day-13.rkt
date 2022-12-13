@@ -1,13 +1,10 @@
 #lang racket
 
-(require advent-of-code
-         threading)
+(require advent-of-code)
 
 (define raw-packets
-  (~> (fetch-aoc-input (find-session) 2022 13 #:cache #true)
-      (string-replace _ "," " ")
-      (string-split "\n" #:repeat? #true)
-      (map (λ (str) (apply append (port->list read (open-input-string str)))) _)))
+  (parameterize ([current-readtable (make-readtable #f #\, #\space #f)])
+    (port->list read (open-aoc-input (find-session) 2022 13 #:cache #true))))
 
 (define (compare xs ys)
   (match* (xs ys)
