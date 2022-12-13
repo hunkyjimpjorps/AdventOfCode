@@ -15,13 +15,13 @@
 
   (for/fold ([folders (hash)] [current-path '()] [previously-seen? #false] #:result folders)
             ([cmd (in-list cmds)])
-    (match cmd
-      ["$ ls" (values folders current-path (hash-has-key? folders current-path))]
-      ["$ cd /" (values folders '("/") #false)]
-      ["$ cd .." (values folders (rest current-path) #false)]
-      [(regexp #px"\\$ cd (.+)" (list _ folder)) (values folders (cons folder current-path) #false)]
-      [(regexp #px"dir (.+)") (values folders current-path previously-seen?)]
-      [(regexp #px"(.+) (.+)" (list _ (app ->number size) _))
+    (match (string-split cmd)
+      [(list "$" "ls") (values folders current-path (hash-has-key? folders current-path))]
+      [(list "$" "cd" "/") (values folders '("/") #false)]
+      [(list "$" "cd" "..") (values folders (rest current-path) #false)]
+      [(list "$" "cd" folder) (values folders (cons folder current-path) #false)]
+      [(list "dir" _) (values folders current-path previously-seen?)]
+      [(list (app ->number size) _)
        (cond
          [previously-seen? (values folders current-path previously-seen?)]
          [else (values (update-sizes folders current-path size) current-path previously-seen?)])])))

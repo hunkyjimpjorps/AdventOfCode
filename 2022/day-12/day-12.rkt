@@ -35,11 +35,12 @@
                     (list p neighbor))))
 
 ;; part 1
-(match-define-values (distances _) (dijkstra paths (hash-ref special-points 'start)))
-(hash-ref distances (hash-ref special-points 'end))
+(time (match-define-values (distances _) (bfs paths (hash-ref special-points 'start)))
+      (hash-ref distances (hash-ref special-points 'end)))
 
 ;; part 2
-(for/lists (lengths #:result (apply min lengths))
-           ([start (in-list (hash-keys terrain-mesh))] #:when (= 0 (hash-ref terrain-mesh start)))
-           (match-define-values (distances _) (dijkstra paths start))
-           (hash-ref distances (hash-ref special-points 'end)))
+(time (for/lists
+       (lengths #:result (apply min lengths))
+       ([start (in-list (hash-keys terrain-mesh))] #:when (= 0 (hash-ref terrain-mesh start)))
+       (match-define-values (distances _) (bfs paths start))
+       (hash-ref distances (hash-ref special-points 'end))))
