@@ -23,16 +23,16 @@
   (for*/list ([dx (in-list '(-1 0 1))]
               [dy (in-list '(-1 0 1))]
               #:when (= 1 (abs (+ dx dy)))
-              #:do [(define p (cons (+ x dx) (+ y dy)))]
-              #:when (hash-has-key? terrain-mesh p))
-    p))
+              #:do [(define p* (cons (+ x dx) (+ y dy)))]
+              #:when (hash-has-key? terrain-mesh p*))
+    p*))
 
 (define paths
   (directed-graph (for*/list ([p (in-list (hash-keys terrain-mesh))]
-                              [neighbor (in-list (neighbors p))]
-                              #:unless (> (sub1 (hash-ref terrain-mesh neighbor))
+                              [p* (in-list (neighbors p))]
+                              #:unless (> (sub1 (hash-ref terrain-mesh p*))
                                           (hash-ref terrain-mesh p)))
-                    (list p neighbor))))
+                    (list p p*))))
 
 ;; part 1
 (time (match-define-values (distances _) (bfs paths (hash-ref special-points 'start)))
