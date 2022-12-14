@@ -1,7 +1,6 @@
 #lang racket
 
 (require advent-of-code
-         fancy-app
          graph)
 
 (define raw-terrain (fetch-aoc-input (find-session) 2022 12 #:cache #true))
@@ -9,14 +8,15 @@
 
 (define terrain-mesh
   (for*/hash ([(row x) (in-indexed (string-split raw-terrain))] [(col y) (in-indexed row)])
+    (define p (cons x y))
     (case col
       [(#\S)
-       (hash-set! special-points 'start (cons x y))
-       (values (cons x y) 0)]
+       (hash-set! special-points 'start p)
+       (values p 0)]
       [(#\E)
-       (hash-set! special-points 'end (cons x y))
-       (values (cons x y) 25)]
-      [else (values (cons x y) (- (char->integer col) (char->integer #\a)))])))
+       (hash-set! special-points 'end p)
+       (values p 25)]
+      [else (values p (- (char->integer col) (char->integer #\a)))])))
 
 (define (neighbors p)
   (match-define (cons x y) p)
