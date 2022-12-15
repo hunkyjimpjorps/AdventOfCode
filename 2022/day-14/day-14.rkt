@@ -27,23 +27,25 @@
   (not (set-member? pts p)))
 
 ;; part 1
-(define (trace-grain pts [pt (cons 500 0)] #:at-limit do-at-limit)
-  (match-define (cons x y) pt)
+(define (trace-grain pts path #:at-limit do-at-limit)
+  (match-define (list* (and p (cons x y)) _) path)
+  (match-define (list dest-1 dest-2 dest-3) (map (λ (d) (cons (+ x d) (add1 y))) '(0 -1 1)))
   (cond
-    [(>= y max-vertical-distance) (do-at-limit pts pt)]
-    [(ormap (λ (d)
-              (let ([p* (cons (+ x d) (add1 y))])
-                (if (open? pts p*) (trace-grain pts p* #:at-limit do-at-limit) #f)))
-            '(0 -1 1))]
-    [else (set-add pts pt)]))
+    [(>= y max-vertical-distance) (values (do-at-limit pts p) path)]
+    [(open? pts dest-1) (trace-grain pts (cons dest-1 path) #:at-limit do-at-limit)]
+    [(open? pts dest-2) (trace-grain pts (cons dest-2 path) #:at-limit do-at-limit)]
+    [(open? pts dest-3) (trace-grain pts (cons dest-3 path) #:at-limit do-at-limit)]
+    [else (values (set-add pts (car path)) path)]))
 
-(for/fold ([pts blocked-locations] [grains 0] #:result grains) ([_ (in-naturals 1)])
-  (define pts* (trace-grain pts #:at-limit (const 'break)))
-  #:break (equal? pts* 'break)
-  (values pts* (add1 grains)))
+(time (for/fold ([pts blocked-locations] [path (list (cons 500 0))] [grains 0] #:result grains)
+                ([_ (in-naturals 1)])
+        (define-values (pts* path*) (trace-grain pts path #:at-limit (const 'break)))
+        #:break (equal? pts* 'break)
+        (values pts* (cdr path*) (add1 grains))))
 
 ;; part 2
-(for/fold ([pts blocked-locations] [grains 0] #:result grains) ([_ (in-naturals 1)])
-  #:break (not (open? pts (cons 500 0)))
-  (define pts* (trace-grain pts #:at-limit set-add))
-  (values pts* (add1 grains)))
+(time (for/fold ([pts blocked-locations] [path (list (cons 500 0))] [grains 0] #:result grains)
+                ([_ (in-naturals 1)])
+        #:break (not (open? pts (cons 500 0)))
+        (define-values (pts* path*) (trace-grain pts path #:at-limit set-add))
+        (values pts* (cdr path*) (add1 grains))))
