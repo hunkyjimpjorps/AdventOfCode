@@ -39,30 +39,33 @@
 
 ;; part 1
 (define (find-best-single-route start
+                                [minutes-left 30]
                                 [current-pressure 0]
-                                [available-valves valve-flows]
-                                [minutes-left 30])
+                                [available-valves valve-flows])
   (cond
     [(>= minutes-left 1)
-     (for/fold ([running-pressure current-pressure])
+     (for/fold ([running-pressure current-pressure]
+                [remaining-valves available-valves]
+                #:result (cons running-pressure remaining-valves))
                ([candidate (reachable-destinations start available-valves minutes-left)])
        (match-define (cons dest travel-time) candidate)
        (define minutes-left* (- minutes-left (add1 travel-time)))
-       (define candidate-pressure
+       (match-define (cons candidate-pressure remaining-valves*)
          (find-best-single-route dest
+                                 minutes-left*
                                  (+ current-pressure (* (hash-ref valve-flows dest) minutes-left*))
-                                 (hash-remove available-valves dest)
-                                 minutes-left*))
-       (if (> candidate-pressure running-pressure) candidate-pressure running-pressure))]
-    [else current-pressure]))
+                                 (hash-remove available-valves dest)))
+       (if (> candidate-pressure running-pressure)
+           (values candidate-pressure remaining-valves*)
+           (values running-pressure remaining-valves*)))]
+    [else (cons current-pressure available-valves)]))
 
-(find-best-single-route "AA")
+(car (find-best-single-route "AA"))
 
 ;; part 2
-(define (find-best-double-route start
-                                [current-pressure 0]
-                                [available-valves valve-flows]
-                                [minutes-left 30])
-  'todo)
+; (define (find-best-double-route start)
+;   (define done-by-me (find-best-single-route start 26))
+;   (define done-by-elephant (find-best-single-route start 26 0 (cdr done-by-me)))
+;   (+ (car done-by-me) (car done-by-elephant)))
 
-(find-best-double-route "AA")
+; (find-best-double-route "AA")
