@@ -61,11 +61,3 @@
     [else (cons current-pressure available-valves)]))
 
 (car (find-best-single-route "AA"))
-
-;; part 2
-; (define (find-best-double-route start)
-;   (define done-by-me (find-best-single-route start 26))
-;   (define done-by-elephant (find-best-single-route start 26 0 (cdr done-by-me)))
-;   (+ (car done-by-me) (car done-by-elephant)))
-
-; (find-best-double-route "AA")
