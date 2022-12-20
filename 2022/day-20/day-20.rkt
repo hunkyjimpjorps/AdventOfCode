@@ -1,7 +1,6 @@
 #lang racket
 (require advent-of-code)
 
-;(define data '(1 2 -3 3 -2 0 4))
 (define data (port->list read (open-aoc-input (find-session) 2022 20 #:cache #true)))
 
 (define gps-lst data)
