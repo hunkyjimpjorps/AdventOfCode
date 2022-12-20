@@ -1,5 +1,6 @@
 #lang racket
-(require advent-of-code)
+(require advent-of-code
+         threading)
 
 (define data (port->list read (open-aoc-input (find-session) 2022 20 #:cache #true)))
 
@@ -25,22 +26,23 @@
 (define (mix-gps data original)
   (for/fold ([pts data]) ([pt original])
     (mix pt pts)))
+
 (define (cycle-mixed-gps mixed)
-  (in-sequences (drop mixed (index-of mixed 0)) (in-cycle mixed)))
-(define (calculate-answer mix)
-  (for/sum ([id '(1000 2000 3000)]) (sequence-ref mix id)))
+  (define lst (map cdr mixed))
+  (in-sequences (drop lst (index-of lst 0)) (in-cycle lst)))
+
+(define (calculate-answer seq)
+  (for/sum ([id '(1000 2000 3000)]) (sequence-ref seq id)))
 
 ;; part 1
-(define part1-mix (cycle-mixed-gps (map cdr (mix-gps gps-indexed gps-indexed))))
-(calculate-answer part1-mix)
+(~> gps-indexed (mix-gps _ gps-indexed) cycle-mixed-gps calculate-answer)
 
 ;; part 2
 (define encrypted-gps-indexed
   (for/list ([pt (in-list gps-indexed)] #:do [(match-define (cons i v) pt)])
     (cons i (* 811589153 v))))
 
-(define part2-mix
-  (cycle-mixed-gps (map cdr
-                        (for/fold ([pts encrypted-gps-indexed]) ([_ (in-range 10)])
-                          (mix-gps pts encrypted-gps-indexed)))))
-(calculate-answer part2-mix)
+(~>> encrypted-gps-indexed
+     ((λ (data) (foldr (λ (_ pts) (mix-gps pts data)) data (range 10))))
+     cycle-mixed-gps
+     calculate-answer)
