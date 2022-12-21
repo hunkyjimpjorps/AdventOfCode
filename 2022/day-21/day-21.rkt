@@ -33,18 +33,11 @@
 (evaluate-monkey "root")
 
 ;; part 2
+;; since humn only ever appears once, and it's never the divisor in a division operation,
+;; the difference of the branches is linearly proportional to humn
+;; therefore, if we find two points we can calculate the root directly
 (match-define (op _ branch-1 branch-2) (hash-ref monkey-table "root"))
-
-;; the branch that doesn't depend on humn
 (define known-side (evaluate-monkey branch-2))
-
-(for/fold ([lower-bound 0] [upper-bound 1e16] #:result (inexact->exact lower-bound))
-          ([_ (in-naturals)])
-  #:break (= lower-bound upper-bound)
-  (define midpoint (quotient (+ lower-bound upper-bound) 2))
-  (define candidate (evaluate-monkey branch-1 midpoint))
-  (println (~a midpoint " -> " candidate " -> " (- candidate known-side)))
-  (cond
-    [(= candidate known-side) (values midpoint midpoint)]
-    [(> candidate known-side) (values midpoint upper-bound)]
-    [(< candidate known-side) (values lower-bound midpoint)]))
+(define humn-zero (- known-side (evaluate-monkey branch-1 0)))
+(define humn-one (- known-side (evaluate-monkey branch-1 1)))
+(- (/ humn-zero (- humn-one humn-zero)))
