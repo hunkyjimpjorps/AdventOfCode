@@ -4,20 +4,13 @@
          fancy-app
          threading)
 
-(define elf-map (in-lines (open-aoc-input (find-session) 2022 23 #:cache #true)))
-
 (struct posn (x y) #:transparent)
 
 (define initial-map
-  (for*/hash ([(row y) (in-indexed elf-map)] [(col x) (in-indexed row)] #:when (equal? col #\#))
+  (for*/hash ([(row y) (in-indexed (in-lines (open-aoc-input (find-session) 2022 23 #:cache #true)))]
+              [(col x) (in-indexed row)]
+              #:when (equal? col #\#))
     (values (posn x y) #t)))
-
-(define (count-empty-spots elves)
-  (define elf-posns (hash-keys elves))
-  (match-define (list x-min _ ... x-max) (sort (map posn-x elf-posns) <))
-  (match-define (list y-min _ ... y-max) (sort (map posn-y elf-posns) <))
-  (for*/sum ([y (inclusive-range y-min y-max)] [x (inclusive-range x-min x-max)])
-            (if (hash-has-key? elves (posn x y)) 0 1)))
 
 (define/match (neighbors-in direction p)
   [('north (posn x (app sub1 y*))) (list (posn (sub1 x) y*) (posn x y*) (posn (add1 x) y*))]
@@ -53,21 +46,32 @@
   (define reconciled-elves (make-hash))
   (for ([(posn elves) (in-hash moved-elves)])
     (match elves
+      ; if there's only one elf at a coordinate, leave it there
       [(list _) (hash-set! reconciled-elves posn #t)]
+      ; if there's many elves at one coordinate, back them up to their previous spot
       [many-elves
        (for ([elf (in-list many-elves)])
          (hash-set! reconciled-elves elf #t))]))
   reconciled-elves)
 
 ;; part 1
+(define (count-empty-spots elves)
+  (define elf-posns (hash-keys elves))
+  (match-define (list x-min _ ... x-max) (sort (map posn-x elf-posns) <))
+  (match-define (list y-min _ ... y-max) (sort (map posn-y elf-posns) <))
+  (for*/sum ([y (inclusive-range y-min y-max)] [x (inclusive-range x-min x-max)])
+            (if (hash-has-key? elves (posn x y)) 0 1)))
+
 (for/fold ([elves initial-map] [dirs '(north south west east)] #:result (count-empty-spots elves))
           ([_rnd (in-range 10)])
   (values (~> elves (propose-movements dirs) try-proposed-movements)
           (append (cdr dirs) (list (car dirs)))))
 
 ;; part 2
-(time (for/fold ([elves initial-map] [dirs '(north south west east)] [rnd 1] #:result rnd)
-          ([_rnd (in-naturals)])
-  (define elves-proposed (propose-movements elves dirs))
-  #:break (~> elves-proposed hash-values remove-duplicates (equal? '(stay)))
-  (values (try-proposed-movements elves-proposed) (append (cdr dirs) (list (car dirs))) (add1 rnd))))
+(time
+ (for/fold ([elves initial-map] [dirs '(north south west east)] [rnd 1] #:result rnd)
+           ([_rnd (in-naturals)])
+   (define elves-proposed (propose-movements elves dirs))
+   ; elves have stopped moving if they all conclude they want to stay put
+   #:break (~> elves-proposed hash-values remove-duplicates (equal? '(stay)))
+   (values (try-proposed-movements elves-proposed) (append (cdr dirs) (list (car dirs))) (add1 rnd))))
