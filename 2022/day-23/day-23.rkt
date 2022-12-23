@@ -68,10 +68,9 @@
           (append (cdr dirs) (list (car dirs)))))
 
 ;; part 2
-(time
- (for/fold ([elves initial-map] [dirs '(north south west east)] [rnd 1] #:result rnd)
-           ([_rnd (in-naturals)])
-   (define elves-proposed (propose-movements elves dirs))
-   ; elves have stopped moving if they all conclude they want to stay put
-   #:break (~> elves-proposed hash-values remove-duplicates (equal? '(stay)))
-   (values (try-proposed-movements elves-proposed) (append (cdr dirs) (list (car dirs))) (add1 rnd))))
+(for/fold ([elves initial-map] [dirs '(north south west east)] [rnd 1] #:result rnd)
+          ([_rnd (in-naturals)])
+  (define elves-proposed (propose-movements elves dirs))
+  ; elves have stopped moving if they all conclude they want to stay put
+  #:break (~> elves-proposed hash-values remove-duplicates (equal? '(stay)))
+  (values (try-proposed-movements elves-proposed) (append (cdr dirs) (list (car dirs))) (add1 rnd)))
