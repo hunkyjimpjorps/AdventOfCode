@@ -19,40 +19,25 @@
   (for/hash ([m raw-monkeys] #:do [(match-define (monkey name op) (parse-monkey m))])
     (values name op)))
 
-(define (parse f name1 name2)
+;; part 1
+(define (evaluate-monkey m-name [guess #f])
+  (match-define (op f name1 name2)
+    (if (and guess (equal? m-name "humn")) (op 'constant guess #f) (hash-ref monkey-table m-name)))
   (match f
     ['constant name1]
-    ['+ (+ (evaluate-monkey name1) (evaluate-monkey name2))]
-    ['- (- (evaluate-monkey name1) (evaluate-monkey name2))]
-    ['* (* (evaluate-monkey name1) (evaluate-monkey name2))]
-    ['/ (/ (evaluate-monkey name1) (evaluate-monkey name2))]))
-
-;; part 1
-(define (evaluate-monkey m-name)
-  (match-define (op f name1 name2) (hash-ref monkey-table m-name))
-  (parse f name1 name2))
+    ['+ (+ (evaluate-monkey name1 guess) (evaluate-monkey name2 guess))]
+    ['- (- (evaluate-monkey name1 guess) (evaluate-monkey name2 guess))]
+    ['* (* (evaluate-monkey name1 guess) (evaluate-monkey name2 guess))]
+    ['/ (/ (evaluate-monkey name1 guess) (evaluate-monkey name2 guess))]))
 
 (evaluate-monkey "root")
 
 ;; part 2
+;; since humn only ever appears once, and it's never the divisor in a division operation,
+;; the difference of the branches is linearly proportional to humn
+;; therefore, if we find two points we can calculate the root directly
 (match-define (op _ branch-1 branch-2) (hash-ref monkey-table "root"))
-
-(define (evaluate-monkey* m-name guess)
-  (match-define (op f name1 name2)
-    (if (equal? m-name "humn") (op 'constant guess #f) (hash-ref monkey-table m-name)))
-  (match f
-    ['constant name1]
-    ['+ (+ (evaluate-monkey* name1 guess) (evaluate-monkey* name2 guess))]
-    ['- (- (evaluate-monkey* name1 guess) (evaluate-monkey* name2 guess))]
-    ['* (* (evaluate-monkey* name1 guess) (evaluate-monkey* name2 guess))]
-    ['/ (/ (evaluate-monkey* name1 guess) (evaluate-monkey* name2 guess))]))
-
-;; the branch that doesn't depend on humn
-(define result-2 (evaluate-monkey branch-2))
-
-;; I plugged in numbers for guess to find a suitable starting range and settled on the first one
-;; that I found that got me within a million
-(for/first ([guess (in-naturals 3059361690000)]
-            #:do [(define result-1 (evaluate-monkey* branch-1 guess))]
-            #:when (= result-1 result-2))
-  guess)
+(define known-side (evaluate-monkey branch-2))
+(define humn-zero (- known-side (evaluate-monkey branch-1 0)))
+(define humn-one (- known-side (evaluate-monkey branch-1 1)))
+(- (/ humn-zero (- humn-one humn-zero)))
