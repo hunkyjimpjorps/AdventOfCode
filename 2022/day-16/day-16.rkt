@@ -61,3 +61,47 @@
     [else (cons current-pressure available-valves)]))
 
 (car (find-best-single-route "AA"))
+
+;; part 2
+
+(define (possible-paths start dests minutes-left)
+  (cond
+    [(or (hash-empty? dests) (< minutes-left 3)) '()]
+    [else
+     (for/fold ([path '()]) ([dest (in-list (reachable-destinations start dests minutes-left))])
+       (match-define (cons valve minutes) dest)
+       (define dests* (hash-remove dests valve))
+       (define next-valves (possible-paths valve dests* (- minutes-left minutes)))
+       (append (list (list dest)) (map (cons dest _) next-valves) path))]))
+
+(define (flow-for-path path minutes [sum 0])
+  (match path
+    ['() sum]
+    [(list* (cons valve dist) tail)
+     (define valve-open-for (- minutes dist 1))
+     (flow-for-path tail valve-open-for (+ sum (* (hash-ref valve-flows valve) valve-open-for)))]))
+
+(define minutes-left 26)
+
+(define human-paths
+  (~>> (possible-paths "AA" valve-flows minutes-left)
+       (map (λ (path) (cons (flow-for-path path minutes-left) (map car path))))
+       (sort _ > #:key car)))
+
+(define (best-possible-elephant-path human-path)
+  (define remaining-dests
+    (for/hash ([(dest flow) (in-hash valve-flows)] #:unless (member dest (cdr human-path)))
+      (values dest flow)))
+  (~>> (possible-paths "AA" remaining-dests minutes-left)
+       (map (λ (path) (cons (flow-for-path path minutes-left) (map car path))))
+       (sort _ > #:key car)
+       car))
+
+;; this takes a long time to run but I stuck a displayln in for debugging
+;; and just took the highest max-flow after letting it run for a while and waiting until
+;; it stopped printing new bests to console
+(for*/fold ([max-flow 0])
+           ([human-path (in-list human-paths)]
+            #:do [(define elephant-path (best-possible-elephant-path human-path))])
+  (define combined-flow (+ (car human-path) (car elephant-path)))
+  (if (< max-flow combined-flow) combined-flow max-flow))
