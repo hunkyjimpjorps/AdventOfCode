@@ -3,3 +3,5 @@
 compiled/*
 *.bak
 input
+.clj-kondo/*
+.lsp/*
