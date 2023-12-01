@@ -14,3 +14,4 @@ gleam_stdlib = "~> 0.32"
 
 [dev-dependencies]
 gleeunit = "~> 1.0"
+adglent = "~> 1.2"
