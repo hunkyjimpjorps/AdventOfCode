@@ -3,7 +3,6 @@ import gleam/io
 import gleam/list
 import gleam/string
 import gleam/regex.{type Match, Match}
-import gleam/result
 import gleam/int
 
 fn parse_digits(input: String) {
@@ -11,21 +10,19 @@ fn parse_digits(input: String) {
 
   input
   |> string.split("\n")
-  |> list.map(fn(s) {
+  |> list.fold(0, fn(acc, s) {
     let matches = regex.scan(s, with: re)
 
     let assert Ok(Match(content: first, ..)) = list.first(matches)
     let assert Ok(Match(content: last, ..)) = list.last(matches)
-
-    int.parse(first <> last)
+    let assert Ok(i) = int.parse(first <> last)
+    acc + i
   })
 }
 
 pub fn part1(input: String) {
   input
   |> parse_digits
-  |> result.values
-  |> int.sum
   |> string.inspect
 }
 
