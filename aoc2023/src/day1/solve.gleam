@@ -5,24 +5,22 @@ import gleam/string
 import gleam/regex.{type Match, Match}
 import gleam/int
 
-fn parse_digits(input: String) {
+pub fn part1(input: String) {
   let assert Ok(re) = regex.from_string("[1-9]")
 
   input
   |> string.split("\n")
-  |> list.fold(0, fn(acc, s) {
-    let matches = regex.scan(s, with: re)
+  |> list.fold(
+    0,
+    fn(acc, s) {
+      let matches = regex.scan(s, with: re)
 
-    let assert Ok(Match(content: first, ..)) = list.first(matches)
-    let assert Ok(Match(content: last, ..)) = list.last(matches)
-    let assert Ok(i) = int.parse(first <> last)
-    acc + i
-  })
-}
-
-pub fn part1(input: String) {
-  input
-  |> parse_digits
+      let assert Ok(Match(content: first, ..)) = list.first(matches)
+      let assert Ok(Match(content: last, ..)) = list.last(matches)
+      let assert Ok(i) = int.parse(first <> last)
+      acc + i
+    },
+  )
   |> string.inspect
 }
 
