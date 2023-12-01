@@ -28,11 +28,11 @@
 
 ;; part 1
 
-(define valid-for-part-1 (~> (range 0 10) (map ~a _)))
+(define valid-for-part-1 (~> (range 1 10) (map ~a _)))
 (total-calibration calibration-values valid-for-part-1)
 
 ;; part 2
 (define word-to-digit
-  (hash "one" 1 "two" 2 "three" 3 "four" 4 "five" 5 "six" 6 "seven" 7 "eight" 8 "nine" 9 "zero" 0))
+  (hash "one" 1 "two" 2 "three" 3 "four" 4 "five" 5 "six" 6 "seven" 7 "eight" 8 "nine" 9))
 (define valid-for-part-2 (append valid-for-part-1 (hash-keys word-to-digit)))
 (total-calibration calibration-values valid-for-part-2)
