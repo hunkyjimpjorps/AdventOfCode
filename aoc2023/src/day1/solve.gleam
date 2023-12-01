@@ -7,7 +7,7 @@ import gleam/result
 import gleam/int
 
 fn parse_digits(input: String) {
-  let assert Ok(re) = regex.from_string("[0-9]")
+  let assert Ok(re) = regex.from_string("[1-9]")
 
   input
   |> string.split("\n")
@@ -39,7 +39,6 @@ const substitutions = [
   #("seven", "7n"),
   #("eight", "e8t"),
   #("nine", "n9e"),
-  #("zero", "0o"),
 ]
 
 pub fn part2(input: String) {
