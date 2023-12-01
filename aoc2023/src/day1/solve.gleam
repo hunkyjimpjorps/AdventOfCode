@@ -2,7 +2,7 @@ import adglent.{First, Second}
 import gleam/io
 import gleam/list
 import gleam/string
-import gleam/regex
+import gleam/regex.{type Match, Match}
 import gleam/result
 import gleam/int
 
@@ -12,20 +12,12 @@ fn parse_digits(input: String) {
   input
   |> string.split("\n")
   |> list.map(fn(s) {
-    let matches =
-      regex.scan(s, with: re)
-      |> list.map(fn(m) { m.content })
+    let matches = regex.scan(s, with: re)
 
-    case matches {
-      [one] -> int.parse(one <> one)
-      _ ->
-        int.parse(
-          result.unwrap(list.first(matches), "") <> result.unwrap(
-            list.last(matches),
-            "",
-          ),
-        )
-    }
+    let assert Ok(Match(content: first, ..)) = list.first(matches)
+    let assert Ok(Match(content: last, ..)) = list.last(matches)
+
+    int.parse(first <> last)
   })
 }
 
