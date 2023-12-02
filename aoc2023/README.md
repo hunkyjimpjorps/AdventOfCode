@@ -20,3 +20,9 @@ gleam add aoc2023
 ```
 
 and its documentation can be found at <https://hexdocs.pm/aoc2023>.
+
+## Use
+
+* Set up a solution: `gleam run -m adglent/day <n>`
+* Check against examples: `gleam test -- --modules=day<n>/day<n>_test`
+* Get final answer: `gleam run -m day<n>/solve <p>`
