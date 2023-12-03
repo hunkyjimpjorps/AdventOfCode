@@ -11,10 +11,14 @@ type Coord {
   Coord(x: Int, y: Int)
 }
 
+type PartKind {
+  Gear
+  SomethingElse
+}
+
 type Symbol {
   Number(Int)
-  Gear
-  OtherSymbol
+  Part(PartKind)
   Empty
 }
 
@@ -25,8 +29,8 @@ fn to_symbol(c: String) -> Symbol {
   case int.parse(c), c {
     Ok(n), _ -> Number(n)
     Error(Nil), "." -> Empty
-    Error(Nil), "*" -> Gear
-    _, _ -> OtherSymbol
+    Error(Nil), "*" -> Part(Gear)
+    _, _ -> Part(SomethingElse)
   }
 }
 
@@ -40,7 +44,7 @@ fn to_board(input: String) -> Board {
   |> dict.from_list()
 }
 
-fn find_all_numbers(b: Board) {
+fn find_all_parts(b: Board) {
   b
   |> dict.filter(fn(_, v) {
     case v {
@@ -90,39 +94,23 @@ fn check_part_neighbors(
 ) -> Result(Int, Nil) {
   let #(coords, n) = part
 
-  let neighbors =
-    coords
-    |> list.flat_map(all_neighbors)
-    |> list.unique()
-
-  case
-    list.any(
-      neighbors,
-      fn(c) {
-        let content = dict.get(board, c)
-        content == Ok(OtherSymbol) || content == Ok(Gear)
-      },
-    )
-  {
-    True -> Ok(n)
-    False -> Error(Nil)
-  }
+  coords
+  |> list.flat_map(all_neighbors)
+  |> list.unique()
+  |> list.map(dict.get(board, _))
+  |> result.all()
+  |> result.replace(n)
 }
 
 pub fn part1(input: String) {
   let board = to_board(input)
 
   board
-  |> find_all_numbers
+  |> find_all_parts
   |> group_parts([])
   |> list.map(check_part_neighbors(_, board))
   |> result.values
   |> int.sum
-}
-
-fn find_gears(b: Board) {
-  dict.filter(b, fn(_, v) { v == Gear })
-  |> dict.keys
 }
 
 fn to_part_with_neighbors(part: #(List(Coord), Int)) {
@@ -149,15 +137,11 @@ fn find_parts_near_gear(gear: Coord, parts: List(#(List(Coord), Int))) {
 }
 
 fn keep_gears_near_two_parts(sets_of_parts: List(List(Int))) {
-  list.filter_map(
-    sets_of_parts,
-    fn(ps) {
-      case ps {
-        [p1, p2] -> Ok(p1 * p2)
-        _ -> Error(Nil)
-      }
-    },
-  )
+  use ps <- list.filter_map(sets_of_parts)
+  case ps {
+    [p1, p2] -> Ok(p1 * p2)
+    _ -> Error(Nil)
+  }
 }
 
 pub fn part2(input: String) {
@@ -165,12 +149,13 @@ pub fn part2(input: String) {
 
   let parts =
     board
-    |> find_all_numbers
+    |> find_all_parts
     |> group_parts([])
     |> list.map(to_part_with_neighbors)
 
   board
-  |> find_gears
+  |> dict.filter(fn(_, v) { v == Part(Gear) })
+  |> dict.keys
   |> list.map(find_parts_near_gear(_, parts))
   |> keep_gears_near_two_parts
   |> int.sum
