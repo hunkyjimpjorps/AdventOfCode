@@ -5,7 +5,6 @@ import gleam/string
 import gleam/list
 import gleam/int
 import gleam/order.{type Order, Eq}
-import gleam/result
 
 type Coord {
   Coord(x: Int, y: Int)
@@ -102,7 +101,7 @@ fn all_neighbors(c: Coord) -> List(Coord) {
   }
 }
 
-fn check_part_neighbors(part: Part, board: Board) -> Result(Int, Nil) {
+fn sum_valid_parts(acc: Int, part: Part, board: Board) -> Int {
   let neighbors =
     part.coords
     |> list.flat_map(all_neighbors)
@@ -110,8 +109,8 @@ fn check_part_neighbors(part: Part, board: Board) -> Result(Int, Nil) {
 
   let sym = [Ok(Symbol(Gear)), Ok(Symbol(SomethingElse))]
   case list.any(neighbors, fn(c) { list.contains(sym, dict.get(board, c)) }) {
-    True -> Ok(part.part_number)
-    False -> Error(Nil)
+    True -> acc + part.part_number
+    False -> acc
   }
 }
 
@@ -121,11 +120,7 @@ pub fn part1(input: String) -> Int {
   board
   |> find_all_part_digits
   |> to_parts
-  |> io.debug
-  |> list.map(check_part_neighbors(_, board))
-  |> io.debug
-  |> result.values
-  |> int.sum
+  |> list.fold(0, fn(acc, p) { sum_valid_parts(acc, p, board) })
 }
 
 fn to_part_with_neighbors(part: Part) -> Part {
