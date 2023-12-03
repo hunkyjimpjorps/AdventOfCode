@@ -4,33 +4,41 @@ import gleam/dict.{type Dict}
 import gleam/string
 import gleam/list
 import gleam/int
-import gleam/order.{Eq}
+import gleam/order.{type Order, Eq}
 import gleam/result
 
 type Coord {
   Coord(x: Int, y: Int)
 }
 
-type PartKind {
+type SymbolKind {
   Gear
   SomethingElse
 }
 
 type Symbol {
   Number(Int)
-  Part(PartKind)
+  Symbol(SymbolKind)
   Empty
 }
 
 type Board =
   Dict(Coord, Symbol)
 
+type Cell {
+  Cell(coord: Coord, symbol: Symbol)
+}
+
+type Part {
+  Part(coords: List(Coord), part_number: Int)
+}
+
 fn to_symbol(c: String) -> Symbol {
   case int.parse(c), c {
     Ok(n), _ -> Number(n)
-    Error(Nil), "." -> Empty
-    Error(Nil), "*" -> Part(Gear)
-    _, _ -> Part(SomethingElse)
+    _, "." -> Empty
+    _, "*" -> Symbol(Gear)
+    _, _ -> Symbol(SomethingElse)
   }
 }
 
@@ -44,7 +52,14 @@ fn to_board(input: String) -> Board {
   |> dict.from_list()
 }
 
-fn find_all_parts(b: Board) {
+fn cell_compare(a: Cell, b: Cell) -> Order {
+  case int.compare(a.coord.y, b.coord.y) {
+    Eq -> int.compare(a.coord.x, b.coord.x)
+    other -> other
+  }
+}
+
+fn find_all_part_digits(b: Board) -> List(Cell) {
   b
   |> dict.filter(fn(_, v) {
     case v {
@@ -53,112 +68,103 @@ fn find_all_parts(b: Board) {
     }
   })
   |> dict.to_list()
-  |> list.sort(fn(a, b) {
-    let #(Coord(x_a, y_a), _) = a
-    let #(Coord(x_b, y_b), _) = b
-    case int.compare(y_a, y_b) {
-      Eq -> int.compare(x_a, x_b)
-      other -> other
-    }
-  })
+  |> list.map(fn(tup) { Cell(tup.0, tup.1) })
+  |> list.sort(cell_compare)
 }
 
-fn group_parts(ns, acc) {
-  case ns, acc {
-    [], _ -> acc
-    [#(Coord(x, y) as c, Number(n)), ..t], [
-      #([Coord(x0, y0), ..] as cs, n0),
-      ..acc_rest
-    ] if y == y0 ->
-      case { x - 1 == x0 } {
-        True -> group_parts(t, [#([c, ..cs], n0 * 10 + n), ..acc_rest])
-        False -> group_parts(t, [#([c], n), ..acc])
+fn to_parts(cells: List(Cell)) -> List(Part) {
+  do_parts(cells, [])
+}
+
+fn do_parts(cells: List(Cell), parts: List(Part)) -> List(Part) {
+  case cells {
+    [] -> parts
+    [Cell(next, Number(n)), ..t] -> {
+      case parts {
+        [] -> do_parts(t, [Part([next], n), ..parts])
+        [Part([prev, ..] as coords, n0), ..rest_parts] ->
+          case { next.x - prev.x }, { next.y - prev.y } {
+            1, 0 ->
+              do_parts(t, [Part([next, ..coords], n0 * 10 + n), ..rest_parts])
+            _, _ -> do_parts(t, [Part([next], n), ..parts])
+          }
       }
-    [#(coord, Number(n)), ..t], _ -> group_parts(t, [#([coord], n), ..acc])
+    }
   }
 }
 
 fn all_neighbors(c: Coord) -> List(Coord) {
-  let Coord(x, y) = c
   use dx <- list.flat_map([-1, 0, 1])
   use dy <- list.filter_map([-1, 0, 1])
   case dx, dy {
     0, 0 -> Error(Nil)
-    _, _ -> Ok(Coord(x + dx, y + dy))
+    _, _ -> Ok(Coord(c.x + dx, c.y + dy))
   }
 }
 
-fn check_part_neighbors(
-  part: #(List(Coord), Int),
-  board: Board,
-) -> Result(Int, Nil) {
-  let #(coords, n) = part
+fn check_part_neighbors(part: Part, board: Board) -> Result(Int, Nil) {
+  let neighbors =
+    part.coords
+    |> list.flat_map(all_neighbors)
+    |> list.unique()
 
-  coords
-  |> list.flat_map(all_neighbors)
-  |> list.unique()
-  |> list.map(dict.get(board, _))
-  |> result.all()
-  |> result.replace(n)
+  let sym = [Ok(Symbol(Gear)), Ok(Symbol(SomethingElse))]
+  case list.any(neighbors, fn(c) { list.contains(sym, dict.get(board, c)) }) {
+    True -> Ok(part.part_number)
+    False -> Error(Nil)
+  }
 }
 
-pub fn part1(input: String) {
+pub fn part1(input: String) -> Int {
   let board = to_board(input)
 
   board
-  |> find_all_parts
-  |> group_parts([])
+  |> find_all_part_digits
+  |> to_parts
+  |> io.debug
   |> list.map(check_part_neighbors(_, board))
+  |> io.debug
   |> result.values
   |> int.sum
 }
 
-fn to_part_with_neighbors(part: #(List(Coord), Int)) {
-  let #(coords, n) = part
-
-  let neighbors =
-    coords
-    |> list.flat_map(all_neighbors)
-    |> list.unique
-    |> list.filter(fn(c) { !list.contains(coords, c) })
-
-  #(neighbors, n)
+fn to_part_with_neighbors(part: Part) -> Part {
+  part.coords
+  |> list.flat_map(all_neighbors)
+  |> list.unique
+  |> Part(part.part_number)
 }
 
-fn find_parts_near_gear(gear: Coord, parts: List(#(List(Coord), Int))) {
-  parts
-  |> list.filter_map(fn(part) {
-    let #(neighbors, n) = part
-    case list.contains(neighbors, gear) {
-      True -> Ok(n)
-      False -> Error(Nil)
-    }
-  })
-}
-
-fn keep_gears_near_two_parts(sets_of_parts: List(List(Int))) {
-  use ps <- list.filter_map(sets_of_parts)
-  case ps {
-    [p1, p2] -> Ok(p1 * p2)
-    _ -> Error(Nil)
+fn find_part_numbers_near_gear(gear: Coord, parts: List(Part)) -> List(Int) {
+  use part <- list.filter_map(parts)
+  case list.contains(part.coords, gear) {
+    True -> Ok(part.part_number)
+    False -> Error(Nil)
   }
 }
 
-pub fn part2(input: String) {
+fn to_sum_of_gear_ratios(adjacent_parts: List(List(Int))) -> Int {
+  use acc, ps <- list.fold(adjacent_parts, 0)
+  case ps {
+    [p1, p2] -> acc + p1 * p2
+    _ -> acc
+  }
+}
+
+pub fn part2(input: String) -> Int {
   let board = to_board(input)
 
   let parts =
     board
-    |> find_all_parts
-    |> group_parts([])
+    |> find_all_part_digits
+    |> to_parts
     |> list.map(to_part_with_neighbors)
 
   board
-  |> dict.filter(fn(_, v) { v == Part(Gear) })
+  |> dict.filter(fn(_, v) { v == Symbol(Gear) })
   |> dict.keys
-  |> list.map(find_parts_near_gear(_, parts))
-  |> keep_gears_near_two_parts
-  |> int.sum
+  |> list.map(find_part_numbers_near_gear(_, parts))
+  |> to_sum_of_gear_ratios
 }
 
 pub fn main() {
