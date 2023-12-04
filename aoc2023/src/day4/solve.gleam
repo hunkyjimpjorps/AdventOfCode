@@ -41,31 +41,20 @@ fn win_points(n) {
 }
 
 fn count_wins(card: Card) {
-  list.fold(
-    card.has,
-    0,
-    fn(acc, c) {
-      case list.contains(card.winning, c) {
-        True -> acc + 1
-        False -> acc
-      }
-    },
-  )
+  use acc, c <- list.fold(card.has, 0)
+  case list.contains(card.winning, c) {
+    True -> acc + 1
+    False -> acc
+  }
 }
 
 pub fn part1(input: String) {
-  input
-  |> string.split("\n")
-  |> list.fold(
-    0,
-    fn(acc, c) {
-      c
-      |> parse_card
-      |> count_wins
-      |> win_points
-      |> int.add(acc)
-    },
-  )
+  use acc, c <- list.fold(string.split(input, "\n"), 0)
+  c
+  |> parse_card
+  |> count_wins
+  |> win_points
+  |> int.add(acc)
 }
 
 fn win_more_cards(cards: List(String), card_count: dict.Dict(Int, Int)) {
