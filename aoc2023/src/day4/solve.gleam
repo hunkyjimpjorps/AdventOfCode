@@ -18,7 +18,7 @@ fn numbers_to_list(str: String) -> List(Int) {
   |> result.values()
 }
 
-fn parse_card(card: String) {
+fn parse_card(card: String) -> Card {
   let assert Ok(#("Card" <> n_str, rest)) = string.split_once(card, ": ")
   let assert Ok(#(winning_str, has_str)) = string.split_once(rest, " | ")
   let assert Ok(n) =
@@ -32,11 +32,11 @@ fn parse_card(card: String) {
   Card(number: n, winning: winning, has: has)
 }
 
-fn double_up(n) {
+fn win_points(n) {
   case n {
     0 -> 0
     1 -> 1
-    n -> 2 * double_up(n - 1)
+    n -> 2 * win_points(n - 1)
   }
 }
 
@@ -62,20 +62,20 @@ pub fn part1(input: String) {
       c
       |> parse_card
       |> count_wins
-      |> double_up
+      |> win_points
       |> int.add(acc)
     },
   )
-  |> string.inspect
 }
 
-fn win_more_cards(cards: List(Card), card_count: dict.Dict(Int, Int)) {
+fn win_more_cards(cards: List(String), card_count: dict.Dict(Int, Int)) {
   case cards {
     [] ->
       card_count
       |> dict.values
       |> int.sum
-    [card, ..rest] -> {
+    [raw_card, ..rest] -> {
+      let card = parse_card(raw_card)
       let wins = count_wins(card)
       case wins {
         0 -> win_more_cards(rest, card_count)
@@ -108,9 +108,7 @@ pub fn part2(input: String) {
     |> dict.from_list()
 
   raw_cards
-  |> list.map(parse_card)
   |> win_more_cards(card_count)
-  |> string.inspect
 }
 
 pub fn main() {
