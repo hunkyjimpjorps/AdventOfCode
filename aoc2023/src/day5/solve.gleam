@@ -67,16 +67,11 @@ pub fn part1(input: String) {
 }
 
 fn correspond(n: Int, mapper: Mapper) {
-  list.fold_until(
-    over: mapper,
-    from: n,
-    with: fn(acc, mrange) {
-      case mrange.start <= acc && acc <= mrange.end {
-        True -> Stop(acc + mrange.offset)
-        False -> Continue(acc)
-      }
-    },
-  )
+  use acc, mrange <- list.fold_until(over: mapper, from: n)
+  case mrange.start <= acc && acc <= mrange.end {
+    True -> Stop(acc + mrange.offset)
+    False -> Continue(acc)
+  }
 }
 
 // Part 2 ------------------------------------------------------------------------------------------
