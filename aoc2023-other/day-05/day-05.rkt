@@ -40,21 +40,33 @@
 (define (remap-range r mapper [acc '()])
   (match-define (seed-range r-start r-end) r)
   (match mapper
+    ; mapper exhausted
     ['() (cons r acc)]
+    ; range to the left - not covered by this mapping, so keep as-is
     [(list* (map-range m-start _ _) _)
      #:when (< r-end m-start)
      (cons r acc)]
+    ; range to the right - move to next map-range
     [(list* (map-range _ m-end _) ms)
      #:when (< m-end r-start)
      (remap-range r ms acc)]
+    ; range is inside map-range - transform whole range
     [(list* (map-range m-start m-end offset) _)
      #:when (and (<= m-start r-start) (<= r-end m-end))
      (cons (seed-range (+ r-start offset) (+ r-end offset)) acc)]
+    ; range overlaps start only - keep left side, transform right side
+    [(list* (map-range m-start m-end offset) ms)
+     #:when (and (< r-start m-start) (<= r-end m-end))
+     (remap-range (seed-range (add1 m-end) r-end)
+                  ms
+                  (cons (seed-range (+ m-start offset) (+ r-end offset)) acc))]
+    ; range overlaps end - transform left side, pass right side
     [(list* (map-range m-start m-end offset) ms)
      #:when (and (< m-start r-start) (<= m-end r-end))
      (remap-range (seed-range (add1 m-end) r-end)
                   ms
                   (cons (seed-range (+ r-start offset) (+ m-end offset)) acc))]
+    ; range overlaps whole map-range - keep left side, transform middle, pass right side
     [(list* (map-range m-start m-end offset) ms)
      (remap-range (seed-range (add1 m-end) r-end)
                   ms
