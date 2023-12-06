@@ -49,7 +49,6 @@ fn win_more_cards(cards: List(String), count: Dict(Int, Int)) {
   case cards {
     [] ->
       count
-      |> io.debug
       |> dict.values
       |> int.sum
     [raw_card, ..rest] -> {
