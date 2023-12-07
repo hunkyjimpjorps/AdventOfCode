@@ -26,6 +26,37 @@ type HandType {
 
 // Common functions --------------------------------------------------------------------------------
 
+fn parse_hand(str: String) -> Hand {
+  let [cards, wager] = string.split(str, " ")
+  let cards =
+    string.to_graphemes(cards)
+    |> list.map(card_rank)
+  let assert Ok(wager) = int.parse(wager)
+
+  Hand(cards, wager)
+}
+
+fn classify_hand(hand: Hand) -> HandType {
+  case list.length(list.unique(hand.cards)), card_counts(hand) {
+    1, _ -> FiveOfAKind
+    2, [1, 4] -> FourOfAKind
+    2, [2, 3] -> FullHouse
+    3, [1, 1, 3] -> ThreeOfAKind
+    3, [1, 2, 2] -> TwoPair
+    4, _ -> OnePair
+    5, _ -> HighCard
+    _, _ -> Unknown
+  }
+}
+
+fn card_counts(hand: Hand) {
+  hand.cards
+  |> list.sort(int.compare)
+  |> list.chunk(function.identity)
+  |> list.map(list.length)
+  |> list.sort(int.compare)
+}
+
 fn hand_rank(hand_rank: HandType) -> Int {
   case hand_rank {
     HighCard -> 1
@@ -51,56 +82,25 @@ fn card_rank(card: String) -> Int {
   }
 }
 
-fn parse_hand(str: String) -> Hand {
-  let [cards, wager] = string.split(str, " ")
-  let cards =
-    string.to_graphemes(cards)
-    |> list.map(card_rank)
-  let assert Ok(wager) = int.parse(wager)
-
-  Hand(cards, wager)
-}
-
-fn card_counts(hand: Hand) {
-  hand.cards
-  |> list.sort(int.compare)
-  |> list.chunk(function.identity)
-  |> list.map(list.length)
-  |> list.sort(int.compare)
-}
-
-fn classify_hand(hand: Hand) -> HandType {
-  case list.length(list.unique(hand.cards)), card_counts(hand) {
-    1, _ -> FiveOfAKind
-    2, [1, 4] -> FourOfAKind
-    2, [2, 3] -> FullHouse
-    3, [1, 1, 3] -> ThreeOfAKind
-    3, [1, 2, 2] -> TwoPair
-    4, _ -> OnePair
-    5, _ -> HighCard
-    _, _ -> Unknown
-  }
-}
-
 // Part 1 ------------------------------------------------------------------------------------------
 
 pub fn part1(input: String) {
   input
   |> string.split("\n")
   |> list.map(parse_hand)
-  |> list.sort(compare_hands)
+  |> list.sort(compare_without_wilds)
   |> list.index_map(fn(i, h) { { i + 1 } * h.wager })
   |> int.sum
   |> string.inspect
 }
 
-fn compare_hands(hand1: Hand, hand2: Hand) -> Order {
-  case
-    int.compare(
-      hand_rank(classify_hand(hand1)),
-      hand_rank(classify_hand(hand2)),
-    )
-  {
+fn compare_without_wilds(hand1: Hand, hand2: Hand) {
+  use hand <- compare_hands(hand1, hand2)
+  function.compose(classify_hand, hand_rank)(hand)
+}
+
+fn compare_hands(hand1: Hand, hand2: Hand, using: fn(Hand) -> Int) -> Order {
+  case int.compare(using(hand1), using(hand2)) {
     Eq -> compare_top_card(hand1.cards, hand2.cards)
     other -> other
   }
@@ -144,28 +144,20 @@ fn find_best_joker_substitution(hand: Hand) {
       },
     )
   let subbed_hand = Hand(..hand, cards: subbed_cards)
-  case compare_hands(acc, subbed_hand) {
+  case
+    compare_hands(acc, subbed_hand, function.compose(classify_hand, hand_rank))
+  {
     Lt -> subbed_hand
     _ -> acc
   }
 }
 
 fn compare_hands_considering_jokers(hand1: Hand, hand2: Hand) -> Order {
-  case
-    int.compare(
-      hand1
-      |> find_best_joker_substitution
-      |> classify_hand
-      |> hand_rank,
-      hand2
-      |> find_best_joker_substitution
-      |> classify_hand
-      |> hand_rank,
-    )
-  {
-    Eq -> compare_top_card(hand1.cards, hand2.cards)
-    other -> other
-  }
+  use hand <- compare_hands(hand1, hand2)
+  hand
+  |> find_best_joker_substitution
+  |> classify_hand
+  |> hand_rank
 }
 
 pub fn main() {
