@@ -16,7 +16,7 @@ type Hand {
 // Common functions --------------------------------------------------------------------------------
 
 fn parse_hand(str: String) -> Hand {
-  let [cards, wager] = string.split(str, " ")
+  let assert [cards, wager] = string.split(str, " ")
   let cards =
     string.to_graphemes(cards)
     |> list.map(card_rank)
@@ -54,7 +54,7 @@ fn card_rank(card: String) -> Int {
     _, "Q" -> 12
     _, "J" -> 11
     _, "T" -> 10
-    _, "*" -> 1
+    _, _ -> 1
   }
 }
 
@@ -67,8 +67,8 @@ fn compare_hands(hand1: Hand, hand2: Hand, using: fn(Hand) -> Int) -> Order {
 
 fn compare_top_card(cards1: List(Int), cards2: List(Int)) -> Order {
   use <- bool.guard(cards1 == [] || cards2 == [], Eq)
-  let [c1, ..rest1] = cards1
-  let [c2, ..rest2] = cards2
+  let assert [c1, ..rest1] = cards1
+  let assert [c2, ..rest2] = cards2
   case int.compare(c1, c2) {
     Eq -> compare_top_card(rest1, rest2)
     other -> other
