@@ -15,9 +15,13 @@
   [(#\T) 10]
   [(#\*) 1])
 
-(define (parse-hand str)
+(define (parse-hand str #:jokers [jokers? #f])
   (match-define (list card-str wager-str) (string-split str))
-  (define cards (~> card-str string->list (map card->int _)))
+  (define cards
+    (~> card-str
+        ((λ (str) (if jokers? (string-replace str "J" "*") str)))
+        string->list
+        (map card->int _)))
   (define wager (~> wager-str string->number))
   (hand cards wager))
 
@@ -50,10 +54,14 @@
 (define (compare-hands-no-wilds h1 h2)
   (compare-hands identify-hand h1 h2))
 
-(define (total-score with in)
-  (for/sum ([(h i) (in-indexed (~> in (map parse-hand _) (sort with)))]) (* (add1 i) (hand-wager h))))
+(define (total-score in #:jokers [jokers? #false])
+  (for/sum ([(h i)
+             (in-indexed (~> in
+                             (map (curry parse-hand #:jokers jokers?) _)
+                             (sort (if jokers? compare-hands-no-wilds compare-hands-with-wilds))))])
+           (* (add1 i) (hand-wager h))))
 
-(total-score compare-hands-no-wilds input)
+(total-score input)
 
 ;; part 2
 
@@ -66,4 +74,4 @@
 (define (compare-hands-with-wilds h1 h2)
   (compare-hands (λ~> find-best-joker-substitution identify-hand) h1 h2))
 
-(total-score compare-hands-with-wilds (map (curryr string-replace "J" "*") input))
+(total-score input #:jokers #true)
