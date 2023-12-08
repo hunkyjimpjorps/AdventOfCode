@@ -1,7 +1,8 @@
 #lang racket
 
 (require advent-of-code
-         threading)
+         threading
+         )
 
 (match-define (list times distances)
   (~> (open-aoc-input (find-session) 2023 6 #:cache #true) port->lines))
