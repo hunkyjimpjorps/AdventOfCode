@@ -4,10 +4,10 @@ import adglent.{type Example, Example}
 import day8/solve
 
 type Problem1AnswerType =
-  String
+  Int
 
 type Problem2AnswerType =
-  String
+  Int
 
 /// Add examples for part 1 here:
 /// ```gleam
@@ -20,7 +20,7 @@ const part1_examples: List(Example(Problem1AnswerType)) = [
 AAA = (BBB, BBB)
 BBB = (AAA, ZZZ)
 ZZZ = (ZZZ, ZZZ)",
-    "6",
+    6,
   ),
 ]
 
@@ -40,7 +40,7 @@ const part2_examples: List(Example(Problem2AnswerType)) = [
 22C = (22Z, 22Z)
 22Z = (22B, 22B)
 XXX = (XXX, XXX)",
-    "6",
+    6,
   ),
 ]
 
