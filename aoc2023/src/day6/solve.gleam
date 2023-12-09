@@ -20,7 +20,7 @@ fn parse_with_bad_kerning(input: String) {
   })
   |> list.transpose
   |> list.map(fn(ns) {
-    let [t, d] = ns
+    let assert [t, d] = ns
     Race(t, d)
   })
 }
@@ -59,12 +59,12 @@ fn parse_properly(input: String) {
 }
 
 pub fn part2(input: String) {
-  let [time, distance] =
+  let assert [time, distance] =
     input
     |> parse_properly
 
   let race = Race(time, distance)
-  
+
   upper_bound(race) - lower_bound(race) + 1
   |> string.inspect
 }

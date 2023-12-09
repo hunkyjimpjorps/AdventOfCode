@@ -87,8 +87,10 @@ fn do_parts(cells: List(Cell), parts: List(Part)) -> List(Part) {
               do_parts(t, [Part([next, ..coords], n0 * 10 + n), ..rest_parts])
             _, _ -> do_parts(t, [Part([next], n), ..parts])
           }
+        _ -> panic
       }
     }
+    _ -> panic
   }
 }
 

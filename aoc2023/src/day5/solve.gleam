@@ -26,7 +26,8 @@ type Mapper =
 // Parsing -----------------------------------------------------------------------------------------
 
 fn parse_input(input: String) {
-  let ["seeds: " <> raw_seeds, ..raw_mappers] = string.split(input, on: "\n\n")
+  let assert ["seeds: " <> raw_seeds, ..raw_mappers] =
+    string.split(input, on: "\n\n")
 
   let seeds = string_to_int_list(raw_seeds)
   let mappers =
@@ -45,7 +46,7 @@ fn string_to_int_list(str: String) {
 }
 
 fn parse_mapper(strs: List(String)) -> Mapper {
-  let [_, ..raw_ranges] = strs
+  let assert [_, ..raw_ranges] = strs
   list.map(raw_ranges, parse_mrange)
   |> list.sort(fn(a, b) { int.compare(a.start, b.start) })
 }
@@ -79,11 +80,11 @@ fn correspond(n: Int, mapper: Mapper) {
 pub fn part2(input: String) {
   let Almanac(seeds, mappers) = parse_input(input)
 
-  let [SRange(answer, _), ..] =
+  let assert [SRange(answer, _), ..] =
     seeds
     |> list.sized_chunk(into: 2)
     |> list.map(fn(chunk) {
-      let [start, length] = chunk
+      let assert [start, length] = chunk
       [SRange(start, start + length - 1)]
       |> remap_all_seed_ranges(mappers)
     })
@@ -131,22 +132,17 @@ fn do_remap_range(r: SeedRange, mapper: Mapper, acc: List(SeedRange)) {
     ]
     // range overlaps end but not start -> left side transformed, right side moves to next mapping
     [m, ..ms] if r.start >= m.start && r.end > m.end ->
-      do_remap_range(
-        SRange(m.end + 1, r.end),
-        ms,
-        [transform_range(SRange(r.start, m.end), m), ..acc],
-      )
+      do_remap_range(SRange(m.end + 1, r.end), ms, [
+        transform_range(SRange(r.start, m.end), m),
+        ..acc
+      ])
     // mapping is fully inside range -> left not transformed, middle transformed, right to next
     [m, ..ms] ->
-      do_remap_range(
-        SRange(m.end + 1, r.end),
-        ms,
-        [
-          SRange(r.start, m.start - 1),
-          transform_range(SRange(m.start, m.end), m),
-          ..acc
-        ],
-      )
+      do_remap_range(SRange(m.end + 1, r.end), ms, [
+        SRange(r.start, m.start - 1),
+        transform_range(SRange(m.start, m.end), m),
+        ..acc
+      ])
   }
 }
 

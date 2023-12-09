@@ -6,6 +6,7 @@ abcdefgh"
 
 pub fn main() {
   let trim = 8
-  let <<_:bytes-size(trim), "\n":utf8, rest:bytes>> = bit_array.from_string(str)
+  let assert <<_:bytes-size(trim), "\n":utf8, rest:bytes>> =
+    bit_array.from_string(str)
   io.debug(rest)
 }
