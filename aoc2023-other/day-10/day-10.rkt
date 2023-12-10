@@ -80,13 +80,13 @@
              #:break (not (hash-has-key? grid test-pt))
              #:when (set-member? pipes test-pt))
     (define pipe (hash-ref grid test-pt))
-    (match* (pipe corner)
-      [(#\| #f) (values (add1 acc) #f)] ; vertical crossing
-      [((or #\F #\L) #f) (values acc pipe)]
-      [(#\J #\F) (values (add1 acc) #f)] ; a  ┏━┛ shape counts as a vertical crossing
-      [(#\7 #\L) (values (add1 acc) #f)]
-      [(#\7 #\F) (values acc #f)] ; a  ┏━┓ shape doesn't count
-      [(#\J #\L) (values acc #f)]
+    (match* (corner pipe)
+      [(#f #\|) (values (add1 acc) #f)] ; vertical crossing
+      [(#f (or #\F #\L)) (values acc pipe)]
+      [(#\F #\J) (values (add1 acc) #f)] ; a  ┏━┛ shape counts as a vertical crossing
+      [(#\L #\7) (values (add1 acc) #f)]
+      [(#\F #\7) (values acc #f)] ; a  ┏━┓ shape doesn't count
+      [(#\L #\J) (values acc #f)]
       [(_ _) (values acc corner)])))
 
 (~> pipe-grid hash-keys (count (λ~> (trace-rays pipe-loop-set pipe-grid)) _))
