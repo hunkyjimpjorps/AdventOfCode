@@ -22,7 +22,7 @@ fn parse(input: String) -> List(List(Game)) {
     "red" -> Game(..acc, red: n)
     "blue" -> Game(..acc, blue: n)
     "green" -> Game(..acc, green: n)
-    _ -> panic as { "unrecognized color " <> color }
+    _ -> panic as "unrecognized color"
   }
 }
 
