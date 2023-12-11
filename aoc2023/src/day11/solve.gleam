@@ -8,10 +8,6 @@ type Posn {
   Posn(x: Int, y: Int)
 }
 
-fn manhattan_distance(p1: Posn, p2: Posn) -> Int {
-  int.absolute_value(p1.x - p2.x) + int.absolute_value(p1.y - p2.y)
-}
-
 fn find_empty(grid: List(List(String))) {
   use acc, row, r <- list.index_fold(grid, [])
   case list.unique(row) {
@@ -24,10 +20,6 @@ fn count_prior_empty_ranks(rank: Int, empty_ranks: List(Int)) -> Int {
   empty_ranks
   |> list.drop_while(fn(r_empty) { r_empty > rank })
   |> list.length
-}
-
-fn apply_expansion(p: Posn, empty_r: Int, empty_c: Int, add: Int) -> Posn {
-  Posn(p.x + empty_r * add, p.y + empty_c * add)
 }
 
 fn parse_with_expansion(input: String, expansion: Int) -> List(Posn) {
@@ -43,10 +35,12 @@ fn parse_with_expansion(input: String, expansion: Int) -> List(Posn) {
   {
     use r, row <- list.index_map(grid)
     use acc, cell, c <- list.index_fold(over: row, from: [])
-    let empty_rows = count_prior_empty_ranks(r, empty_row_list)
-    let empty_cols = count_prior_empty_ranks(c, empty_col_list)
+
+    let p = Posn(r, c)
+    let empty_r = count_prior_empty_ranks(r, empty_row_list)
+    let empty_c = count_prior_empty_ranks(c, empty_col_list)
     case cell {
-      "#" -> [apply_expansion(Posn(r, c), empty_rows, empty_cols, add), ..acc]
+      "#" -> [Posn(p.x + empty_r * add, p.y + empty_c * add), ..acc]
       _empty -> acc
     }
   }
@@ -55,8 +49,8 @@ fn parse_with_expansion(input: String, expansion: Int) -> List(Posn) {
 
 fn all_distances(stars: List(Posn)) -> Int {
   use acc, pair <- list.fold(list.combination_pairs(stars), 0)
-  let #(star1, star2) = pair
-  acc + manhattan_distance(star1, star2)
+  let #(s1, s2) = pair
+  acc + int.absolute_value(s1.x - s2.x) + int.absolute_value(s1.y - s2.y)
 }
 
 fn find_distances(input: String, expand_by: Int) -> String {
