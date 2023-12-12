@@ -35,6 +35,7 @@ fn extrapolate(ns: List(Int)) {
   case is_constant(ns), ns {
     True, [n, ..] -> n
     False, [n, ..] -> n + extrapolate(take_derivative(ns))
+    _, _ -> panic as "list empty when it shouldn't be"
   }
 }
 

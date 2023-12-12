@@ -17,7 +17,7 @@ type Maze =
   Dict(String, Paths)
 
 fn parse(input: String) -> #(Iterator(String), Dict(String, Paths)) {
-  let [directions_str, maze_str] = string.split(input, "\n\n")
+  let assert [directions_str, maze_str] = string.split(input, "\n\n")
 
   let directions =
     directions_str
@@ -52,6 +52,7 @@ fn to_next_step(
   case next_direction {
     "L" -> paths.to_left
     "R" -> paths.to_right
+    _ -> panic as "bad direction"
   }
   |> to_next_step(stop_at, count + 1, rest_directions, maze)
 }
