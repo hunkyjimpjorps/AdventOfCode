@@ -2,40 +2,43 @@ import adglent.{First, Second}
 import gleam/io
 import gleam/list
 import gleam/string
-import gleam/result
+import gleam/bool
 
 type SymmetryType {
   Horizontal(Int)
   Vertical(Int)
 }
 
-fn is_symmetric(xs: List(List(a)), errors: Int, index: Int) -> Result(Int, Nil) {
-  case list.split(xs, index) {
-    #(_, []) -> Error(Nil)
-    #(ls, rs) -> {
-      let zipped = list.zip(list.flatten(list.reverse(ls)), list.flatten(rs))
-      let found_errors =
-        zipped
-        |> list.filter(fn(tup) { tup.1 != tup.0 })
-        |> list.length
-      case found_errors == errors {
-        True -> Ok(index)
-        False -> is_symmetric(xs, errors, index + 1)
-      }
-    }
+fn is_symmetric(xss: List(List(a)), errs: Int) {
+  let assert [left, ..right] = xss
+  do_is_symmetric([left], right, errs)
+}
+
+fn do_is_symmetric(
+  left: List(List(a)),
+  right: List(List(a)),
+  errors: Int,
+) -> Result(Int, Nil) {
+  use <- bool.guard(list.is_empty(right), Error(Nil))
+  let assert [h, ..t] = right
+  let found_errors =
+    list.zip(list.flatten(left), list.flatten(right))
+    |> list.filter(fn(tup) { tup.1 != tup.0 })
+    |> list.length
+  case found_errors == errors {
+    True -> Ok(list.length(left))
+    False -> do_is_symmetric([h, ..left], t, errors)
   }
 }
 
-fn get_symmetry_type(xs: List(List(String)), errors: Int) {
-  result.or(
-    xs
-    |> is_symmetric(errors, 1)
-    |> result.map(Horizontal(_)),
-    xs
-    |> list.transpose()
-    |> is_symmetric(errors, 1)
-    |> result.map(Vertical(_)),
-  )
+fn get_symmetry_type(xss: List(List(String)), errors: Int) {
+  case is_symmetric(xss, errors) {
+    Ok(n) -> Horizontal(n)
+    _ -> {
+      let assert Ok(n) = is_symmetric(list.transpose(xss), errors)
+      Vertical(n)
+    }
+  }
 }
 
 fn summarize_notes(symmetries: List(SymmetryType)) {
@@ -55,7 +58,6 @@ fn solve(input: String, errors: Int) {
     |> list.map(string.to_graphemes)
     |> get_symmetry_type(errors)
   })
-  |> result.values
   |> summarize_notes
   |> string.inspect
 }
