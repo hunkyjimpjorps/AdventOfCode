@@ -1,12 +1,10 @@
 import adglent.{First, Second}
+import gleam/dict
+import gleam/int
 import gleam/io
-import gleam/string
 import gleam/list
 import gleam/order
-import gleam/int
-import gleam/iterator
-import gleam/result
-import utilities/memo.{type Cache}
+import gleam/string
 
 fn parse(input) {
   input
@@ -23,30 +21,22 @@ fn roll_boulders(strs: List(String)) {
   |> list.flatten
 }
 
-fn score(matrix, cache) {
-  use <- memo.memoize(cache, matrix)
-  {
-    use col <- list.map(matrix)
-    list.index_map(list.reverse(col), fn(i, c) { #(i + 1, c) })
-    |> list.fold(
-      0,
-      fn(acc, tup) {
-        case tup {
-          #(n, "O") -> acc + n
-          _ -> acc
-        }
-      },
-    )
+fn score(matrix) {
+  use acc, col <- list.fold(matrix, 0)
+  acc + {
+    use col_acc, char, n <- list.index_fold(list.reverse(col), 0)
+    case char {
+      "O" -> col_acc + n + 1
+      _ -> col_acc
+    }
   }
-  |> int.sum
 }
 
 pub fn part1(input: String) {
-  use cache: Cache(List(List(String)), Int) <- memo.create()
   input
   |> parse
   |> list.map(roll_boulders)
-  |> score(cache)
+  |> score()
   |> string.inspect
 }
 
@@ -56,21 +46,34 @@ fn rotate(matrix) {
   |> list.transpose
 }
 
-fn spin_the_board(matrix, cache) {
-  use <- memo.memoize(cache, matrix)
-  matrix
+fn spin(matrix) {
+  use acc, _ <- list.fold(list.range(1, 4), matrix)
+  acc
   |> list.map(roll_boulders)
   |> rotate
 }
 
+fn spin_cycle(matrix) {
+  let cache = dict.new()
+  check_if_seen(matrix, cache, 1_000_000_000)
+}
+
+fn check_if_seen(matrix, cache, count) {
+  case dict.get(cache, matrix) {
+    Error(Nil) ->
+      check_if_seen(spin(matrix), dict.insert(cache, matrix, count), count - 1)
+    Ok(n) -> {
+      let assert Ok(extra) = int.modulo(count, n - count)
+      list.fold(list.range(1, extra), matrix, fn(acc, _) { spin(acc) })
+      |> score
+    }
+  }
+}
+
 pub fn part2(input: String) {
-  use cache: Cache(List(List(String)), List(List(String))) <- memo.create()
-  use score_cache: Cache(List(List(String)), Int) <- memo.create()
   input
   |> parse
-  |> iterator.iterate(spin_the_board(_, cache))
-  |> iterator.map(score(_, score_cache))
-  |> iterator.at(10000)
+  |> spin_cycle
   |> string.inspect
 }
 
