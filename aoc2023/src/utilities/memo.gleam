@@ -14,6 +14,10 @@ type Message(k, v) {
 type Server(k, v) =
   Subject(Message(k, v))
 
+pub opaque type Cache(k, v) {
+  Cache(server: Server(k, v))
+}
+
 fn handle_message(
   message: Message(k, v),
   dict: Dict(k, v),
@@ -26,10 +30,6 @@ fn handle_message(
     }
     Set(key, value) -> Continue(dict.insert(dict, key, value), None)
   }
-}
-
-pub opaque type Cache(k, v) {
-  Cache(server: Server(k, v))
 }
 
 pub fn create(apply fun: fn(Cache(k, v)) -> t) -> t {
