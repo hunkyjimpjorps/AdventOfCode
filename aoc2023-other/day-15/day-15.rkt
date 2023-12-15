@@ -32,10 +32,10 @@
 
 (define (focusing-power boxes)
   (for*/sum ([(box-number lenses) (in-hash boxes)] [(lens order) (in-indexed lenses)])
-    (match-define (cons _ focal) lens)
-    (* (add1 box-number) (add1 order) (string->number focal))))
+    (* (add1 box-number) (add1 order) (cdr lens))))
 
 (for/fold ([boxes (hash)] #:result (focusing-power boxes)) ([code (in-list input)])
   (match code
-    [(regexp #rx"(.*)=(.*)" (list _ label focal)) (insert-lens boxes label focal)]
+    [(regexp #rx"(.*)=(.*)" (list _ label (app string->number focal)))
+     (insert-lens boxes label focal)]
     [(regexp #rx"(.*)-" (list _ label)) (remove-lens boxes label)]))
