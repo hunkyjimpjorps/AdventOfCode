@@ -3,7 +3,7 @@ import gleam/dict.{type Dict}
 import gleam/string
 
 pub type Posn {
-  Posn(x: Int, y: Int)
+  Posn(r: Int, c: Int)
 }
 
 pub type Array2D(a) =
@@ -11,9 +11,9 @@ pub type Array2D(a) =
 
 pub fn to_2d_array(xss: List(List(a))) -> Array2D(a) {
   {
-    use x, row <- list.index_map(xss)
-    use y, cell <- list.index_map(row)
-    #(Posn(x, y), cell)
+    use r, row <- list.index_map(xss)
+    use c, cell <- list.index_map(row)
+    #(Posn(r, c), cell)
   }
   |> list.flatten
   |> dict.from_list
