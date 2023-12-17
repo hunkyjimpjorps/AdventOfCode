@@ -67,4 +67,4 @@
           (map (λ (c) (light (posn -1 c) 'down)) (range cols))
           (map (λ (c) (light (posn rows c) 'up)) (range cols))))
 
-(get-energized (argmax get-energized all-starting-positions))
+(time(get-energized (argmax get-energized all-starting-positions)))
