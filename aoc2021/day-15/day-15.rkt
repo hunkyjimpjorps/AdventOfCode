@@ -1,12 +1,13 @@
 #lang racket
-(require "../../jj-aoc.rkt"
+(require advent-of-code
          threading
          graph)
 
 (struct Point (x y) #:transparent)
 
 (define data
-  (for/fold ([cells (hash)]) ([row (in-lines (open-day 15 2021))] [x (in-naturals)])
+  (for/fold ([cells (hash)])
+            ([row (in-lines (open-aoc-input (find-session) 2021 15 #:cache #true))] [x (in-naturals)])
     (for/fold ([cells cells]) ([n (in-string row)] [y (in-naturals)])
       (hash-set cells (Point x y) (~> n string string->number)))))
 
