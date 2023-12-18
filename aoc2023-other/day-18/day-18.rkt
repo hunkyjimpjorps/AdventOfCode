@@ -9,10 +9,10 @@
 (define (go-to-next-coord c dir dist)
   (match-define (coord x y) c)
   (match dir
-    ["R" (coord (+ x dist) y)]
-    ["L" (coord (- x dist) y)]
-    ["U" (coord x (+ y dist))]
-    ["D" (coord x (- y dist))]))
+    [(or "R" "0") (coord (+ x dist) y)]
+    [(or "D" "1") (coord x (- y dist))]
+    [(or "L" "2") (coord (- x dist) y)]
+    [(or "U" "3") (coord x (+ y dist))]))
 
 (define/match (triangle-area _coord1 _coord2)
   [((coord x1 y1) (coord x2 y2)) (/ (- (* x1 y2) (* x2 y1)) 2)])
@@ -37,15 +37,8 @@
 ;; part 2
 
 (define (parse-hex dig)
-  (match-define (regexp #rx".*\\(#(.....)(.)\\)"
-                        (list _ (app (curryr string->number 16) dist) (app num->dir dir)))
+  (match-define (regexp #rx".*\\(#(.....)(.)\\)" (list _ (app (curryr string->number 16) dist) dir))
     dig)
   (values dir dist))
-
-(define/match (num->dir _n)
-  [("0") "R"]
-  [("1") "D"]
-  [("2") "L"]
-  [("3") "U"])
 
 (find-area-using parse-hex)
