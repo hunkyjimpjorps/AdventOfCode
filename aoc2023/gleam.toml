@@ -16,6 +16,7 @@ simplifile = "~> 1.0"
 gleam_erlang = "~> 0.23"
 gleam_community_maths = "~> 1.0"
 gleam_otp = "~> 0.8"
+pqueue = "~> 2.0"
 
 [dev-dependencies]
 gleeunit = "~> 1.0"

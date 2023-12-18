@@ -1,13 +1,13 @@
 import adglent.{First, Second}
+import gleam/bool
+import gleam/dict.{type Dict}
 import gleam/io
-import gleam/string
 import gleam/list
 import gleam/result
+import gleam/string
+import gleam/set.{type Set}
 import utilities/array2d.{type Posn, Posn}
-import gleam/bool
-import gleam/dict
-import gleam/queue.{type Queue}
-import gleam/set
+import utilities/prioqueue.{type PriorityQueue}
 
 type State {
   State(posn: Posn, heatloss: Int, previous: Posn, history: List(Posn))
@@ -22,7 +22,9 @@ fn make_key(s: State) {
 fn same_dir(s: State) {
   case s.history {
     [] -> []
-    [first, ..] as deltas -> list.take_while(deltas, fn(d) { d == first })
+    [first, ..] as deltas ->
+      list.take_while(deltas, fn(d) { d == first })
+      |> list.take(10)
   }
 }
 
@@ -62,21 +64,32 @@ fn make_state(d: Posn, s: State, grid) {
   )
 }
 
-fn find_path(grid, goal, seen, queue: Queue(State), neighbor_fn, goal_fn) {
-  let assert Ok(#(s, rest)) = queue.pop_front(queue)
-  let key = make_key(s)
-
+fn find_path(
+  grid: Dict(Posn, Int),
+  queue: PriorityQueue(State),
+  seen: Set(#(Posn, List(Posn))),
+  get_neighbors: fn(State) -> List(State),
+  is_goal: fn(State) -> Bool,
+) {
+  let assert Ok(#(state, rest)) = prioqueue.pop(queue)
+  let key =
+    make_key(
+      state
+      |> io.debug,
+    )
   case set.contains(seen, key) {
-    True -> find_path(grid, goal, seen, rest, neighbor_fn, goal_fn)
+    True -> find_path(grid, rest, seen, get_neighbors, is_goal)
     False -> {
-      let seen = set.insert(seen, key)
-      let neighbors: List(State) = neighbor_fn(s)
-
-      case list.find(neighbors, goal_fn) {
+      let now_seen = set.insert(seen, key)
+      let neighbors = get_neighbors(state)
+      case list.find(neighbors, is_goal) {
         Ok(final) -> final.heatloss
-        Error(Nil) -> {
-          let queue = list.fold(neighbors, queue, queue.push_back)
-          find_path(grid, goal, seen, queue, neighbor_fn, goal_fn)
+        _err -> {
+          let now_queue =
+            list.fold(neighbors, rest, fn(acc, n) {
+              prioqueue.insert(acc, n, n.heatloss)
+            })
+          find_path(grid, now_queue, now_seen, get_neighbors, is_goal)
         }
       }
     }
@@ -96,13 +109,13 @@ pub fn part1(input: String) {
     |> list.first
     |> result.map(list.length)
 
+  let start = State(Posn(0, 0), 0, Posn(0, 0), [])
   let goal = Posn(rmax, cmax)
 
   find_path(
     grid,
-    goal,
+    prioqueue.insert(prioqueue.new(), start, 0),
     set.new(),
-    queue.from_list([State(Posn(0, 0), 0, Posn(0, 0), [])]),
     find_good_neighbors(0, 3, _, grid),
     is_goal(_, 1, goal),
   )
