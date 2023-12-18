@@ -12,13 +12,13 @@ fn split(input: String) -> List(String) {
 }
 
 fn hash_algorithm(str: String) -> Int {
-  str
-  |> string.to_utf_codepoints()
-  |> list.map(string.utf_codepoint_to_int)
-  |> list.fold(0, fn(acc, c) {
-    let assert Ok(acc) = int.modulo({ acc + c } * 17, 256)
-    acc
-  })
+  let codepoints =
+    str
+    |> string.to_utf_codepoints()
+    |> list.map(string.utf_codepoint_to_int)
+  use acc, c <- list.fold(codepoints, 0)
+  let assert Ok(acc) = int.modulo({ acc + c } * 17, 256)
+  acc
 }
 
 pub fn part1(input: String) -> String {
