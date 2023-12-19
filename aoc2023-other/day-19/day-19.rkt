@@ -110,19 +110,19 @@
      (split-range pr
                   rating
                   (interval i-min (sub1 threshold))
-                  (interval threshold i-max)
                   action
+                  (interval threshold i-max)
                   tail)]
     [(list* (rule rating (== >) threshold action) tail)
      (match-define (interval i-min i-max) (rating pr))
      (split-range pr
                   rating
                   (interval (add1 threshold) i-max)
-                  (interval i-min threshold)
                   action
+                  (interval i-min threshold)
                   tail)]))
 
-(define (split-range pr rating keep pass action rules)
+(define (split-range pr rating keep action pass rules)
   (+ (evaluate-rules-on-range (part-update-range pr rating keep)
                               (list (just action)))
      (evaluate-rules-on-range (part-update-range pr rating pass)
@@ -130,4 +130,5 @@
 
 (define start-interval (interval 1 4000))
 
-(evaluate-workflow-on-range (part start-interval start-interval start-interval start-interval))
+(evaluate-workflow-on-range
+ (part start-interval start-interval start-interval start-interval))
