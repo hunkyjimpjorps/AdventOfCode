@@ -2,7 +2,7 @@ import adglent.{First, Second}
 import gleam/io
 import gleam/string
 import gleam/dict.{type Dict}
-import gleam/order.{type Order, Eq, Gt, Lt}
+import gleam/order.{type Order, Gt, Lt}
 import gleam/regex.{type Match, Match}
 import gleam/list
 import gleam/option.{Some}
@@ -57,10 +57,9 @@ fn parse_rules(rules: List(String)) -> List(Rule) {
   let assert Ok(re_rule) = regex.from_string("(.*)(>|<)(.*):(.*)")
   use rule <- list.map(rules)
   case regex.scan(re_rule, rule) {
-    [] -> Just(to_instruction(rule))
     [Match(submatches: [Some(r), Some(c), Some(t), Some(i)], ..)] ->
       If(to_rating(r), to_comp(c), to_val(t), to_instruction(i))
-    _ -> panic
+    _nomatch -> Just(to_instruction(rule))
   }
 }
 
@@ -77,8 +76,7 @@ fn to_rating(rating: String) {
     "x" -> XtremelyCool
     "m" -> Musical
     "a" -> Aerodynamic
-    "s" -> Shiny
-    _ -> panic
+    _s -> Shiny
   }
 }
 
@@ -94,8 +92,7 @@ fn get_rating(part: Part, rating: Rating) -> Int {
 fn to_comp(comp: String) {
   case comp {
     "<" -> Lt
-    ">" -> Gt
-    _ -> panic
+    _gt -> Gt
   }
 }
 
@@ -207,7 +204,6 @@ fn evaluate_rules_on_range(
     [If(rating, comparison, t, action), ..rest] -> {
       let mod_i = get_partrange(pr, rating)
       case comparison {
-        Eq -> panic
         Lt ->
           split_range(
             keep: update_partrange(pr, rating, Interval(mod_i.min, t - 1)),
@@ -216,7 +212,7 @@ fn evaluate_rules_on_range(
             and_eval: rest,
             with: workflow,
           )
-        Gt ->
+        _gt ->
           split_range(
             keep: update_partrange(pr, rating, Interval(t + 1, mod_i.max)),
             and_do: action,
