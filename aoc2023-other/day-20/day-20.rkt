@@ -65,6 +65,10 @@
     [(conjunction received) (conjunction (hash-set received from tone))]
     [(nothing) (nothing)]))
 
+; needed for part 2
+(define to-rx '(rk cd zf qx))
+(define sentry-tones (make-hash (for/list ([node to-rx]) (cons node 0))))
+
 (define (press-button-once current-state this-round)
   (for/fold ([queue '(broadcaster)]
              [all-cables-state current-state]
@@ -103,11 +107,11 @@
        (values tl state* high low)]
       [(conjunction received)
        #:when (or (empty? (hash-values received)) (member 'low (hash-values received)))
+
        (when (member hd to-rx)
-         (set! sentry-tones (cons this-round sentry-tones)))
+         (hash-set! sentry-tones hd this-round))
        (define state*
          (foldl (λ (r acc)
-
                   (hash-update acc r (λ~> (receive hd 'high)) (nothing)))
                 all-cables-state
                 to))
@@ -135,12 +139,8 @@
 ;; and since those cycle lengths are prime, it reduces to the product of the lengths
 ;; this is a really hacky mutable solution, I'm sure there's better ways of flagging these cycles
 
-;; from the data -- the four conjunctions that indirectly feed rx
-(define to-rx '(rk cd zf qx))
-(define sentry-tones '())
-
 (for/fold ([starting-state (make-initial-conditions-hash cables)]
-           #:result (apply * sentry-tones))
+           #:result (apply * (hash-values sentry-tones)))
           ([i (in-range 1 5000)])
   (define-values (next-state _high _low) (press-button-once starting-state i))
   (values next-state))
