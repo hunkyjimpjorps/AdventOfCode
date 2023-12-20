@@ -132,6 +132,7 @@
 ;; part 2
 ;; rx receives a tone from gh, which receives four tones itself
 ;; those tones arrive on regular synced cycles so it's just the LCM of those cycle lengths
+;; and since those cycle lengths are prime, it reduces to the product of the lengths
 ;; this is a really hacky mutable solution, I'm sure there's better ways of flagging these cycles
 
 ;; from the data -- the four conjunctions that indirectly feed rx
