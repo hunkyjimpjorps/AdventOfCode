@@ -5,17 +5,13 @@
          data/applicative
          data/monad
          megaparsack
-         megaparsack/text
-         struct-update)
+         megaparsack/text)
 
 (struct broadcaster ())
 (struct flipflop (state received) #:transparent)
 (struct conjunction (recieved) #:transparent)
 (struct cable (type dests) #:transparent)
 (struct nothing ())
-
-(define-struct-updaters flipflop)
-(define-struct-updaters conjunction)
 
 (define charlist->symbol (λ~>> (apply string) string->symbol))
 
