@@ -37,14 +37,8 @@
 ;; part 2
 ;; the growth of the steps pattern is regular and quadratic
 ;; the rock pattern has aisles in it that allow the steps pattern to expand freely
-;; such that it will cross from one side to another in X steps 
+;; such that it will cross from one side to another in X steps
 ;; where X is the height/width of the repeated section
-
-;; cycles | filled segments
-;; ------ | ---------------
-;;  1/2   |      1 
-;; 1-1/2  |      2
-;; 2-1/2 |       |
 
 (define grid-size (~> input (string-split "\n") length))
 (define half-size (/ (sub1 grid-size) 2))
