@@ -19,8 +19,7 @@ const part1_examples: List(Example(Problem1AnswerType)) = [
 %a -> b
 %b -> c
 %c -> inv
-&inv -> a
-",
+&inv -> a",
     "32000000",
   ),
   Example(
@@ -28,7 +27,8 @@ const part1_examples: List(Example(Problem1AnswerType)) = [
 %a -> inv, con
 &inv -> b
 %b -> con
-&con -> output",
+&con -> output
+output -> ",
     "11687500",
   ),
 ]
