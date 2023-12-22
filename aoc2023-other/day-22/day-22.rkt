@@ -14,9 +14,14 @@
 (define input (fetch-aoc-input (find-session) 2023 22 #:cache #true))
 
 (define coordinate/p
-  (do [coords <- (many/p integer/p #:sep (char/p #\,) #:min 3 #:max 3)] (pure (apply posn coords))))
+  (do [coords <- (many/p integer/p #:sep (char/p #\,) #:min 3 #:max 3)]
+    (pure (apply posn coords))))
 
-(define block/p (do [from <- coordinate/p] (char/p #\~) [to <- coordinate/p] (pure (cons from to))))
+(define block/p
+  (do [from <- coordinate/p]
+    (char/p #\~)
+    [to <- coordinate/p]
+    (pure (cons from to))))
 
 (define starting-blocks
   (~> (for/list ([line (in-list (string-split input "\n"))]
