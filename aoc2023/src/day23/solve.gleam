@@ -84,45 +84,37 @@ fn walk_to_next_junction(
   }
 }
 
+fn find_routes(junctions, trails) {
+  use junction <- list.flat_map(junctions)
+  use neighbor <- list.filter_map(junction_neighbors(junction))
+  case dict.has_key(trails, neighbor) {
+    True -> Ok(start_walking_to_next_junction(junction, neighbor, trails))
+    False -> Error(Nil)
+  }
+}
+
 fn generate_routes(
   junctions: List(Posn),
   trails: Array2D(Path),
 ) -> Dict(Posn, List(Route)) {
-  {
-    use junction <- list.flat_map(junctions)
-    use neighbor <- list.filter_map(junction_neighbors(junction))
-    case dict.has_key(trails, neighbor) {
-      True -> Ok(start_walking_to_next_junction(junction, neighbor, trails))
-      False -> Error(Nil)
-    }
-  }
-  |> list.fold(dict.new(), fn(acc, edge) {
-    let #(from, route) = edge
-    use v <- dict.update(acc, from)
-    case v {
-      None -> [route]
-      Some(routes) -> [route, ..routes]
-    }
-  })
+  use acc, #(from, route) <- list.fold(
+    find_routes(junctions, trails),
+    dict.new(),
+  )
+  dict.update(acc, from, append_to_key(_, route))
 }
 
 fn generate_2way_routes(
   junctions: List(Posn),
   trails: Array2D(Path),
 ) -> Dict(Posn, List(Route)) {
-  let routes = {
-    use junction <- list.flat_map(junctions)
-    use neighbor <- list.filter_map(junction_neighbors(junction))
-    case dict.has_key(trails, neighbor) {
-      True -> Ok(start_walking_to_next_junction(junction, neighbor, trails))
-      False -> Error(Nil)
-    }
-  }
-  use acc, r <- list.fold(routes, dict.new())
-  let #(from, Route(to, dist)) = r
+  use acc, #(from, route) <- list.fold(
+    find_routes(junctions, trails),
+    dict.new(),
+  )
   acc
-  |> dict.update(from, append_to_key(_, Route(to, dist)))
-  |> dict.update(to, append_to_key(_, Route(from, dist)))
+  |> dict.update(from, append_to_key(_, route))
+  |> dict.update(route.to, append_to_key(_, Route(from, route.distance)))
 }
 
 fn dfs(routes, from, to) {
