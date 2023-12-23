@@ -2,6 +2,7 @@ import gleam/list
 import gleam/dict.{type Dict}
 import gleam/string
 import gleam/int
+import gleam/result
 
 pub type Posn {
   Posn(r: Int, c: Int)
@@ -16,13 +17,29 @@ pub fn add_posns(p1: Posn, p2: Posn) -> Posn {
   }
 }
 
+pub fn ortho_neighbors(p: Posn) -> List(Posn) {
+  let Posn(r, c) = p
+  [Posn(r + 1, c), Posn(r - 1, c), Posn(r, c + 1), Posn(r, c - 1)]
+}
+
 pub fn to_2d_array(xss: List(List(a))) -> Array2D(a) {
+  to_2d_array_using(xss, fn(x) { Ok(x) })
+}
+
+pub fn to_2d_array_using(
+  xss: List(List(a)),
+  f: fn(a) -> Result(b, Nil),
+) -> Array2D(b) {
   {
     use r, row <- list.index_map(xss)
     use c, cell <- list.index_map(row)
-    #(Posn(r, c), cell)
+    case f(cell) {
+      Ok(contents) -> Ok(#(Posn(r, c), contents))
+      Error(Nil) -> Error(Nil)
+    }
   }
   |> list.flatten
+  |> result.values
   |> dict.from_list
 }
 
@@ -44,7 +61,14 @@ pub fn to_list_of_lists(str: String) -> List(List(String)) {
 }
 
 pub fn parse_grid(str: String) -> Array2D(String) {
+  parse_grid_using(str, fn(x) { Ok(x) })
+}
+
+pub fn parse_grid_using(
+  str: String,
+  f: fn(String) -> Result(a, Nil),
+) -> Array2D(a) {
   str
   |> to_list_of_lists
-  |> to_2d_array
+  |> to_2d_array_using(f)
 }
