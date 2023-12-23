@@ -4,10 +4,10 @@ import adglent.{type Example, Example}
 import day22/solve
 
 type Problem1AnswerType =
-  String
+  Int
 
 type Problem2AnswerType =
-  String
+  Int
 
 /// Add examples for part 1 here:
 /// ```gleam
@@ -22,7 +22,7 @@ const part1_examples: List(Example(Problem1AnswerType)) = [
 2,0,5~2,2,5
 0,1,6~2,1,6
 1,1,8~1,1,9",
-    "5",
+    5,
   ),
 ]
 
@@ -39,7 +39,7 @@ const part2_examples: List(Example(Problem2AnswerType)) = [
 2,0,5~2,2,5
 0,1,6~2,1,6
 1,1,8~1,1,9",
-    "7",
+    7,
   ),
 ]
 

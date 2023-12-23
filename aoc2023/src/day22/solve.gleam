@@ -134,9 +134,7 @@ pub fn part1(input: String) {
 
   let vulnerable_blocks = vulnerable_blocks(below_blocks)
 
-  list.length(dict.keys(block_positions))
-  - list.length(vulnerable_blocks)
-  |> string.inspect
+  list.length(dict.keys(block_positions)) - list.length(vulnerable_blocks)
 }
 
 fn all_falling_blocks(n: Int, above: BlockTree, below: BlockTree) {
@@ -181,9 +179,8 @@ pub fn part2(input: String) {
 
   let vulnerable_blocks = vulnerable_blocks(below_blocks)
 
-  list.map(vulnerable_blocks, all_falling_blocks(_, above_blocks, below_blocks))
-  |> int.sum
-  |> string.inspect
+  use acc, b <- list.fold(vulnerable_blocks, 0)
+  acc + all_falling_blocks(b, above_blocks, below_blocks)
 }
 
 pub fn main() {
