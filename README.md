@@ -15,6 +15,7 @@ Solutions are in:
 * ⭐⭐⭐ I needed to do some research to figure out how to do this one, or it took me many abortive tries to figure out a working method
 * ⭐⭐⭐⭐ I couldn't figure this one out without seeing someone else discuss how they solved it
 * ⭐⭐⭐⭐⭐ I couldn't figure this one out without seeing someone else's code
+* ⛔ I couldn't do it
 
 ### Enjoyment rating
 * ♥️ Really annoying; the problem statement was confusing, or the solution didn't feel worth all the effort, or Part 2 was unsolvable without knowing obscure theory
