@@ -48,5 +48,5 @@ Solutions are in:
 | [Step Counter](https://adventofcode.com/2023/day/21)                   | [21](/aoc2023-other/day-21/day-21.rkt) | ⛔                                  | ⭐⭐⭐⭐       | ♥️♥️         | cellular automata
 | [Sand Slabs](https://adventofcode.com/2023/day/22)                     | [22](/aoc2023-other/day-22/day-22.rkt) | [22](/aoc2023/src/day22/solve.gleam) | ⭐⭐⭐        | ♥️♥️♥️♥️♥️ | simulation, BFS
 | [A Long Walk](https://adventofcode.com/2023/day/23)                    | [23](/aoc2023-other/day-23/day-23.rkt) | [23](/aoc2023/src/day23/solve.gleam) | ⭐⭐⭐        | ♥️♥️♥️     | DFS
-| [](https://adventofcode.com/2023/day/24)                               | [24](/aoc2023-other/day-24/day-24.rkt) | [24](/aoc2023/src/day24/solve.gleam) |            |            |
+| [Never Tell Me The Odds](https://adventofcode.com/2023/day/24) | [24-1](/aoc2023-other/day-24/day-24.rkt) [24-2](/aoc2023-other/day-24/day-24.ipynb) | ⛔ | ⭐⭐⭐ | ♥️♥️♥️ | algebra, linear equations, constraint solving
 | [](https://adventofcode.com/2023/day/25)                               | [25](/aoc2023-other/day-25/day-25.rkt) | [25](/aoc2023/src/day25/solve.gleam) |            |            |
