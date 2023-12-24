@@ -40,4 +40,4 @@
           #:when (apply valid-intersection? trial-paths))
          1)
 
-;; part 2 - in Z3 via Python
+;; part 2 - see day-24b.rkt

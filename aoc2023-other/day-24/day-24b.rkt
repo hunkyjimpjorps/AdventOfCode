@@ -21,6 +21,9 @@
              [_ (in-range 3)])
     (parse-hail-record hail)))
 
+;; part 1 - see day-24a.rkt
+;; part 2
+
 (define-symbolic px py pz vx vy vz integer?)
 
 (define sol
