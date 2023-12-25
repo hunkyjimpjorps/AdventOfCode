@@ -10,11 +10,11 @@
 (define input (fetch-aoc-input (find-session) 2023 24 #:cache #true))
 
 (define (->struct f str)
-  (~> str (string-split ",") (map (λ~> string-trim string->number) _) (apply f _)))
+  (~> str (string-split _ ",") (map (λ~> string-trim string->number) _) (apply f _)))
 
 (define (parse-hail-record str)
   (match-define (list p v) (string-split str " @ "))
-  (hail (->struct p posn) (->struct v vel)))
+  (hail (->struct posn p) (->struct vel v)))
 
 (define hail-paths
   (for/list ([hail (in-list (string-split input "\n"))] ;
