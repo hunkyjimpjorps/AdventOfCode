@@ -16,7 +16,10 @@
       [(list _ name left right) (values name (exits left right))])))
 
 (define (to-next-node start end dirs maze)
-  (for/fold ([current start] [acc 0] #:result acc) ([dir (in-cycle dirs)])
+  (for/fold ([current start]
+             [acc 0]
+             #:result acc)
+            ([dir (in-cycle dirs)])
     #:break (string-suffix? current end)
     (define node (hash-ref maze current))
     (case dir
@@ -28,5 +31,6 @@
 
 ;; part 2
 (for/lists (ns #:result (apply lcm ns))
-           ([start (in-list (hash-keys maze))] #:when (string-suffix? start "A"))
-           (to-next-node start "Z" directions maze))
+           ([start (in-list (hash-keys maze))]
+            #:when (string-suffix? start "A"))
+  (to-next-node start "Z" directions maze))

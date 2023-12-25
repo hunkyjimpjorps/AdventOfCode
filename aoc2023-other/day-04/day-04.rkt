@@ -8,7 +8,7 @@
          megaparsack/text
          threading)
 
-(struct card (n wins) #:transparent)
+(struct card (n wins))
 
 (define card/p
   (do (string/p "Card")

@@ -10,7 +10,7 @@
               [(col c) (in-indexed row)]
               #:when (not (equal? col #\#)))
     ; for now, we don't actually need to detect paths and slopes, just not-rocks
-    ; in part 1, all forks in the road go left or down, so we can just infer the path
+    ; in part 1, all forks in the road go right or down, so we can just infer the path
     ;    direction from the shape of the junction and form a network of junctions from there
     ; in part 2, the slopes are removed anyway
     (values (cons (add1 r) (add1 c)) col)))
@@ -23,7 +23,8 @@
 (define (get-neighbors posn type)
   (match-define (cons r c) posn)
   (match type
-    ['junction (~> (set (cons (add1 r) c) (cons r (add1 c))))]
+    ['junction
+     (~> (set (cons (add1 r) c) (cons r (add1 c))))]
     [_
      (~> (list (cons (add1 r) c) (cons (sub1 r) c) (cons r (add1 c)) (cons r (sub1 c)))
          (filter (curry hash-has-key? trails) _)
@@ -41,7 +42,9 @@
       [else (values k 'trail)])))
 
 (define (walk-to-next-junction start current [length 1] [seen (set start)])
-  (define next (~> current (get-neighbors _ 'trail) (set-subtract seen) set-first))
+  (define next (~> current
+                   (get-neighbors _ 'trail)
+                   (set-subtract seen) set-first))
   (cond
     [(equal? (hash-ref trails-with-junctions next) 'junction)
      (list (- (add1 length)) start next)] ; weird format is due to graph library
@@ -77,7 +80,7 @@
     [(equal? from to) acc]
     [else
      (define choices (filter (λ (path) (not (set-member? seen (car path)))) (hash-ref g from)))
-     (if (empty? choices) 0 ;; long dead-ends don't count
+     (if (empty? choices) 0 ; long dead-ends don't count
          (for/fold ([best acc])
                    ([path (in-list choices)]
                     #:do [(match-define (cons next dist) path)])

@@ -4,7 +4,7 @@
          threading
          memo)
 
-(struct hand (cards wager) #:transparent)
+(struct hand (cards wager))
 
 (define/match (card->int card)
   [((? char-numeric?)) (~> card string string->number)]
@@ -28,16 +28,16 @@
 (define input (~> (open-aoc-input (find-session) 2023 7 #:cache #true) port->lines))
 
 (define/memoize (identify-hand h)
-                (define freqs (~> h hand-cards (sort <) (group-by identity _) (map length _)))
-                (match freqs
-                  [(list-no-order 5) 8]
-                  [(list-no-order 1 4) 7]
-                  [(list-no-order 2 3) 6]
-                  [(list-no-order 1 1 3) 5]
-                  [(list-no-order 1 2 2) 4]
-                  [(list-no-order 1 1 1 2) 3]
-                  [(list-no-order 1 1 1 1 1) 2]
-                  [_ 1]))
+  (define freqs (~> h hand-cards (sort <) (group-by identity _) (map length _)))
+  (match freqs
+    [(list-no-order 5) 8]
+    [(list-no-order 1 4) 7]
+    [(list-no-order 2 3) 6]
+    [(list-no-order 1 1 3) 5]
+    [(list-no-order 1 2 2) 4]
+    [(list-no-order 1 1 1 2) 3]
+    [(list-no-order 1 1 1 1 1) 2]
+    [_ 1]))
 
 (define (compare-first-card cs1 cs2)
   (if (= (first cs1) (first cs2))
@@ -55,21 +55,26 @@
   (compare-hands identify-hand h1 h2))
 
 (define (total-score in #:jokers [jokers? #false])
+  (define sorted-hands
+    (~> in
+        (map (curry parse-hand #:jokers jokers?) _)
+        (sort (if jokers? compare-hands-no-wilds compare-hands-with-wilds))))
   (for/sum ([(h i)
-             (in-indexed (~> in
-                             (map (curry parse-hand #:jokers jokers?) _)
-                             (sort (if jokers? compare-hands-no-wilds compare-hands-with-wilds))))])
-           (* (add1 i) (hand-wager h))))
+             (in-indexed sorted-hands)])
+    (* (add1 i) (hand-wager h))))
 
 (total-score input)
 
 ;; part 2
 
 (define/memoize (find-best-joker-substitution h)
-                (for/fold ([best-hand (hand '() 0)]) ([wild (in-inclusive-range 2 14)])
-                  (define trial-hand
-                    (hand (map (λ (c) (if (= c 1) wild c)) (hand-cards h)) (hand-wager h)))
-                  (if (> (identify-hand trial-hand) (identify-hand best-hand)) trial-hand best-hand)))
+  (for/fold ([best-hand (hand '() 0)]) 
+            ([wild (in-inclusive-range 2 14)])
+    (define trial-hand
+      (hand (map (λ (c) (if (= c 1) wild c)) (hand-cards h)) (hand-wager h)))
+    (if (> (identify-hand trial-hand) (identify-hand best-hand)) 
+        trial-hand 
+        best-hand)))
 
 (define (compare-hands-with-wilds h1 h2)
   (compare-hands (λ~> find-best-joker-substitution identify-hand) h1 h2))

@@ -4,8 +4,8 @@
          threading
          data/heap)
 
-(struct state (p heat-lost previous history) #:transparent)
-(struct posn (r c) #:transparent)
+(struct state (p heat-lost previous history))
+(struct posn (r c))
 
 (define/match (add _p1 _p2)
   [((posn r1 c1) (posn r2 c2)) (posn (+ r1 r2) (+ c1 c2))])
@@ -25,11 +25,14 @@
   (cons (state-p s) (same-dir s)))
 
 (define (goal? n s)
-  (and (equal? goal-posn (state-p s)) (>= (length (same-dir s)) n)))
+  (and (equal? goal-posn (state-p s)) 
+       (>= (length (same-dir s)) n)))
 
 (define (same-dir s)
   (define history (state-history s))
-  (if (empty? history) '() (takef history (λ (n) (equal? n (car history))))))
+  (if (empty? history) 
+      '() 
+      (takef history (λ (n) (equal? n (car history))))))
 
 (define (find-good-neighbors min-dist max-dist s)
   (match-define (state p hl prev hist) s)

@@ -1,8 +1,7 @@
 #lang racket
 
 (require advent-of-code
-         threading
-         )
+         threading)
 
 (match-define (list times distances)
   (~> (open-aoc-input (find-session) 2023 6 #:cache #true) port->lines))
@@ -20,7 +19,8 @@
   (find-bound rtime dist rtime -1))
 
 (for/fold ([acc 1])
-          ([race-time (in-list (get-numbers times))] [distance (in-list (get-numbers distances))])
+          ([race-time (in-list (get-numbers times))]
+           [distance (in-list (get-numbers distances))])
   (* acc (add1 (- (upper-bound race-time distance) (lower-bound race-time distance)))))
 
 ;; part 2

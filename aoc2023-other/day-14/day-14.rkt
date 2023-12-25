@@ -15,15 +15,21 @@
     (~> col (chunks-by (curry equal? #\#)) (append-map (curryr sort char>?) _))))
 
 (define (score board)
-  (for*/sum ([col (in-list board)] [(row n) (in-indexed (reverse col))] #:when (equal? row #\O))
+  (for*/sum ([col (in-list board)] 
+             [(row n) (in-indexed (reverse col))] 
+             #:when (equal? row #\O))
             (add1 n)))
 
 ;; part 1
-(~> input roll-boulders score)
+(~> input 
+    roll-boulders 
+    score)
 
 ;; part 2
 (define (rotate-board xss)
-  (~> xss (map reverse _) transpose))
+  (~> xss 
+      (map reverse _) 
+      transpose))
 
 (define (full-cycle board)
   (foldl (λ (_ acc) (~> acc roll-boulders rotate-board)) board (range 4)))

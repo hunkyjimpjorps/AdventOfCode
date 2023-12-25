@@ -28,7 +28,8 @@
   [(#\J) (list go-north go-west)])
 
 (define (make-pipe-grid in)
-  (for*/hash ([(row r) (in-indexed (string-split in "\n"))] [(ch c) (in-indexed (string->list row))])
+  (for*/hash ([(row r) (in-indexed (string-split in "\n"))] 
+              [(ch c) (in-indexed (string->list row))])
     (values (posn (add1 r) (add1 c)) ch)))
 
 (define (get-valid-S-neighbors S grid)
@@ -74,7 +75,9 @@
 
 (define (trace-ray pt pipes grid)
   (define row (posn-r pt))
-  (for/fold ([acc 0] [corner #f] #:result acc)
+  (for/fold ([acc 0] 
+             [corner #f] 
+             #:result acc)
             ([col (in-naturals (posn-c pt))]
              #:do [(define test-pt (posn row col))]
              #:break (not (hash-has-key? grid test-pt))
@@ -89,4 +92,6 @@
       [(#\L #\J) (values acc #f)]
       [(_ _) (values acc corner)])))
 
-(~> pipe-grid hash-keys (count (λ~> (trace-rays pipe-loop-set pipe-grid)) _))
+(~> pipe-grid 
+    hash-keys 
+    (count (λ~> (trace-rays pipe-loop-set pipe-grid)) _))

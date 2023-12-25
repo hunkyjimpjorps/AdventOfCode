@@ -27,7 +27,9 @@
       (for ([neighbor (in-list (neighbors cons))] #:when (hash-has-key? g neighbor))
         (hash-set! update neighbor 'on)))
     (hash-union! g update #:combine/key (λ (_k _v v) v)))
-  (for/fold ([_ void] #:result (~>> g hash-values (count (curry equal? 'on)))) ([i (in-range n)])
+  (for/fold ([_ void] 
+             #:result (~>> g hash-values (count (curry equal? 'on)))) 
+            ([i (in-range n)])
     (displayln i)
     (make-one-step)))
 

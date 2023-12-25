@@ -3,9 +3,9 @@
 (require advent-of-code
          threading)
 
-(struct hail (posn vel) #:transparent)
-(struct posn (x y z) #:transparent)
-(struct vel (x y z) #:transparent)
+(struct hail (posn vel))
+(struct posn (x y z))
+(struct vel (x y z))
 
 (define input (fetch-aoc-input (find-session) 2023 24 #:cache #true))
 

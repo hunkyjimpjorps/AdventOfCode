@@ -4,8 +4,8 @@
          algorithms
          threading)
 
-(struct map-range (start end offset) #:transparent)
-(struct seed-range (start end) #:transparent)
+(struct map-range (start end offset))
+(struct seed-range (start end))
 
 (define input (fetch-aoc-input (find-session) 2023 5 #:cache #true))
 

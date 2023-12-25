@@ -8,10 +8,10 @@
          megaparsack/text
          racket/struct)
 
-(struct part (x m a s) #:transparent)
-(struct rule (rating comparison threshold action) #:transparent)
-(struct just (action) #:transparent)
-(struct interval (from to) #:transparent)
+(struct part (x m a s))
+(struct rule (rating comparison threshold action))
+(struct just (action))
+(struct interval (from to))
 
 (match-define (list raw-workflows raw-parts)
   (~> (fetch-aoc-input (find-session) 2023 19 #:cache #true)

@@ -31,23 +31,28 @@
 
 (define (group-into-parts cells [acc '()])
   (match* (cells acc)
-    [('() acc) acc]
-    [((list* (cons (and pt (posn x y)) n) cs) (list* (part n* (and pts (list* (posn x* y) rest-pts)))
-                                                     rest-acc))
+    [('() acc)
+     acc]
+    [((list* (cons (and pt (posn x y)) n) cs)
+      (list* (part n* (and pts (list* (posn x* y) rest-pts)))
+             rest-acc))
      #:when (= (- x x*) 1)
      (group-into-parts cs (cons (part (+ n (* n* 10)) (cons pt pts)) rest-acc))]
-    [((list* (cons pt n) cs) acc) (group-into-parts cs (cons (part n (list pt)) acc))]))
+    [((list* (cons pt n) cs) acc)
+     (group-into-parts cs (cons (part n (list pt)) acc))]))
 
 (define (neighbors p)
-  (for*/list ([dx '(-1 0 1)] [dy '(-1 0 1)] #:unless (and (= dx 0) (= dy 0)))
+  (for*/list ([dx '(-1 0 1)]
+              [dy '(-1 0 1)]
+              #:unless (and (= dx 0) (= dy 0)))
     (posn (+ dx (posn-x p)) (+ dy (posn-y p)))))
 
 (define to-neighbors (λ~>> part-posns (append-map neighbors) remove-duplicates))
 (define (symbol-in-neighbors b pt acc)
   (~>> pt
        to-neighbors
-       (ormap (λ (p)
-                (let ([lookup (hash-ref b p #f)]) (or (equal? lookup 'gear) (equal? lookup 'other)))))
+       (ormap (λ (p) (let ([lookup (hash-ref b p #f)])
+                       (or (equal? lookup 'gear) (equal? lookup 'other)))))
        ((λ (bool) (if bool (+ acc (part-n pt)) acc)))))
 
 ;; part 1
@@ -56,8 +61,7 @@
 
 ;; part 2
 (define gears (~>> board (find-cells (curry equal? 'gear)) (map car)))
-(define parts-with-neighbors
-  (~>> parts (map (λ (pt) (struct-copy part pt [posns (to-neighbors pt)])))))
+(define parts-with-neighbors (map (λ (pt) (struct-copy part pt [posns (to-neighbors pt)])) parts))
 
 (define (find-parts-near-gear pts gear)
   (filter-map (λ (pt) (and (findf (curry equal? gear) (part-posns pt)) (part-n pt))) pts))

@@ -15,14 +15,18 @@
     n))
 
 (define (count-prior-empty-ranks rank empty-ranks)
-  (~> empty-ranks (takef (curryr < rank)) length))
+  (~> empty-ranks 
+      (takef (curryr < rank)) 
+      length))
 
 (define empty-rows (get-empty-ranks input))
 (define empty-columns (get-empty-ranks (apply map list input))) ;; transpose
 
 (define (sum-of-star-distances in expand-by)
   (define stars
-    (for*/list ([(row x) (in-indexed in)] [(col y) (in-indexed row)] #:when (equal? col #\#))
+    (for*/list ([(row x) (in-indexed in)] 
+                [(col y) (in-indexed row)] 
+                #:when (equal? col #\#))
       (posn (+ x (* (sub1 expand-by) (count-prior-empty-ranks x empty-rows)))
             (+ y (* (sub1 expand-by) (count-prior-empty-ranks y empty-columns))))))
   (for/sum ([star-pair (in-combinations stars 2)])

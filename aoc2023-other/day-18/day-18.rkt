@@ -2,7 +2,7 @@
 (require advent-of-code
          threading)
 
-(struct coord (x y) #:transparent)
+(struct coord (x y))
 
 (define input (~> (fetch-aoc-input (find-session) 2023 18 #:cache #true)))
 
@@ -25,11 +25,14 @@
             ([dig (in-list (string-split input "\n"))])
     (define-values (dir dist) (parser dig))
     (define next-coord (go-to-next-coord current-coord dir dist))
-    (values (+ area (triangle-area current-coord next-coord)) (+ perimeter dist) next-coord)))
+    (values (+ area (triangle-area current-coord next-coord)) 
+            (+ perimeter dist) next-coord)))
 
 ;; part 1
 (define (parse-front dig)
-  (match-define (regexp #rx"(.) (.*) \\((.*)\\)" (list _ dir (app string->number dist) _hex)) dig)
+  (match-define (regexp #rx"(.) (.*) \\((.*)\\)" 
+                        (list _ dir (app string->number dist) _hex)) 
+    dig)
   (values dir dist))
 
 (find-area-using parse-front)
@@ -37,7 +40,8 @@
 ;; part 2
 
 (define (parse-hex dig)
-  (match-define (regexp #rx".*\\(#(.....)(.)\\)" (list _ (app (curryr string->number 16) dist) dir))
+  (match-define (regexp #rx".*\\(#(.....)(.)\\)" 
+                        (list _ (app (curryr string->number 16) dist) dir))
     dig)
   (values dir dist))
 

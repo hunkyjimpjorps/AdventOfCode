@@ -8,9 +8,9 @@
          megaparsack/text)
 
 (struct broadcaster ())
-(struct flipflop (state received) #:transparent)
-(struct conjunction (recieved) #:transparent)
-(struct cable (type dests) #:transparent)
+(struct flipflop (state received))
+(struct conjunction (recieved))
+(struct cable (type dests))
 (struct nothing ())
 
 (define charlist->symbol (λ~>> (apply string) string->symbol))
@@ -24,7 +24,8 @@
             (do (char/p #\&)
               [name <- (many+/p letter/p)]
               (pure (cons (charlist->symbol name) (conjunction (hash)))))
-            (do [name <- (many+/p letter/p)] (pure (cons (charlist->symbol name) (broadcaster)))))))
+            (do [name <- (many+/p letter/p)]
+              (pure (cons (charlist->symbol name) (broadcaster)))))))
 
 (define cable/p
   (do [mod <- module/p]
@@ -38,22 +39,23 @@
   (for/hash ([cable (in-list cables)])
     (values (car (cable-type cable)) (cable-dests cable))))
 
+(define (set-conjunction-initial-state c)
+  (cond
+    [(conjunction? (cdr c))
+     (~>> destinations
+          hash-keys
+          (filter (λ (k) (member (car c) (hash-ref destinations k))))
+          (map (λ (k) (cons k 'low)))
+          (make-immutable-hash)
+          conjunction
+          (cons (car c)))]
+    [else c]))
+
 (define (make-initial-conditions-hash cables)
-  (~> cables
-      (map cable-type _)
-      (map (λ (c)
-             (cond
-               [(conjunction? (cdr c))
-                (~> destinations
-                    hash-keys
-                    (filter (λ (k) (member (car c) (hash-ref destinations k))) _)
-                    (map (λ (k) (cons k 'low)) _)
-                    (make-immutable-hash)
-                    (conjunction)
-                    (cons (car c) _))]
-               [else c]))
-           _)
-      make-immutable-hash))
+  (~>> cables
+       (map cable-type)
+       (map set-conjunction-initial-state)
+       make-immutable-hash))
 
 (define (receive mod from tone)
   (match mod

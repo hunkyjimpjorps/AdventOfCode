@@ -8,8 +8,8 @@
          megaparsack/text
          racket/hash)
 
-(struct posn (x y z) #:transparent)
-(struct block (n from to) #:transparent)
+(struct posn (x y z))
+(struct block (n from to))
 
 (define input (fetch-aoc-input (find-session) 2023 22 #:cache #true))
 
