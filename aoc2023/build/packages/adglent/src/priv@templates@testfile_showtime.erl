@@ -1,1 +1,0 @@
--module(priv@templates@testfile_showtime).

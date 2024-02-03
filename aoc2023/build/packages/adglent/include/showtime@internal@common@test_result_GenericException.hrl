@@ -1,1 +1,0 @@
--record(generic_exception, {value :: gleam@dynamic:dynamic_()}).

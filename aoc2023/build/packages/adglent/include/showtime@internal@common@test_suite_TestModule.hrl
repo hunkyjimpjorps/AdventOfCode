@@ -1,1 +1,0 @@
--record(test_module, {name :: binary(), path :: gleam@option:option(binary())}).

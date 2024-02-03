@@ -1,1 +1,0 @@
--record(meta, {description :: binary(), tags :: list(binary())}).

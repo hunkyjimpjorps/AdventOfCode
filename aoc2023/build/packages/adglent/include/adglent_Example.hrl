@@ -1,1 +1,0 @@
--record(example, {input :: binary(), answer :: any()}).

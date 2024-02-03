@@ -1,1 +1,0 @@
--record(end_test_run, {num_modules :: integer()}).

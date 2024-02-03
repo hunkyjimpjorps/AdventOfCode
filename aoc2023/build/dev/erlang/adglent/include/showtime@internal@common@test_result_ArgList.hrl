@@ -1,1 +1,0 @@
--record(arg_list, {arg_list :: list(gleam@dynamic:dynamic_())}).
