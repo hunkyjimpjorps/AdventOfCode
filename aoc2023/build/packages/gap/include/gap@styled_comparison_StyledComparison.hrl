@@ -1,0 +1,1 @@
+-record(styled_comparison, {first :: binary(), second :: binary()}).

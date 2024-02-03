@@ -1,0 +1,1 @@
+-record(content, {unstyled_text :: binary()}).

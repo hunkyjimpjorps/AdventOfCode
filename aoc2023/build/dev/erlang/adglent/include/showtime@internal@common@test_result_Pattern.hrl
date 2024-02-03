@@ -1,0 +1,1 @@
+-record(pattern, {pattern :: binary()}).

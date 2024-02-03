@@ -1,0 +1,16 @@
+{application, gleam_community_maths, [
+    {vsn, "1.0.1"},
+    {applications, [gleam_stdlib,
+                    gleeunit]},
+    {description, "A basic maths library"},
+    {modules, [gleam_community@maths@arithmetics,
+               gleam_community@maths@combinatorics,
+               gleam_community@maths@conversion,
+               gleam_community@maths@elementary,
+               gleam_community@maths@metrics,
+               gleam_community@maths@piecewise,
+               gleam_community@maths@predicates,
+               gleam_community@maths@sequences,
+               gleam_community@maths@special]},
+    {registered, []}
+]}.

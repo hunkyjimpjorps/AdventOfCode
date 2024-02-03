@@ -1,0 +1,1 @@
+-record(ignored, {reason :: showtime@internal@common@test_result:ignore_reason()}).

@@ -1,0 +1,1 @@
+-record(finished, {num_modules :: integer()}).
