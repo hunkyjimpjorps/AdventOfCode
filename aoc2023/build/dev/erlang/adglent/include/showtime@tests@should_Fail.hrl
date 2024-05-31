@@ -1,0 +1,1 @@
+-record(fail, {meta :: gleam@option:option(showtime@tests@meta:meta())}).

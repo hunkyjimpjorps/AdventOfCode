@@ -1,0 +1,1 @@
+-record(module, {name :: binary()}).

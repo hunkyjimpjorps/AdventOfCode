@@ -1,0 +1,1 @@
+-record(separator, {char :: binary()}).

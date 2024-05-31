@@ -1,0 +1,29 @@
+name = "adglent"
+version = "1.2.0"
+
+description = "Advent of code helper - automating setup of tests, solution template and problem input"
+licences = ["Apache-2.0"]
+repository = { type = "github", user = "JohnBjrk", repo = "adglent" }
+
+internal_modules = [
+  "adglent/priv",
+  "adglent/priv/*",
+  "showtime/internal/*",
+]
+gleam = ">= 0.32.0"
+
+[dependencies]
+gleam_stdlib = "~> 0.32"
+simplifile = "~> 1.0"
+gleam_http = "~> 3.5"
+gleam_erlang = "~> 0.23.0"
+gleam_otp = "~> 0.8.0"
+gleam_community_ansi = "~> 1.2"
+glint = "~> 0.13.0"
+gap = "~> 1.0"
+snag = "~> 0.2.0"
+tom = "~> 0.2.0"
+gleam_httpc = "~> 2.1"
+
+[dev-dependencies]
+gleeunit = "~> 1.0"
