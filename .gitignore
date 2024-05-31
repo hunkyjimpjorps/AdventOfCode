@@ -5,3 +5,4 @@ compiled/*
 input
 .clj-kondo/*
 .lsp/*
+adglent/*

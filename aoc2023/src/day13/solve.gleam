@@ -43,10 +43,11 @@ fn get_symmetry_type(xss: List(List(String)), errors: Int) {
 
 fn summarize_notes(symmetries: List(SymmetryType)) {
   use acc, note <- list.fold(symmetries, 0)
-  case note {
+  acc
+  + case note {
     Horizontal(n) -> 100 * n
     Vertical(n) -> n
-  } + acc
+  }
 }
 
 fn solve(input: String, errors: Int) {

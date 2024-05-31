@@ -41,9 +41,8 @@ fn do_count(
   case template, groups, left, gap {
     "", [], 0, _ -> 1
     "?" <> t_rest, [g, ..g_rest], 0, False ->
-      do_count(t_rest, g_rest, g - 1, g == 1, cache) + {
-        do_count(t_rest, groups, 0, False, cache)
-      }
+      do_count(t_rest, g_rest, g - 1, g == 1, cache)
+      + do_count(t_rest, groups, 0, False, cache)
     "?" <> t_rest, [], 0, False
     | "?" <> t_rest, _, 0, True
     | "." <> t_rest, _, 0, _ -> do_count(t_rest, groups, 0, False, cache)

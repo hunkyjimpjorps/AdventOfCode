@@ -42,7 +42,9 @@ pub fn insert(
     queue.refs
     |> dict.insert(value, ref)
 
-  PriorityQueue(refs: refs, queue: insert_(#(value, ref), priority, queue.queue),
+  PriorityQueue(
+    refs: refs,
+    queue: insert_(#(value, ref), priority, queue.queue),
   )
 }
 

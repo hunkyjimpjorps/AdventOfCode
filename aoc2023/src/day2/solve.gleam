@@ -45,10 +45,9 @@ pub fn part2(input: String) {
       green: int.max(green, acc.green),
     )
   }
-  |> list.fold(
-    from: 0,
-    with: fn(acc, g: Game) { acc + g.red * g.blue * g.green },
-  )
+  |> list.fold(from: 0, with: fn(acc, g: Game) {
+    acc + g.red * g.blue * g.green
+  })
 }
 
 pub fn main() {

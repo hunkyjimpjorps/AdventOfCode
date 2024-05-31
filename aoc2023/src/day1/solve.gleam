@@ -10,17 +10,14 @@ pub fn part1(input: String) {
 
   input
   |> string.split("\n")
-  |> list.fold(
-    0,
-    fn(acc, s) {
-      let matches = regex.scan(s, with: re)
+  |> list.fold(0, fn(acc, s) {
+    let matches = regex.scan(s, with: re)
 
-      let assert Ok(Match(content: first, ..)) = list.first(matches)
-      let assert Ok(Match(content: last, ..)) = list.last(matches)
-      let assert Ok(i) = int.parse(first <> last)
-      acc + i
-    },
-  )
+    let assert Ok(Match(content: first, ..)) = list.first(matches)
+    let assert Ok(Match(content: last, ..)) = list.last(matches)
+    let assert Ok(i) = int.parse(first <> last)
+    acc + i
+  })
   |> string.inspect
 }
 
@@ -37,14 +34,10 @@ const substitutions = [
 ]
 
 pub fn part2(input: String) {
-  list.fold(
-    over: substitutions,
-    from: input,
-    with: fn(acc, sub) {
-      let #(from, to) = sub
-      string.replace(in: acc, each: from, with: to)
-    },
-  )
+  list.fold(over: substitutions, from: input, with: fn(acc, sub) {
+    let #(from, to) = sub
+    string.replace(in: acc, each: from, with: to)
+  })
   |> part1
 }
 

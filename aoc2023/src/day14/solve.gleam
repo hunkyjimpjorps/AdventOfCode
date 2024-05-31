@@ -23,7 +23,8 @@ fn roll_boulders(strs: List(String)) {
 
 fn score(matrix) {
   use acc, col <- list.fold(matrix, 0)
-  acc + {
+  acc
+  + {
     use col_acc, char, n <- list.index_fold(list.reverse(col), 0)
     case char {
       "O" -> col_acc + n + 1

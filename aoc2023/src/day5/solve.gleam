@@ -132,22 +132,17 @@ fn do_remap_range(r: SeedRange, mapper: Mapper, acc: List(SeedRange)) {
     ]
     // range overlaps end but not start -> left side transformed, right side moves to next mapping
     [m, ..ms] if r.start >= m.start && r.end > m.end ->
-      do_remap_range(
-        SRange(m.end + 1, r.end),
-        ms,
-        [transform_range(SRange(r.start, m.end), m), ..acc],
-      )
+      do_remap_range(SRange(m.end + 1, r.end), ms, [
+        transform_range(SRange(r.start, m.end), m),
+        ..acc
+      ])
     // mapping is fully inside range -> left not transformed, middle transformed, right to next
     [m, ..ms] ->
-      do_remap_range(
-        SRange(m.end + 1, r.end),
-        ms,
-        [
-          SRange(r.start, m.start - 1),
-          transform_range(SRange(m.start, m.end), m),
-          ..acc
-        ],
-      )
+      do_remap_range(SRange(m.end + 1, r.end), ms, [
+        SRange(r.start, m.start - 1),
+        transform_range(SRange(m.start, m.end), m),
+        ..acc
+      ])
   }
 }
 
