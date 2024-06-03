@@ -4,6 +4,7 @@
 packages = [
   { name = "argv", version = "1.0.2", build_tools = ["gleam"], requirements = [], otp_app = "argv", source = "hex", outer_checksum = "BA1FF0929525DEBA1CE67256E5ADF77A7CDDFE729E3E3F57A5BDCAA031DED09D" },
   { name = "filepath", version = "1.0.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "filepath", source = "hex", outer_checksum = "EFB6FF65C98B2A16378ABC3EE2B14124168C0CE5201553DE652E2644DCFDB594" },
+  { name = "gary", version = "1.0.1", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "gary", source = "hex", outer_checksum = "4C05611EEC74876A1E36309EED22C826B92F22E566579ACBC65C579CD615EC60" },
   { name = "gladvent", version = "0.7.3", build_tools = ["gleam"], requirements = ["argv", "filepath", "gleam_erlang", "gleam_json", "gleam_otp", "gleam_package_interface", "gleam_stdlib", "glint", "parallel_map", "shellout", "simplifile", "snag", "spinner", "tom"], otp_app = "gladvent", source = "hex", outer_checksum = "59D93FD759427BCE8EE9828C0B62A3CD18362225F948C9789D334DCEAD621358" },
   { name = "gleam_community_ansi", version = "1.4.0", build_tools = ["gleam"], requirements = ["gleam_community_colour", "gleam_stdlib"], otp_app = "gleam_community_ansi", source = "hex", outer_checksum = "FE79E08BF97009729259B6357EC058315B6FBB916FAD1C2FF9355115FEB0D3A4" },
   { name = "gleam_community_colour", version = "1.4.0", build_tools = ["gleam"], requirements = ["gleam_json", "gleam_stdlib"], otp_app = "gleam_community_colour", source = "hex", outer_checksum = "795964217EBEDB3DA656F5EB8F67D7AD22872EB95182042D3E7AFEF32D3FD2FE" },
@@ -26,6 +27,7 @@ packages = [
 ]
 
 [requirements]
-gladvent = { version = ">= 0.7.3 and < 1.0.0"}
+gary = { version = ">= 1.0.1 and < 2.0.0"}
+gladvent = { version = ">= 0.7.3 and < 1.0.0" }
 gleam_stdlib = { version = ">= 0.34.0 and < 2.0.0" }
 gleeunit = { version = ">= 1.0.0 and < 2.0.0" }
