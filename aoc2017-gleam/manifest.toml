@@ -27,7 +27,7 @@ packages = [
 ]
 
 [requirements]
-gary = { version = ">= 1.0.1 and < 2.0.0"}
+gary = { version = ">= 1.0.1 and < 2.0.0" }
 gladvent = { version = ">= 0.7.3 and < 1.0.0" }
 gleam_stdlib = { version = ">= 0.34.0 and < 2.0.0" }
 gleeunit = { version = ">= 1.0.0 and < 2.0.0" }
