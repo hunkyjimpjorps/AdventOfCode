@@ -1,5 +1,4 @@
 import gleam/int
-import gleam/io
 import gleam/string
 
 const sixteen_bits = 0xFFFF
