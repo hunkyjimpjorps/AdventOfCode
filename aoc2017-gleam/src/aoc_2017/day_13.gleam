@@ -1,75 +1,58 @@
 import gleam/int
 import gleam/list
+import gleam/option.{Some}
+import gleam/regex.{Match}
 import gleam/string
 
-pub type Direction {
-  North
-  Northeast
-  Northwest
-  South
-  Southeast
-  Southwest
+pub type Layer {
+  Layer(depth: Int, cycle: Int)
 }
 
-type HexPosition {
-  HexPosition(x: Int, y: Int, z: Int)
+pub type Status {
+  Caught(severity: Int)
+  Free
 }
 
-const start = HexPosition(0, 0, 0)
+pub fn parse(input: String) {
+  let assert Ok(re) = regex.from_string("([0-9]+): ([0-9]+)")
 
-fn to_direction(str: String) -> Direction {
-  case str {
-    "n" -> North
-    "ne" -> Northeast
-    "nw" -> Northwest
-    "s" -> South
-    "se" -> Southeast
-    "sw" -> Southwest
-    _ -> panic as "unrecognized direction"
+  use acc, row <- list.fold(string.split(input, "\n"), [])
+  let assert [Match(submatches: [Some(depth), Some(cycle)], ..)] =
+    regex.scan(row, with: re)
+  let assert Ok(depth) = int.parse(depth)
+  let assert Ok(cycle) = int.parse(cycle)
+  [Layer(depth, cycle), ..acc]
+}
+
+fn severity(time: Int, depth: Int, cycle: Int) {
+  case { time + depth } % { 2 * { cycle - 1 } } {
+    0 -> Caught(cycle * depth)
+    _ -> Free
   }
 }
 
-fn distance(hp1: HexPosition, hp2: HexPosition) -> Int {
-  {
-    int.absolute_value(hp1.x - hp2.x)
-    + int.absolute_value(hp1.y - hp2.y)
-    + int.absolute_value(hp1.z - hp2.z)
-  }
-  / 2
-}
-
-fn move(p, direction) -> HexPosition {
-  case direction {
-    North -> HexPosition(..p, y: p.y + 1, z: p.z - 1)
-    South -> HexPosition(..p, y: p.y - 1, z: p.z + 1)
-    Northeast -> HexPosition(..p, x: p.x + 1, z: p.z - 1)
-    Southwest -> HexPosition(..p, x: p.x - 1, z: p.z + 1)
-    Southeast -> HexPosition(..p, x: p.x + 1, y: p.y - 1)
-    Northwest -> HexPosition(..p, x: p.x - 1, y: p.y + 1)
+pub fn pt_1(input: List(Layer)) {
+  use acc, layer <- list.fold(input, 0)
+  case severity(0, layer.depth, layer.cycle) {
+    Free -> acc
+    Caught(severity) -> acc + severity
   }
 }
 
-pub fn parse(input: String) -> List(Direction) {
-  input
-  |> string.split(",")
-  |> list.map(to_direction)
+pub fn pt_2(input: List(Layer)) {
+  find_delay(0, input)
 }
 
-pub fn pt_1(input: List(Direction)) {
-  do_walk(input, start, 0).0
-}
-
-pub fn pt_2(input: List(Direction)) {
-  do_walk(input, start, 0).1
-}
-
-fn do_walk(steps, position, max) {
-  case steps {
-    [] -> #(distance(position, HexPosition(0, 0, 0)), max)
-    [next, ..rest] -> {
-      let new_position = move(position, next)
-      let new_max = int.max(max, distance(new_position, start))
-      do_walk(rest, new_position, new_max)
-    }
+fn find_delay(delay: Int, layers: List(Layer)) {
+  let trial_run =
+    list.try_fold(layers, Free, fn(_, layer) {
+      case severity(delay, layer.depth, layer.cycle) {
+        Free -> Ok(Free)
+        Caught(_) -> Error(Nil)
+      }
+    })
+  case trial_run {
+    Ok(_) -> delay
+    _err -> find_delay(delay + 1, layers)
   }
 }
