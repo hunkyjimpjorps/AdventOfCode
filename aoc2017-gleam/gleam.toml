@@ -18,6 +18,7 @@ gladvent = ">= 0.7.3 and < 1.0.0"
 gary = ">= 1.0.1 and < 2.0.0"
 gleam_otp = ">= 0.10.0 and < 1.0.0"
 gleam_erlang = ">= 0.25.0 and < 1.0.0"
+glearray = ">= 0.2.2 and < 1.0.0"
 
 [dev-dependencies]
 gleeunit = ">= 1.0.0 and < 2.0.0"
