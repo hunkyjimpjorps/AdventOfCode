@@ -4,7 +4,7 @@ import gleam/list
 import gleam/result
 import gleam/set
 import gleam/string
-import helpers/state
+import helpers/set_state
 
 pub fn pt_1(input: String) {
   use acc, row <- list.fold(make_rows(input), 0)
@@ -29,7 +29,7 @@ fn popcount(hex_number: String) -> Int {
 }
 
 pub fn pt_2(input: String) {
-  let grid = state.start_actor(make_grid(input))
+  let grid = set_state.start_actor(make_grid(input))
 
   find_next_group(grid, 0)
 }
@@ -57,7 +57,7 @@ fn make_grid(input: String) {
 }
 
 fn find_next_group(actor, count) {
-  case state.pop(actor) {
+  case set_state.pop(actor) {
     Ok(p) -> {
       list.each(neighbors(p), remove_neighbor(actor, _))
       find_next_group(actor, count + 1)
@@ -72,9 +72,9 @@ fn neighbors(of: #(Int, Int)) {
 }
 
 fn remove_neighbor(actor, point) {
-  case state.check(actor, point) {
+  case set_state.check(actor, point) {
     True -> {
-      state.drop(actor, point)
+      set_state.drop(actor, point)
       list.each(neighbors(point), remove_neighbor(actor, _))
     }
     False -> Nil
