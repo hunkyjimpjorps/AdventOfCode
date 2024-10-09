@@ -1,1 +1,0 @@
--record(tom_parse_error, {error :: tom:parse_error()}).

@@ -1,1 +1,0 @@
--record(aligned, {content :: binary()}).

@@ -1,1 +1,0 @@
--record(game, {red :: integer(), blue :: integer(), green :: integer()}).

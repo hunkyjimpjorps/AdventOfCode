@@ -1,1 +1,0 @@
--record(m_range, {start :: integer(), 'end' :: integer(), offset :: integer()}).

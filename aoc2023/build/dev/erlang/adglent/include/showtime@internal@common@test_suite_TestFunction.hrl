@@ -1,1 +1,0 @@
--record(test_function, {name :: binary()}).

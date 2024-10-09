@@ -1,1 +1,0 @@
--module(priv@templates@solution).

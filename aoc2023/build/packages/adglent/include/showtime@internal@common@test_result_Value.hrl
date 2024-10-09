@@ -1,1 +1,0 @@
--record(value, {value :: gleam@dynamic:dynamic_()}).
