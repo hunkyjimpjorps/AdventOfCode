@@ -26,7 +26,7 @@ fn parse(input: String) -> List(Direction) {
 }
 
 fn travel(moves: List(Direction), current: Position, visited: Set(Position)) {
-  use <- bool.guard(list.is_empty(moves), set.size(visited))
+  use <- bool.guard(list.is_empty(moves), visited)
   let assert [dir, ..rest] = moves
   let next = case dir {
     Up -> Posn(current.x, current.y + 1)
@@ -38,9 +38,23 @@ fn travel(moves: List(Direction), current: Position, visited: Set(Position)) {
 }
 
 pub fn pt_1(input: String) {
-  input |> parse |> travel(Posn(0, 0), set.insert(set.new(), Posn(0, 0)))
+  input
+  |> parse
+  |> travel(Posn(0, 0), set.insert(set.new(), Posn(0, 0)))
+  |> set.size()
 }
 
 pub fn pt_2(input: String) {
-  todo as "part 2 not implemented"
+  let assert [santa_route, robosanta_route] =
+    input
+    |> parse
+    |> list.sized_chunk(into: 2)
+    |> list.transpose
+
+  let start = set.insert(set.new(), Posn(0, 0))
+
+  let santa_houses = travel(santa_route, Posn(0, 0), start)
+  let robosanta_houses = travel(robosanta_route, Posn(0, 0), start)
+
+  set.union(santa_houses, robosanta_houses) |> set.size()
 }
