@@ -17,6 +17,7 @@ gleam = ">= 1.4.0"
 gleam_stdlib = ">= 0.34.0 and < 2.0.0"
 gladvent = {path = "../gladvent"}
 rememo = ">= 2.0.0 and < 3.0.0"
+gleam_json = ">= 1.0.1 and < 2.0.0"
 
 [dev-dependencies]
 gleeunit = ">= 1.0.0 and < 2.0.0"
