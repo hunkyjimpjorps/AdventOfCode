@@ -39,7 +39,7 @@ fn read_instruction(str: String) -> Instruction {
       let assert Ok(focal) = int.parse(focal_str)
       Insert(label, focal)
     }
-    _ -> Remove(string.drop_right(str, 1))
+    _ -> Remove(string.drop_end(str, 1))
   }
 }
 
@@ -52,7 +52,7 @@ fn parse_instructions(insts: List(String)) -> Dict(Int, List(#(String, Int))) {
 }
 
 fn remove_lens(boxes, label) {
-  use v <- dict.update(boxes, hash_algorithm(label))
+  use v <- dict.upsert(boxes, hash_algorithm(label))
   case v {
     Some(lenses) ->
       case list.key_pop(lenses, label) {
@@ -64,7 +64,7 @@ fn remove_lens(boxes, label) {
 }
 
 fn insert_lens(boxes, label, focal) {
-  use v <- dict.update(boxes, hash_algorithm(label))
+  use v <- dict.upsert(boxes, hash_algorithm(label))
   case v {
     Some(lenses) -> list.key_set(lenses, label, focal)
     None -> [#(label, focal)]

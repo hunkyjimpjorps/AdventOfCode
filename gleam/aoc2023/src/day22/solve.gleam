@@ -35,7 +35,7 @@ type AllBlocks =
 type BlockTree =
   Dict(Int, Set(Int))
 
-fn parse_block(index: Int, input: String) -> Block {
+fn parse_block(input: String, index: Int) -> Block {
   let assert Ok(re) = regex.from_string("(.*),(.*),(.*)~(.*),(.*),(.*)")
 
   let assert [scan] = regex.scan(with: re, content: input)
@@ -83,7 +83,7 @@ fn do_find_lowest(space: Space, b: Block, z: Int) -> Space {
 
 fn to_block_positions(space: Space) -> AllBlocks {
   use acc, point, index <- dict.fold(space, dict.new())
-  use points <- dict.update(acc, index)
+  use points <- dict.upsert(acc, index)
   case points {
     Some(ps) -> [point, ..ps]
     None -> [point]
@@ -92,7 +92,7 @@ fn to_block_positions(space: Space) -> AllBlocks {
 
 fn above_blocks(blocks: AllBlocks) -> BlockTree {
   use acc, block, points <- dict.fold(blocks, dict.new())
-  use _ <- dict.update(acc, block.index)
+  use _ <- dict.upsert(acc, block.index)
   {
     use above_block, above_points <- dict.filter(blocks)
     above_block.index != block.index
@@ -105,7 +105,7 @@ fn above_blocks(blocks: AllBlocks) -> BlockTree {
 
 fn below_blocks(blocktree: BlockTree) -> BlockTree {
   use acc, block, _ <- dict.fold(blocktree, dict.new())
-  use _ <- dict.update(acc, block)
+  use _ <- dict.upsert(acc, block)
   {
     use _, aboves <- dict.filter(blocktree)
     set.contains(aboves, block)

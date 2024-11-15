@@ -101,7 +101,7 @@ fn generate_routes(
     find_routes(junctions, trails),
     dict.new(),
   )
-  dict.update(acc, from, append_to_key(_, route))
+  dict.upsert(acc, from, append_to_key(_, route))
 }
 
 fn generate_2way_routes(
@@ -113,8 +113,8 @@ fn generate_2way_routes(
     dict.new(),
   )
   acc
-  |> dict.update(from, append_to_key(_, route))
-  |> dict.update(route.to, append_to_key(_, Route(from, route.distance)))
+  |> dict.upsert(from, append_to_key(_, route))
+  |> dict.upsert(route.to, append_to_key(_, Route(from, route.distance)))
 }
 
 fn dfs(routes, from, to) {

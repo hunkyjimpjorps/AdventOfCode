@@ -1,8 +1,8 @@
 import adglent.{First, Second}
-import gleam/io
 import gleam/int
-import gleam/string
+import gleam/io
 import gleam/list
+import gleam/string
 
 type Posn {
   Posn(x: Int, y: Int)
@@ -33,7 +33,7 @@ fn parse_with_expansion(input: String, expansion: Int) -> List(Posn) {
   let empty_col_list = find_empty(list.transpose(grid))
 
   {
-    use r, row <- list.index_map(grid)
+    use row, r <- list.index_map(grid)
     use acc, cell, c <- list.index_fold(over: row, from: [])
 
     let p = Posn(r, c)

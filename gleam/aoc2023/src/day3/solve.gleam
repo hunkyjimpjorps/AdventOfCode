@@ -1,10 +1,10 @@
 import adglent.{First, Second}
-import gleam/io
 import gleam/dict.{type Dict}
-import gleam/string
-import gleam/list
 import gleam/int
+import gleam/io
+import gleam/list
 import gleam/order.{type Order, Eq}
+import gleam/string
 
 type Coord {
   Coord(x: Int, y: Int)
@@ -43,8 +43,8 @@ fn to_symbol(c: String) -> Symbol {
 
 fn to_board(input: String) -> Board {
   {
-    use y, r <- list.index_map(string.split(input, "\n"))
-    use x, c <- list.index_map(string.to_graphemes(r))
+    use r, y <- list.index_map(string.split(input, "\n"))
+    use c, x <- list.index_map(string.to_graphemes(r))
     #(Coord(x, y), to_symbol(c))
   }
   |> list.flatten()

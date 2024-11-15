@@ -64,7 +64,7 @@ fn win_more_cards(cards: List(String), count: Dict(Int, Int)) {
 fn update_counts(n: Int, card: Card, count: Dict(Int, Int)) -> Dict(Int, Int) {
   let assert Ok(bonus) = dict.get(count, card.number)
   use acc, n <- list.fold(list.range(card.number + 1, card.number + n), count)
-  use c <- dict.update(acc, n)
+  use c <- dict.upsert(acc, n)
   case c {
     Some(i) -> i + bonus
     None -> panic as "won a card that doesn't exist in the card pile"

@@ -1,9 +1,9 @@
 import adglent.{First, Second}
 import gleam/bool
 import gleam/dict.{type Dict}
-import gleam/list
 import gleam/int
 import gleam/io
+import gleam/list
 import gleam/set.{type Set}
 import gleam/string
 
@@ -27,9 +27,7 @@ const east = Posn(0, 1)
 const west = Posn(0, -1)
 
 const initial_directions = [
-  #(north, ["|", "7", "F"]),
-  #(south, ["|", "J", "L"]),
-  #(east, ["-", "J", "7"]),
+  #(north, ["|", "7", "F"]), #(south, ["|", "J", "L"]), #(east, ["-", "J", "7"]),
   #(west, ["-", "F", "L"]),
 ]
 
@@ -47,8 +45,8 @@ fn pipe_neighbors(pipe: String) -> List(Posn) {
 
 fn make_grid(input: String) -> PipeGrid {
   {
-    use r, row <- list.index_map(string.split(input, "\n"))
-    use c, col <- list.index_map(string.to_graphemes(row))
+    use row, r <- list.index_map(string.split(input, "\n"))
+    use col, c <- list.index_map(string.to_graphemes(row))
     #(Posn(r, c), col)
   }
   |> list.flatten

@@ -80,7 +80,7 @@ fn part(input: String, comparator: fn(Hand, Hand) -> Order) {
   |> string.split("\n")
   |> list.map(parse_hand)
   |> list.sort(comparator)
-  |> list.index_map(fn(i, h) { { i + 1 } * h.wager })
+  |> list.index_map(fn(h, i) { { i + 1 } * h.wager })
   |> int.sum
   |> string.inspect
 }

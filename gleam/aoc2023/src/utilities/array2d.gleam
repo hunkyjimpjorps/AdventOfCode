@@ -1,8 +1,8 @@
-import gleam/list
 import gleam/dict.{type Dict}
-import gleam/string
 import gleam/int
+import gleam/list
 import gleam/result
+import gleam/string
 
 pub type Posn {
   Posn(r: Int, c: Int)
@@ -31,8 +31,8 @@ pub fn to_2d_array_using(
   f: fn(a) -> Result(b, Nil),
 ) -> Array2D(b) {
   {
-    use r, row <- list.index_map(xss)
-    use c, cell <- list.index_map(row)
+    use row, r <- list.index_map(xss)
+    use cell, c <- list.index_map(row)
     case f(cell) {
       Ok(contents) -> Ok(#(Posn(r, c), contents))
       Error(Nil) -> Error(Nil)
@@ -45,8 +45,8 @@ pub fn to_2d_array_using(
 
 pub fn to_2d_intarray(xss: List(List(String))) -> Array2D(Int) {
   {
-    use r, row <- list.index_map(xss)
-    use c, cell <- list.index_map(row)
+    use row, r <- list.index_map(xss)
+    use cell, c <- list.index_map(row)
     let assert Ok(n) = int.parse(cell)
     #(Posn(r, c), n)
   }
