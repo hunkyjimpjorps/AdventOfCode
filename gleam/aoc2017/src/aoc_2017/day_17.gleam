@@ -32,7 +32,7 @@ fn next_spin(list: List(Int), position: Int, cycle: Int, step: Int) {
 
 fn insert_at(xs: List(a), at index: Int, insert new: a) {
   let #(left, right) = list.split(xs, index)
-  list.concat([left, [new], right])
+  list.flatten([left, [new], right])
 }
 
 pub fn pt_2(input: Int) {

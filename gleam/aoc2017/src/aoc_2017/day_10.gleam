@@ -72,6 +72,6 @@ fn fold_xor(xs: List(Int)) {
   let assert Ok(n) = list.reduce(xs, int.bitwise_exclusive_or)
   n
   |> int.to_base16()
-  |> string.pad_left(to: 2, with: "0")
+  |> string.pad_start(to: 2, with: "0")
   |> string.lowercase()
 }

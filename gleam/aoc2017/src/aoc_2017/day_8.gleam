@@ -54,7 +54,7 @@ pub fn pt_1(input: List(Instruction)) {
 fn next_instruction(regs: Registers, inst: Instruction) {
   case to_compare_fn(inst.condition)(fetch(inst.condition.register, regs)) {
     True -> {
-      let updated_regs = dict.update(regs, inst.register, to_update_fn(inst.op))
+      let updated_regs = dict.upsert(regs, inst.register, to_update_fn(inst.op))
       let assert Ok(max) = updated_regs |> dict.values |> list.reduce(int.max)
       dict.insert(updated_regs, max_register, max)
     }

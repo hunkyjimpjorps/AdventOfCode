@@ -41,7 +41,7 @@ fn make_grid(input: String) {
       |> knot()
       |> int.base_parse(16)
       |> result.map(int.to_base2)
-      |> result.map(string.pad_left(_, with: "0", to: 128))
+      |> result.map(string.pad_start(_, with: "0", to: 128))
       |> result.map(string.to_graphemes)
     })
     |> result.values
