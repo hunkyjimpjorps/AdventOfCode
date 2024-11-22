@@ -1,6 +1,5 @@
 import gleam/int
 import gleam/list
-import glearray
 
 pub fn parse(input: String) {
   let assert Ok(n) = int.parse(input)
