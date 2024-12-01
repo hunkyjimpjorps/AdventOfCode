@@ -23,9 +23,11 @@ packages = [
   { name = "snag", version = "0.3.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "snag", source = "hex", outer_checksum = "54D32E16E33655346AA3E66CBA7E191DE0A8793D2C05284E3EFB90AD2CE92BCC" },
   { name = "spinner", version = "1.2.0", build_tools = ["gleam"], requirements = ["gleam_community_ansi", "gleam_stdlib", "glearray", "repeatedly"], otp_app = "spinner", source = "hex", outer_checksum = "9EE43AA33BE2DA5731B8F3F170AAB59AF1A815AFA5BF615F12C1B91F3B03F157" },
   { name = "tom", version = "1.1.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "tom", source = "hex", outer_checksum = "228E667239504B57AD05EC3C332C930391592F6C974D0EFECF32FFD0F3629A27" },
+  { name = "tote", version = "1.0.2", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "tote", source = "hex", outer_checksum = "A249892E26A53C668897F8D47845B0007EEE07707A1A03437487F0CD5A452CA5" },
 ]
 
 [requirements]
 gladvent = { version = ">= 2.0.0 and < 3.0.0" }
 gleam_stdlib = { version = ">= 0.34.0 and < 2.0.0" }
 gleeunit = { version = ">= 1.0.0 and < 2.0.0" }
+tote = { version = ">= 1.0.2 and < 2.0.0" }
