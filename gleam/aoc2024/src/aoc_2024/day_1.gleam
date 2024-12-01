@@ -5,7 +5,9 @@ import my_utils/to
 import tote/bag
 
 pub fn parse(input: String) -> List(List(Int)) {
-  list.map(string.split(input, "\n"), to.ints(_, split_on: "   "))
+  input
+  |> string.split("\n")
+  |> list.map(to.ints(_, split_on: "   "))
   |> list.transpose()
 }
 
