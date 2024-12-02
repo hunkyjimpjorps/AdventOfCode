@@ -1,3 +1,4 @@
+import gleam/bool
 import gleam/list
 import my_utils/from
 
@@ -23,19 +24,10 @@ fn is_safe(ns: List(Int)) -> Bool {
   || list.all(diffs, fn(n) { n >= -3 && n <= -1 })
 }
 
-fn all_dampenings(ns: List(Int)) -> List(List(Int)) {
-  let indexed = list.index_map(ns, fn(x, i) { #(i, x) })
-
-  // if it's safe to begin with, then it'll also be safe if the first or last is removed
-  // so it's not necessary to check the full list too, just the dampened ones
-  use to_remove <- list.map(list.range(0, list.length(ns) - 1))
-  use pair <- list.filter_map(indexed)
-  case pair.0 {
-    index if index == to_remove -> Error(Nil)
-    _ -> Ok(pair.1)
-  }
-}
-
 fn is_safe_at_any_speed(ns: List(Int)) -> Bool {
-  ns |> all_dampenings |> list.any(is_safe)
+  use <- bool.guard(is_safe(ns), True)
+  let indexed = list.index_map(ns, fn(x, i) { #(i, x) })
+  use n <- list.any(list.range(0, list.length(ns) - 1))
+  let assert Ok(#(_, remaining)) = list.key_pop(indexed, n)
+  remaining |> list.map(fn(pair) { pair.1 }) |> is_safe
 }
