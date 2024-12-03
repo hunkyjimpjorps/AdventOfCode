@@ -1,24 +1,18 @@
-import gleam/list
 import gleam/option.{Some}
 import gleam/regexp.{type Match, Match}
 import my_utils/to
 
 pub fn pt_1(input: String) {
-  let assert Ok(re) = regexp.from_string("mul\\((\\d+),(\\d+)\\)")
-
-  regexp.scan(with: re, content: input)
-  |> list.fold(0, fn(acc, match) {
-    let assert Match(_, [Some(a), Some(b)]) = match
-    acc + to.int(a) * to.int(b)
-  })
+  find_with(input, "mul\\((\\d+),(\\d+)\\)")
 }
 
 pub fn pt_2(input: String) {
-  let assert Ok(re) =
-    regexp.from_string("mul\\((\\d+),(\\d+)\\)|don't\\(\\)|do\\(\\)")
-  input
-  |> regexp.scan(with: re)
-  |> evaluate_instructions(0, True)
+  find_with(input, "mul\\((\\d+),(\\d+)\\)|don't\\(\\)|do\\(\\)")
+}
+
+fn find_with(input: String, pattern: String) {
+  let assert Ok(re) = regexp.from_string(pattern)
+  regexp.scan(input, with: re) |> evaluate_instructions(0, True)
 }
 
 fn evaluate_instructions(instructions: List(Match), acc: Int, doing: Bool) {
