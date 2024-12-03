@@ -16,7 +16,8 @@ pub fn pt_1(input: String) {
 pub fn pt_2(input: String) {
   let assert Ok(re) =
     regexp.from_string("mul\\((\\d+),(\\d+)\\)|don't\\(\\)|do\\(\\)")
-  regexp.scan(with: re, content: input)
+  input
+  |> regexp.scan(with: re)
   |> evaluate_instructions(0, True)
 }
 
