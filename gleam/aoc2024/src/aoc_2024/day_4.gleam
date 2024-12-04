@@ -61,7 +61,6 @@ fn count_words(grid: Grid, word: String, coord: Coord, acc: Int) -> Int {
 
 fn scan_for_word(grid: Grid, word: String, coord: Coord, dir: Coord) {
   case string.pop_grapheme(word), dict.get(grid, coord) {
-    _, Error(_) -> Error(Nil)
     Ok(#(first, "")), Ok(v) if first == v -> Ok(Nil)
     Ok(#(first, rest)), Ok(v) if first == v ->
       scan_for_word(grid, rest, go(coord, dir), dir)
