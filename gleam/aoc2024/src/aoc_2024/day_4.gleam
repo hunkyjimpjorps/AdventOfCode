@@ -22,9 +22,7 @@ const directions = [
   Coord(1, 1),
 ]
 
-const rmax = 139
-
-const cmax = 139
+const max = 139
 
 pub fn parse(input: String) -> Grid {
   {
@@ -42,8 +40,8 @@ fn find_word(
   coord: Coord,
   acc: List(List(Coord)),
 ) -> List(List(Coord)) {
-  use <- bool.guard(coord.r == rmax + 1, acc)
-  use <- bool.lazy_guard(coord.c == cmax + 1, fn() {
+  use <- bool.guard(coord.r == max + 1, acc)
+  use <- bool.lazy_guard(coord.c == max + 1, fn() {
     find_word(grid, word, Coord(coord.r + 1, 0), acc)
   })
 
@@ -77,8 +75,8 @@ pub fn pt_1(input: Grid) {
 }
 
 fn find_x_mas(grid: Grid, coord: Coord, acc: List(Coord)) -> List(Coord) {
-  use <- bool.guard(coord.r == rmax + 1, acc)
-  use <- bool.lazy_guard(coord.c == cmax + 1, fn() {
+  use <- bool.guard(coord.r == max + 1, acc)
+  use <- bool.lazy_guard(coord.c == max + 1, fn() {
     find_x_mas(grid, Coord(coord.r + 1, 0), acc)
   })
 
@@ -94,20 +92,18 @@ fn find_x_mas(grid: Grid, coord: Coord, acc: List(Coord)) -> List(Coord) {
   }
 }
 
-fn live_mas(grid: Grid, c: Coord) {
-  let Coord(r, c) = c
-  let upper_left = dict.get(grid, Coord(r - 1, c - 1))
-  let upper_right = dict.get(grid, Coord(r - 1, c + 1))
-  let lower_left = dict.get(grid, Coord(r + 1, c - 1))
-  let lower_right = dict.get(grid, Coord(r + 1, c + 1))
+fn live_mas(grid: Grid, coord: Coord) {
+  let found =
+    [Coord(-1, -1), Coord(1, 1), Coord(-1, 1), Coord(1, -1)]
+    |> list.map(fn(dir) {
+      dict.get(grid, Coord(coord.r + dir.r, coord.c + dir.c))
+    })
+    |> result.values()
+    |> string.join("")
 
-  case upper_left, lower_right, lower_left, upper_right {
-    Ok("M"), Ok("S"), Ok("M"), Ok("S")
-    | Ok("M"), Ok("S"), Ok("S"), Ok("M")
-    | Ok("S"), Ok("M"), Ok("S"), Ok("M")
-    | Ok("S"), Ok("M"), Ok("M"), Ok("S")
-    -> True
-    _, _, _, _ -> False
+  case found {
+    "MSMS" | "MSSM" | "SMSM" | "SMMS" -> True
+    _ -> False
   }
 }
 
