@@ -15,30 +15,32 @@ pub fn parse(input: String) -> Grid {
   from.grid(input, fn(c) { c })
 }
 
-fn count_words(grid: Grid, word: String, coord: Coord, acc: Int) -> Int {
+fn count_xmases(grid: Grid, coord: Coord, acc: Int) -> Int {
   use <- bool.guard(coord.r == max, acc)
   use <- bool.lazy_guard(coord.c == max, fn() {
-    count_words(grid, word, coord.next_row(coord), acc)
+    count_xmases(grid, coord.next_row(coord), acc)
   })
-
-  let found =
-    coord.eight_directions
-    |> list.filter_map(scan_for_word(grid, word, coord, _))
-    |> list.length
-  count_words(grid, word, coord.next_col(coord), acc + found)
+  case dict.get(grid, coord) {
+    Ok("X") ->
+      list.fold(coord.eight_directions, acc, fn(found, dir) {
+        found + scan_for_word(grid, "MAS", coord.go(coord, dir), dir)
+      })
+    _ -> acc
+  }
+  |> count_xmases(grid, coord.next_col(coord), _)
 }
 
 fn scan_for_word(grid: Grid, word: String, coord: Coord, dir: Coord) {
   case string.pop_grapheme(word), dict.get(grid, coord) {
-    Ok(#(first, "")), Ok(v) if first == v -> Ok(Nil)
+    Ok(#(first, "")), Ok(v) if first == v -> 1
     Ok(#(first, rest)), Ok(v) if first == v ->
       scan_for_word(grid, rest, coord.go(coord, dir), dir)
-    _, _ -> Error(Nil)
+    _, _ -> 0
   }
 }
 
 pub fn pt_1(input: Grid) {
-  count_words(input, "XMAS", coord.origin, 0)
+  count_xmases(input, coord.origin, 0)
 }
 
 fn find_x_mas(grid: Grid, coord: Coord, acc: Int) -> Int {
@@ -47,11 +49,11 @@ fn find_x_mas(grid: Grid, coord: Coord, acc: Int) -> Int {
     find_x_mas(grid, coord.next_row(coord), acc)
   })
 
-  let found = case dict.get(grid, coord) {
-    Ok("A") -> live_mas(grid, coord)
-    _ -> 0
+  case dict.get(grid, coord) {
+    Ok("A") -> acc + live_mas(grid, coord)
+    _ -> acc
   }
-  find_x_mas(grid, coord.next_col(coord), acc + found)
+  |> find_x_mas(grid, coord.next_col(coord), _)
 }
 
 fn live_mas(grid: Grid, coord: Coord) {
