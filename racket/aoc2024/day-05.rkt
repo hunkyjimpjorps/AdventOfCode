@@ -17,7 +17,11 @@
       (string->number n))))
 
 (define (middle xs)
-  (list-ref xs (/ (sub1 (length xs)) 2)))
+  (define (do-middle [one-step xs] [two-step xs])
+    (match two-step
+      [(or (list) (list _)) (first one-step)]
+      [(list* _ _ tail) (do-middle (rest one-step) tail)]))
+  (do-middle))
 
 (define (page-order a b)
   (set-member? PAIRS (list a b)))
