@@ -17,7 +17,7 @@
       (string->number n))))
 
 (define (middle xs)
-  (first (drop xs (/ (sub1 (length xs)) 2))))
+  (list-ref xs (/ (sub1 (length xs)) 2)))
 
 (define (page-order a b)
   (set-member? PAIRS (list a b)))
