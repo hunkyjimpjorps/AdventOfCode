@@ -31,9 +31,16 @@ fn page_order(first: Int, second: Int, pairs: Pairs) -> Order {
 }
 
 fn middle_of_list(xs: List(a)) -> a {
-  let len = list.length(xs)
-  let assert [x, ..] = list.drop(xs, { len - 1 } / 2)
-  x
+  let assert Ok(result) = do_middle(xs, xs)
+  result
+}
+
+fn do_middle(one_step: List(a), two_step: List(a)) -> Result(a, Nil) {
+  case one_step, two_step {
+    [middle, ..], [] | [middle, ..], [_] -> Ok(middle)
+    [_, ..one_rest], [_, _, ..two_rest] -> do_middle(one_rest, two_rest)
+    _, _ -> Error(Nil)
+  }
 }
 
 pub fn pt_1(input: Input) -> Int {
