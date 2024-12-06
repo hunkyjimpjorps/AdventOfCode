@@ -2,6 +2,7 @@
 *.ez
 /build
 erl_crash.dump
-
 aoc.toml
+mise.toml
+manifest.toml
 input/**
