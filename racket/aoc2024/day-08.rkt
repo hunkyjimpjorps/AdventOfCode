@@ -11,6 +11,9 @@
 (define (go a delta)
   (Posn (+ (Posn-x a) (Posn-x delta)) (+ (Posn-y a) (Posn-y delta))))
 
+(define (jump a b)
+  (go a (dist b a)))
+
 (define input (fetch-aoc-input (find-session) 2024 8 #:cache #true))
 
 (define GRID
@@ -28,13 +31,11 @@
     (hash-update acc antenna (curry cons posn) list)))
 
 (define (find-simple-antinodes posns)
-  (~> (for/list ([pair (in-combinations posns 2)])
-        (~>> pair
-             (match _
-               [(list a b) (list (go b (dist a b)) (go a (dist b a)))])
-             (filter (curry hash-has-key? GRID))))
-      flatten
-      list->set))
+  (~> (for*/set ([pair (in-combinations posns 2)]
+                 #:do [(match-define (list a b) pair)]
+                 [antinode (list (jump a b) (jump b a))]
+                 #:when (hash-has-key? GRID antinode))
+        antinode)))
 
 ;; part 1
 (define (tally-antinodes with)
@@ -48,14 +49,11 @@
 
 ;; part 2
 (define (find-all-antinodes posns)
-  (~> (for/list ([pair (in-combinations posns 2)])
-        (~>> pair
-             (match _
-               [(list a b) (list (next-antinode b (dist a b)) (next-antinode a (dist b a)))])
-             flatten
-             (filter (curry hash-has-key? GRID))))
-      flatten
-      list->set))
+  (~> (for*/set ([pair (in-combinations posns 2)]
+                 #:do [(match-define (list a b) pair)]
+                 [antinode (flatten (list (next-antinode b (dist a b))
+                                          (next-antinode a (dist b a))))])
+        antinode)))
 
 (define (next-antinode posn delta [acc (list)])
   (if (dict-has-key? GRID posn)
