@@ -1,6 +1,10 @@
+import gleam/float
 import gleam/int
+import gleam/io
 import gleam/list
+import gleam/result
 import gleam/string
+import gleam_community/maths/elementary
 import my_utils/to
 
 pub type Problem {
@@ -31,14 +35,14 @@ fn do_op(op, a, b) {
 }
 
 fn concatenate(a: Int, b: Int) -> Int {
-  let assert Ok(a_digits) = int.digits(a, 10)
   let assert Ok(b_digits) = int.digits(b, 10)
-  let assert Ok(result) = list.append(a_digits, b_digits) |> int.undigits(10)
-  result
+  let multiplier = list.fold(b_digits, 1, fn(acc, _) { 10 * acc })
+  a * multiplier + b
 }
 
 fn check_problem(problem: Problem, ops: List(Op)) -> Result(Int, Nil) {
   case problem {
+    Problem(answer, [a, ..]) if a > answer -> Error(Nil)
     Problem(answer, [a]) if a == answer -> Ok(a)
     Problem(answer, [a, b, ..rest]) -> {
       list.find_map(ops, fn(op) {
