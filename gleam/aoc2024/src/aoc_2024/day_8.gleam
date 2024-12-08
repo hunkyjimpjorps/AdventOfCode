@@ -17,18 +17,18 @@ pub fn parse(input: String) -> Map {
   from.grid(input, fn(c) {
     case c {
       "." -> Open
-      chr -> Antenna(chr)
+      antenna -> Antenna(antenna)
     }
   })
 }
 
 fn collect_antennas(input: Map) -> Dict(Cell, List(Coord)) {
-  use acc, k, v <- dict.fold(input, dict.new())
-  use coords <- dict.upsert(acc, v)
+  use acc, coord, antenna <- dict.fold(input, dict.new())
+  use coords <- dict.upsert(acc, antenna)
   case coords {
-    None -> [k]
-    Some(_) if v == Open -> []
-    Some(vs) -> [k, ..vs]
+    _ if antenna == Open -> []
+    None -> [coord]
+    Some(coords) -> [coord, ..coords]
   }
 }
 
