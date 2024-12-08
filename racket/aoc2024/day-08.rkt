@@ -17,9 +17,9 @@
 (define input (fetch-aoc-input (find-session) 2024 8 #:cache #true))
 
 (define GRID
-  (for*/hash ([(row x) (in-indexed (string-split input))]
-              [(col y) (in-indexed row)])
-    (values (Posn y x)
+  (for*/hash ([(row y) (in-indexed (string-split input))]
+              [(col x) (in-indexed row)])
+    (values (Posn x y)
             (match col
               [#\. 'empty]
               [ch ch]))))
