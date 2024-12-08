@@ -14,6 +14,10 @@ pub fn go(coord: Coord, direction: Coord) {
   Coord(coord.r + direction.r, coord.c + direction.c)
 }
 
+pub fn dist(a: Coord, b: Coord) -> Coord {
+  Coord(b.r - a.r, b.c - a.c)
+}
+
 pub const origin = Coord(0, 0)
 
 pub const eight_directions = [

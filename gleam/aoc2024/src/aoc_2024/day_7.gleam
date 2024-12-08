@@ -1,10 +1,6 @@
-import gleam/float
 import gleam/int
-import gleam/io
 import gleam/list
-import gleam/result
 import gleam/string
-import gleam_community/maths/elementary
 import my_utils/to
 
 pub type Problem {
