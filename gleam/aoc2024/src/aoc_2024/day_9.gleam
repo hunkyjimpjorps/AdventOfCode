@@ -18,11 +18,16 @@ pub type File {
   FreeSpan(size: Int)
 }
 
-pub fn parse(input: String) {
+pub fn parse(input: String) -> List(Block) {
   do_parse(input, Filled, 0, [])
 }
 
-fn do_parse(input: String, state: State, file_index: Int, acc: List(Block)) {
+fn do_parse(
+  input: String,
+  state: State,
+  file_index: Int,
+  acc: List(Block),
+) -> List(Block) {
   case state, string.pop_grapheme(input) {
     _, Error(_) -> list.reverse(acc)
     Filled, Ok(#(first, rest)) -> {
@@ -36,7 +41,12 @@ fn do_parse(input: String, state: State, file_index: Int, acc: List(Block)) {
   }
 }
 
-fn replace(current: List(Block), movable: List(Block), index: Int, acc: Int) {
+fn replace(
+  current: List(Block),
+  movable: List(Block),
+  index: Int,
+  acc: Int,
+) -> Int {
   case current, movable {
     // only end once all the fixed and movable blocks have been used up
     [], [] -> acc
@@ -53,7 +63,7 @@ fn replace(current: List(Block), movable: List(Block), index: Int, acc: Int) {
   }
 }
 
-pub fn pt_1(input: List(Block)) {
+pub fn pt_1(input: List(Block)) -> Int {
   // the length of the final block distribution is just the total length,
   // less the number of unused blocks
   let free_spaces = list.count(input, fn(b) { b == FreeSpace })
@@ -78,13 +88,14 @@ pub fn pt_1(input: List(Block)) {
   replace(to_keep, to_move, 0, 0)
 }
 
-fn find_free_space(drive, files) {
+fn find_free_space(drive: List(File), files: List(File)) -> List(File) {
   use <- bool.guard(list.is_empty(files), drive)
   let assert [File(size, id) as next, ..rest_files] = files
 
   // look for the first free span that's big enough to accommodate the next file to be moved
   // and split the list to expose that free span to match on
   // or split once the next file encounters itself on the disk
+  // (which will be used to signal that the file shouldn't move rightwards instead)
   let drive_parts =
     list.split_while(drive, fn(f) {
       case f {
@@ -95,9 +106,9 @@ fn find_free_space(drive, files) {
     })
 
   case drive_parts {
-    // the second list will be empty if there's no valid spans to split on,
-    // or if the same file is found in the list (so that the file doesn't move rightwards instead)
-    // so leave the file where it is and move on to the next one
+    // the second list will be empty if there's no valid spans to split on;
+    // if the same file is found in the list
+    // leave the file where it is and move on to the next one
     #(_, [File(_, _), ..]) | #(_no_split, []) ->
       find_free_space(drive, rest_files)
     // if the file fits exactly, just replace the free span,
@@ -117,7 +128,11 @@ fn find_free_space(drive, files) {
   }
 }
 
-fn collapse_free_space(drive: List(File), moved: File, acc) {
+fn collapse_free_space(
+  drive: List(File),
+  moved: File,
+  acc: List(File),
+) -> List(File) {
   case drive {
     // various ways a moved file could be surrounded by free space
     // just merge them all together and put the drive back together
@@ -136,7 +151,7 @@ fn collapse_free_space(drive: List(File), moved: File, acc) {
   }
 }
 
-pub fn pt_2(input: List(Block)) {
+pub fn pt_2(input: List(Block)) -> Int {
   let drive =
     input
     |> list.chunk(fn(n) { n })
