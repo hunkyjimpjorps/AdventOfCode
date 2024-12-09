@@ -36,12 +36,14 @@ fn do_parse(input: String, state: State, file_index: Int, acc: List(Block)) {
   }
 }
 
-fn replace(current: List(Block), movable: List(Block), acc: List(Block)) {
+fn replace(current: List(Block), movable: List(Block), index: Int, acc: Int) {
   case current, movable {
-    remaining, [] -> list.append(list.reverse(acc), remaining)
-    [FreeSpace, ..rest], [move, ..rest_to_move] ->
-      replace(rest, rest_to_move, [move, ..acc])
-    [b, ..rest], _ -> replace(rest, movable, [b, ..acc])
+    [], [] -> acc
+    [Block(b), ..remaining], [] ->
+      replace(remaining, [], index + 1, acc + b * index)
+    [FreeSpace, ..rest], [Block(b), ..rest_to_move] ->
+      replace(rest, rest_to_move, index + 1, acc + b * index)
+    [Block(b), ..rest], _ -> replace(rest, movable, index + 1, acc + b * index)
     _, _ -> panic
   }
 }
@@ -60,13 +62,7 @@ pub fn pt_1(input: List(Block)) {
     |> list.filter(fn(b) { b != FreeSpace })
     |> list.take(steps)
 
-  replace(to_keep, to_move, [])
-  |> list.index_fold(0, fn(acc, block, index) {
-    case block {
-      Block(n) -> acc + n * index
-      FreeSpace -> acc
-    }
-  })
+  replace(to_keep, to_move, 0, 0)
 }
 
 fn find_free_space(drive, files) {
