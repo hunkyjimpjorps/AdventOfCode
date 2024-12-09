@@ -38,36 +38,53 @@ fn do_parse(input: String, state: State, file_index: Int, acc: List(Block)) {
 
 fn replace(current: List(Block), movable: List(Block), index: Int, acc: Int) {
   case current, movable {
+    // only end once all the fixed and movable blocks have been used up
     [], [] -> acc
+    // if there's no more blocks to move, 
+    // finish adding the rest of the fixed blocks' scores to the checksum
     [Block(b), ..remaining], [] ->
       replace(remaining, [], index + 1, acc + b * index)
+    // if there's an open space, move a movable block into it and add its score to the checksum
     [FreeSpace, ..rest], [Block(b), ..rest_to_move] ->
       replace(rest, rest_to_move, index + 1, acc + b * index)
+    // otherwise, add the next fixed block's score and move on
     [Block(b), ..rest], _ -> replace(rest, movable, index + 1, acc + b * index)
     _, _ -> panic
   }
 }
 
 pub fn pt_1(input: List(Block)) {
+  // the length of the final block distribution is just the total length,
+  // less the number of unused blocks
   let free_spaces = list.count(input, fn(b) { b == FreeSpace })
   let filled_spaces = list.length(input) - free_spaces
+
+  // within the region of the disk that will contain the final block distribution,
+  // find how many open space there are that need to be filled...
   let steps =
     filled_spaces
     |> list.take(input, _)
     |> list.count(fn(b) { b == FreeSpace })
   let to_keep = list.take(input, filled_spaces)
+
+  // ...and take that many blocks from the end of the current list of blocks...
   let to_move =
     input
     |> list.reverse
     |> list.filter(fn(b) { b != FreeSpace })
     |> list.take(steps)
 
+  // ...and shuffle all the movable blocks into the open spaces between the fixed blocks
   replace(to_keep, to_move, 0, 0)
 }
 
 fn find_free_space(drive, files) {
   use <- bool.guard(list.is_empty(files), drive)
   let assert [File(size, id) as next, ..rest_files] = files
+
+  // look for the first free span that's big enough to accommodate the next file to be moved
+  // and split the list to expose that free span to match on
+  // or split once the next file encounters itself on the disk
   let drive_parts =
     list.split_while(drive, fn(f) {
       case f {
@@ -78,16 +95,22 @@ fn find_free_space(drive, files) {
     })
 
   case drive_parts {
+    // the second list will be empty if there's no valid spans to split on,
+    // or if the same file is found in the list (so that the file doesn't move rightwards instead)
+    // so leave the file where it is and move on to the next one
     #(_, [File(_, _), ..]) | #(_no_split, []) ->
       find_free_space(drive, rest_files)
+    // if the file fits exactly, just replace the free span,
+    // then merge all the free spans around the moved file 
     #(first, [FreeSpan(free_size), ..rest]) if free_size == size -> {
       let after_move = collapse_free_space(rest, next, [])
-      find_free_space(list.flatten([first, [next], after_move]), rest_files)
+      find_free_space(list.append(first, [next, ..after_move]), rest_files)
     }
+    // if it's a loose fit, add an extra span for the remaining space
     #(first, [FreeSpan(free_size), ..rest]) -> {
       let after_move = collapse_free_space(rest, next, [])
       find_free_space(
-        list.flatten([first, [next, FreeSpan(free_size - size)], after_move]),
+        list.append(first, [next, FreeSpan(free_size - size), ..after_move]),
         rest_files,
       )
     }
@@ -96,15 +119,19 @@ fn find_free_space(drive, files) {
 
 fn collapse_free_space(drive: List(File), moved: File, acc) {
   case drive {
+    // various ways a moved file could be surrounded by free space
+    // just merge them all together and put the drive back together
     [FreeSpan(a), f, FreeSpan(b), ..rest] if moved == f ->
-      list.flatten([list.reverse(acc), [FreeSpan(a + f.size + b)], rest])
+      list.append(list.reverse(acc), [FreeSpan(a + f.size + b), ..rest])
     [FreeSpan(a), f, ..rest] if moved == f ->
-      list.flatten([list.reverse(acc), [FreeSpan(a + f.size)], rest])
+      list.append(list.reverse(acc), [FreeSpan(a + f.size), ..rest])
     [f, FreeSpan(b), ..rest] if moved == f ->
-      list.flatten([list.reverse(acc), [FreeSpan(f.size + b)], rest])
+      list.append(list.reverse(acc), [FreeSpan(f.size + b), ..rest])
     [f, ..rest] if moved == f ->
-      list.flatten([list.reverse(acc), [FreeSpan(f.size)], rest])
+      list.append(list.reverse(acc), [FreeSpan(f.size), ..rest])
+    // until the file is found, just keep track of everything to the left of it
     [other, ..rest] -> collapse_free_space(rest, moved, [other, ..acc])
+    // if for some reason the file's not found, just return the original drive
     [] -> list.reverse(acc)
   }
 }
