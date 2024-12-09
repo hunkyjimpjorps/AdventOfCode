@@ -39,10 +39,9 @@
 
 ;; part 1
 (define (tally-antinodes with)
-  (~>> antenna-locations ;
-       hash-values
-       (map with)
-       (apply set-union)
+  (~>> (for*/set ([(_antenna posns) (in-hash antenna-locations)]
+                  [antinode (in-set (with posns))])
+         antinode)
        set-count))
 
 (tally-antinodes find-simple-antinodes)
