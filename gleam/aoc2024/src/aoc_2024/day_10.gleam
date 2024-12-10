@@ -5,6 +5,7 @@ import gleam/set
 import my_utils/coord.{type Coord, Coord}
 import my_utils/from
 import my_utils/to
+import pocket_watch
 
 pub fn parse(input: String) -> Dict(Coord, Int) {
   from.grid(input, to.int)
@@ -36,9 +37,11 @@ fn rate_trails(input: Dict(Coord, Int), using: fn(List(Coord)) -> Int) {
 }
 
 pub fn pt_1(input: Dict(Coord, Int)) {
+  use <- pocket_watch.simple("Part 1")
   rate_trails(input, fn(trail) { trail |> set.from_list |> set.size })
 }
 
 pub fn pt_2(input: Dict(Coord, Int)) {
+  use <- pocket_watch.simple("Part 2")
   rate_trails(input, list.length)
 }
