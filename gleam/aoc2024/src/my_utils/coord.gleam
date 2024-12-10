@@ -1,3 +1,5 @@
+import gleam/list
+
 pub type Coord {
   Coord(r: Int, c: Int)
 }
@@ -30,3 +32,14 @@ pub const eight_directions = [
   Coord(1, 0),
   Coord(1, 1),
 ]
+
+pub const cardinal_directions = [
+  Coord(1, 0),
+  Coord(-1, 0),
+  Coord(0, 1),
+  Coord(0, -1),
+]
+
+pub fn neighbors(p: Coord, dirs: List(Coord)) {
+  list.map(dirs, go(p, _))
+}
