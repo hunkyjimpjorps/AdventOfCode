@@ -14,7 +14,7 @@ fn look_for_summit(current: Coord, grid: Dict(Coord, Int), summits: List(Coord))
   let assert Ok(elevation) = dict.get(grid, current)
   case elevation {
     9 -> [current, ..summits]
-    elev -> {
+    elev ->
       current
       |> coord.neighbors(coord.cardinal_directions)
       |> list.fold(summits, fn(acc, n) {
@@ -23,7 +23,6 @@ fn look_for_summit(current: Coord, grid: Dict(Coord, Int), summits: List(Coord))
           False -> acc
         }
       })
-    }
   }
 }
 
