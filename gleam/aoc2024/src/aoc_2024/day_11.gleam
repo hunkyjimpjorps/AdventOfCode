@@ -1,4 +1,3 @@
-import gleam/bool
 import gleam/float
 import gleam/int
 import gleam/list
@@ -13,16 +12,16 @@ pub fn parse(input: String) {
   to.ints(input, " ")
 }
 
-fn transform_stone(stone: Int, blinks: Int, cache) {
+fn blink(stone: Int, blinks: Int, cache) {
   use <- memo.memoize(cache, #(stone, blinks))
-  use <- bool.guard(blinks == 0, 1)
-  case stone, digits(stone) {
-    0, _ -> transform_stone(1, blinks - 1, cache)
-    n, d if d % 2 == 0 ->
-      list.fold(split(n, d), 0, fn(acc, x) {
-        acc + transform_stone(x, blinks - 1, cache)
-      })
-    n, _ -> transform_stone(n * 2024, blinks - 1, cache)
+  case stone, digits(stone), blinks {
+    _, _, 0 -> 1
+    0, _, b -> blink(1, b - 1, cache)
+    n, d, b if d % 2 == 0 -> {
+      let #(l, r) = split(n, d)
+      blink(l, b - 1, cache) + blink(r, b - 1, cache)
+    }
+    n, _, b -> blink(n * 2024, b - 1, cache)
   }
 }
 
@@ -36,13 +35,13 @@ fn digits(n: Int) -> Int {
   |> float.truncate
 }
 
-fn split(stone: Int, digits: Int) -> List(Int) {
-  [stone / math.pow(10, digits / 2), stone % math.pow(10, digits / 2)]
+fn split(stone: Int, digits: Int) -> #(Int, Int) {
+  #(stone / math.pow(10, digits / 2), stone % math.pow(10, digits / 2))
 }
 
 fn blink_a_lot(input: List(Int), times: Int) -> Int {
   use cache <- memo.create()
-  list.fold(input, 0, fn(acc, x) { acc + transform_stone(x, times, cache) })
+  list.fold(input, 0, fn(acc, x) { acc + blink(x, times, cache) })
 }
 
 pub fn pt_1(input: List(Int)) -> Int {
