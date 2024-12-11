@@ -9,7 +9,7 @@
     (string->number n)))
 
 (define (digits n)
-  (~> n (log 10) (+ 1) floor inexact->exact))
+  (~> n (log 10) add1 floor inexact->exact))
 
 (define (split n)
   (call-with-values (λ () (quotient/remainder n (expt 10 (quotient (digits n) 2)))) list))
