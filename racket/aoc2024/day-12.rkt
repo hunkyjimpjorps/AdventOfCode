@@ -2,7 +2,6 @@
 
 (require advent-of-code
          threading
-         racket/hash
          "utils/posn.rkt")
 
 (define GRID (string->posn-grid (fetch-aoc-input (find-session) 2024 12 #:cache #true)))
@@ -33,25 +32,29 @@
   (for/sum ([posn (in-set region)])
            (count (λ~>> (set-member? region) not) (neighbors-of posn in-cardinal-directions))))
 
-;; part 1
-(for/sum ([region (in-list (find-contiguous-regions))]) (* (area region) (perimeter region)))
-
 (define (sides region)
-  (for*/sum ([posn (in-set region)] #:do [(match-define (list u ur r dr d dl l ul)
-                                            (map (λ~>> (set-member? region))
-                                                 (neighbors-of posn in-all-directions)))]
-                                    #:do [(define vertices
-                                            (list (and (not u) (not l))
-                                                  (and (not u) (not r))
-                                                  (and (not d) (not l))
-                                                  (and (not d) (not r))
-                                                  (and u l (not ul))
-                                                  (and u r (not ur))
-                                                  (and d l (not dl))
-                                                  (and d r (not dr))))]
-                                    [vertex (in-list vertices)]
-                                    #:when vertex)
+  (for*/sum ([posn (in-set region)] ;
+             #:do [(match-define (list u ur r dr d dl l ul)
+                     (map (λ~>> (set-member? region)) (neighbors-of posn in-all-directions)))
+                   (define vertices
+                     (list (and (not u) (not l))
+                           (and (not u) (not r))
+                           (and (not d) (not l))
+                           (and (not d) (not r))
+                           (and u l (not ul))
+                           (and u r (not ur))
+                           (and d l (not dl))
+                           (and d r (not dr))))]
+             [vertex (in-list vertices)]
+             #:when vertex)
             1))
 
+(define REGIONS (find-contiguous-regions))
+(define (score with)
+  (for/sum ([region (in-list REGIONS)]) (* (area region) (with region))))
+
+;; part 1
+(score perimeter)
+
 ;; part 2
-(for/sum ([region (in-list (find-contiguous-regions))]) (* (area region) (sides region)))
+(score sides)
