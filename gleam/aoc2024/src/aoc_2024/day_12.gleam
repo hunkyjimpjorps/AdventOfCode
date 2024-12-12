@@ -63,8 +63,7 @@ pub fn pt_1(input: Dict(Coord, String)) {
 
 fn get_sides(field: Set(Coord)) -> Int {
   // an n-gon has n vertices, so count all the places a vertex occurs instead
-  field
-  |> set.fold(0, fn(acc, pt) {
+  set.fold(field, 0, fn(acc, pt) {
     let assert [up, up_right, right, down_right, down, down_left, left, up_left] =
       pt
       |> coord.neighbors(coord.eight_directions)
