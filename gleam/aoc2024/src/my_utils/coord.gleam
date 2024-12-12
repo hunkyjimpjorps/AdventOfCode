@@ -23,14 +23,14 @@ pub fn dist(a: Coord, b: Coord) -> Coord {
 pub const origin = Coord(0, 0)
 
 pub const eight_directions = [
-  Coord(-1, -1),
-  Coord(-1, 0),
-  Coord(-1, 1),
-  Coord(0, -1),
-  Coord(0, 1),
-  Coord(1, -1),
   Coord(1, 0),
   Coord(1, 1),
+  Coord(0, 1),
+  Coord(-1, 1),
+  Coord(-1, 0),
+  Coord(-1, -1),
+  Coord(0, -1),
+  Coord(1, -1),
 ]
 
 pub const cardinal_directions = [
