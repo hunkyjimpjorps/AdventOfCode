@@ -1,4 +1,3 @@
-import gleam/int
 import gleam/list
 import gleam/option.{Some}
 import gleam/regexp.{Match}
@@ -74,6 +73,10 @@ fn adjust(machine) {
 }
 
 pub fn pt_2(input: List(Machine)) {
-  list.filter_map(input, fn(m) { m |> adjust |> find })
-  |> int.sum
+  list.fold(input, 0, fn(acc, m) {
+    case m |> adjust |> find {
+      Ok(tokens) -> acc + tokens
+      _ -> acc
+    }
+  })
 }
