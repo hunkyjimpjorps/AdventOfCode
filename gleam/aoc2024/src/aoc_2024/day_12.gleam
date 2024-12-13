@@ -24,7 +24,12 @@ fn find_contiguous_regions(
   }
 }
 
-fn flood_fill(field, stack, seen, plant) {
+fn flood_fill(
+  field: Dict(Coord, String),
+  stack: List(Coord),
+  seen: Set(Coord),
+  plant: Result(String, Nil),
+) -> Set(Coord) {
   case stack {
     [] -> seen
     [first, ..rest] ->
@@ -50,46 +55,46 @@ fn get_perimeter(field: Set(Coord)) -> Int {
   })
 }
 
-pub fn pt_1(input: Dict(Coord, String)) {
-  let regions = find_contiguous_regions(input, [])
-
-  list.fold(regions, 0, fn(acc, region) {
-    let perimeter = get_perimeter(region)
-    let area = set.size(region)
-
-    acc + area * perimeter
-  })
-}
-
 fn get_sides(field: Set(Coord)) -> Int {
   // an n-gon has n vertices, so count all the places a vertex occurs instead
-  set.fold(field, 0, fn(acc, pt) {
-    let assert [up, up_right, right, down_right, down, down_left, left, up_left] =
-      pt
-      |> coord.neighbors(coord.eight_directions)
-      |> list.map(fn(n) { set.contains(field, n) })
-    [
-      !up && !left,
-      !up && !right,
-      !down && !left,
-      !down && !right,
-      up && left && !up_left,
-      up && right && !up_right,
-      down && left && !down_left,
-      down && right && !down_right,
-    ]
-    |> list.count(fn(bool) { bool })
-    |> int.add(acc)
+  use acc, pt <- set.fold(field, 0)
+  let assert [up, up_right, right, down_right, down, down_left, left, up_left] =
+    pt
+    |> coord.neighbors(coord.eight_directions)
+    |> list.map(fn(n) { set.contains(field, n) })
+  let corner_shapes = [
+    // convex vertices
+    !up && !left,
+    !up && !right,
+    !down && !left,
+    !down && !right,
+    // concave vertices
+    up && left && !up_left,
+    up && right && !up_right,
+    down && left && !down_left,
+    down && right && !down_right,
+  ]
+  acc + list.count(corner_shapes, fn(b) { b })
+}
+
+fn get_price_of_fences(
+  input: Dict(Coord, String),
+  with: fn(Set(Coord)) -> Int,
+) -> Int {
+  input
+  |> find_contiguous_regions([])
+  |> list.fold(0, fn(acc, region) {
+    let property = with(region)
+    let area = set.size(region)
+
+    acc + area * property
   })
 }
 
-pub fn pt_2(input: Dict(Coord, String)) {
-  let regions = find_contiguous_regions(input, [])
+pub fn pt_1(input: Dict(Coord, String)) -> Int {
+  get_price_of_fences(input, get_perimeter)
+}
 
-  list.fold(regions, 0, fn(acc, region) {
-    let sides = get_sides(region)
-    let area = set.size(region)
-
-    acc + area * sides
-  })
+pub fn pt_2(input: Dict(Coord, String)) -> Int {
+  get_price_of_fences(input, get_sides)
 }
