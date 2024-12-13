@@ -33,22 +33,24 @@ pub fn parse(input: String) -> List(Machine) {
   )
 }
 
-fn press(button: Move, times) {
-  Move(button.x * times, button.y * times)
+fn reduce(target: Move, reduction: Move, times: Int) {
+  Move(target.x - reduction.x * times, target.y - reduction.y * times)
 }
 
-fn reduce(target: Move, reduction: Move) {
-  Move(target.x - reduction.x, target.y - reduction.y)
+fn det(m1, m2) {
+  let Move(a, c) = m1
+  let Move(b, d) = m2
+  a * d - b * c
 }
 
 fn find(machine: Machine) {
-  let Machine(Move(ax, ay) as a, Move(bx, by) as b, Move(mx, my) as m) = machine
-
-  let a_presses = { mx * by - my * bx } / { ax * by - ay * bx }
-  let b_presses = { my * ax - mx * ay } / { ax * by - ay * bx }
+  let a_presses = det(machine.target, machine.b) / det(machine.a, machine.b)
+  let b_presses = det(machine.a, machine.target) / det(machine.a, machine.b)
 
   let check =
-    m |> reduce(press(a, a_presses)) |> reduce(press(b, b_presses))
+    machine.target
+    |> reduce(machine.a, a_presses)
+    |> reduce(machine.b, b_presses)
     == Move(0, 0)
   case check {
     True -> Ok(3 * a_presses + b_presses)
@@ -68,7 +70,7 @@ pub fn pt_1(input: List(Machine)) {
 const adjustment = Move(-10_000_000_000_000, -10_000_000_000_000)
 
 fn adjust(machine) {
-  Machine(..machine, target: reduce(machine.target, adjustment))
+  Machine(..machine, target: reduce(machine.target, adjustment, 1))
 }
 
 pub fn pt_2(input: List(Machine)) {
