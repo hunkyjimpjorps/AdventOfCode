@@ -1,7 +1,6 @@
 #lang racket
 
 (require advent-of-code
-         math/matrix
          threading)
 
 (struct Machine (a b prize) #:transparent)
@@ -23,12 +22,15 @@
 
     (Machine (Dist ax ay) (Dist bx by) (Dist px py))))
 
+(define/match (det _d1 _d2)
+  [((Dist a c) (Dist b d)) (- (* a d) (* b c))])
+
 (define/match (find-price _machine)
-  [((Machine (Dist ax ay) (Dist bx by) (Dist prize-x prize-y)))
-   (define solution
-     (~> (matrix-solve (matrix [[ax bx] [ay by]]) (col-matrix [prize-x prize-y])) matrix->list))
-   (if (andmap integer? solution)
-       (+ (* 3 (first solution)) (second solution))
+  [((Machine a b prize))
+   (define a-press (/ (det prize b) (det a b)))
+   (define b-press (/ (det a prize) (det a b)))
+   (if (and (integer? a) (integer? b))
+       (+ (* 3 a-press) b-press)
        0)])
 
 ;; part 1
