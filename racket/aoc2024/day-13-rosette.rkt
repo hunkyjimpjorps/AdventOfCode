@@ -1,7 +1,10 @@
 #lang rosette
 
 (require advent-of-code
-         threading)
+         threading
+         rosette/solver/smt/z3)
+
+(current-solver (z3 #:logic 'QF_LIA))
 
 (struct Machine (a b prize) #:transparent)
 (struct Dist (x y) #:transparent)
@@ -22,13 +25,15 @@
 
     (Machine (Dist ax ay) (Dist bx by) (Dist px py))))
 
+(define-symbolic a b integer?)
+(assert (positive? a))
+(assert (positive? b))
+
 (define (find-price machine)
   (match-define (Machine (Dist ax ay) (Dist bx by) (Dist px py)) machine)
-  (define-symbolic a b integer?)
+
   (define sol
     (solve (begin
-             (assert (positive? a))
-             (assert (positive? b))
              (assert (= px (+ (* ax a) (* bx b))))
              (assert (= py (+ (* ay a) (* by b)))))))
   (cond
@@ -36,11 +41,11 @@
     [else (evaluate (+ (* 3 a) b) sol)]))
 
 ;; part 1
-(for/sum ([machine (in-list MACHINES)]) (find-price machine))
+(time (for/sum ([machine (in-list MACHINES)]) (find-price machine)))
 
 ;; part 2
 (define/match (recalibrate _machine)
   [((Machine a b (Dist prize-x prize-y)))
    (Machine a b (Dist (+ 10000000000000 prize-x) (+ 10000000000000 prize-y)))])
 
-(for/sum ([machine (in-list MACHINES)]) (~> machine recalibrate find-price))
+(time (for/sum ([machine (in-list MACHINES)]) (~> machine recalibrate find-price)))
