@@ -1,4 +1,3 @@
-import gleam/bool
 import gleam/dict
 import gleam/int
 import gleam/list
@@ -8,7 +7,6 @@ import gleam/result
 import gleam/string
 import my_utils/to
 import my_utils/xy.{type XY, XY}
-import simplifile
 
 pub type Robot {
   Robot(posn: XY, velocity: XY)
@@ -61,8 +59,7 @@ pub fn pt_1(input: List(Robot)) {
   |> list.map(to_time(_, 100))
   |> list.group(classify)
   |> dict.delete(Error(Nil))
-  |> dict.values
-  |> list.fold(1, fn(acc, xs) { acc * list.length(xs) })
+  |> dict.fold(1, fn(acc, _, v) { acc * list.length(v) })
 }
 
 fn security_footage(robots: List(Robot)) {
