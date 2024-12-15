@@ -34,6 +34,11 @@ pub fn parse(input: String) {
   Robot(XY(px, py), XY(vx, vy))
 }
 
+fn to_time(robot: Robot, time: Int) {
+  let total_move = XY(robot.velocity.x * time, robot.velocity.y * time)
+  Robot(..robot, posn: go_wrap(robot.posn, total_move))
+}
+
 fn step(robot: Robot) {
   Robot(..robot, posn: go_wrap(robot.posn, robot.velocity))
 }
@@ -52,54 +57,30 @@ fn classify(robot: Robot) {
 }
 
 pub fn pt_1(input: List(Robot)) {
-  list.fold(list.range(1, 100), input, fn(acc, _) { list.map(acc, step) })
+  input
+  |> list.map(to_time(_, 100))
   |> list.group(classify)
   |> dict.delete(Error(Nil))
   |> dict.values
   |> list.fold(1, fn(acc, xs) { acc * list.length(xs) })
 }
 
-const path = "./day_14_output.txt"
-
-fn security_footage(robots: List(Robot), sec: Int) {
-  let current =
-    robots
-    |> list.map(fn(r) { r.posn })
-    |> list.group(fn(posn) { posn })
-    |> dict.map_values(fn(_, v) { list.length(v) })
-
-  use <- bool.guard(current |> dict.values |> list.any(fn(v) { v > 1 }), Nil)
-  let chrs = {
-    use y <- list.map(list.range(0, v_size - 1))
-    use x <- list.map(list.range(0, h_size - 1))
-    case dict.get(current, XY(x, y)) {
-      Error(_) -> " "
-      Ok(_) -> "█"
-    }
-  }
-
-  let footage = chrs |> list.map(string.concat) |> string.join("\n")
-  let _ =
-    simplifile.append(
-      path,
-      "Second " <> int.to_string(sec) <> "\n" <> footage <> "\n\n\n",
-    )
-
-  Nil
+fn security_footage(robots: List(Robot)) {
+  // finding when no drones overlap produces the tree
+  robots
+  |> list.map(fn(r) { r.posn })
+  |> list.group(fn(posn) { posn })
+  |> dict.map_values(fn(_, v) { list.length(v) })
+  |> dict.values
+  |> list.any(fn(v) { v > 1 })
 }
 
 pub fn pt_2(input: List(Robot)) {
-  let _ = simplifile.delete(path)
-  let _ = simplifile.create_file(path)
-
-  list.fold(list.range(1, 10_000), input, fn(acc, sec) {
-    let next = list.map(acc, step)
-    security_footage(next, sec)
-
-    next
+  list.try_fold(list.range(0, 10_000), input, fn(acc, i) {
+    case security_footage(acc) {
+      True -> Ok(list.map(acc, step))
+      False -> Error(i)
+    }
   })
-
-  let assert Ok(["Second " <> answer, ..]) =
-    simplifile.read(from: path) |> result.map(string.split(_, "\n"))
-  to.int(answer)
+  |> result.unwrap_error(0)
 }
