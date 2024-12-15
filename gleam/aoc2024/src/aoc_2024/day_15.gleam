@@ -82,26 +82,25 @@ fn check_box(
   coord: Coord,
   map: Dict(Coord, Tile),
   delta: Coord,
-  acc: List(#(Coord, Tile)),
-) -> Result(List(#(Coord, Tile)), Nil) {
+  acc: List(Coord),
+) -> Result(List(Coord), Nil) {
   let beyond = coord.go(coord, delta)
   case dict.get(map, beyond) {
-    Ok(Nothing) -> Ok([#(beyond, Box), ..acc])
-    Ok(Box) ->
-      check_box(coord.go(coord, delta), map, delta, [#(beyond, Box), ..acc])
+    Ok(Nothing) -> Ok([beyond, ..acc])
+    Ok(Box) -> check_box(coord.go(coord, delta), map, delta, [beyond, ..acc])
     Ok(Wall) -> Error(Nil)
     _ -> panic as "ran out of things to check beyond box"
   }
 }
 
 fn move_boxes_simple(
-  boxes: List(#(Coord, Tile)),
+  boxes: List(Coord),
   map: Dict(Coord, Tile),
   current: Coord,
   destination: Coord,
   next_steps: List(Direction),
 ) -> Dict(Coord, Tile) {
-  list.fold(boxes, map, fn(acc, b) { dict.insert(acc, b.0, b.1) })
+  list.fold(boxes, map, fn(acc, b) { dict.insert(acc, b, Box) })
   |> dict.insert(current, Nothing)
   |> dict.insert(destination, Robot)
   |> next_step_simple(destination, _, next_steps)
@@ -246,7 +245,7 @@ pub fn pt_2(input: String) {
   next_step(robot, map, steps)
   |> dict.fold(0, fn(acc, k, v) {
     case v {
-      Box | LeftBox -> k.c + 100 * k.r + acc
+      LeftBox -> k.c + 100 * k.r + acc
       _ -> acc
     }
   })
