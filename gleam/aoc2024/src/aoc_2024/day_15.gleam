@@ -7,12 +7,12 @@ import my_utils/coord.{type Coord, Coord}
 import my_utils/from
 
 pub type Tile {
-  Robot
   Nothing
   Box
   Wall
   LeftBox
   RightBox
+  Robot
 }
 
 pub type Direction {
@@ -20,6 +20,10 @@ pub type Direction {
   Down
   Left
   Right
+}
+
+type Found {
+  Found(pos: Coord, tile: Tile)
 }
 
 fn to_delta(dir: Direction) -> Coord {
@@ -31,21 +35,21 @@ fn to_delta(dir: Direction) -> Coord {
   }
 }
 
-fn parse_map(input: String) {
+fn parse_map(input: String) -> Dict(Coord, Tile) {
   from.grid(input, fn(c) {
     case c {
-      "@" -> Robot
       "." -> Nothing
       "O" -> Box
       "#" -> Wall
       "[" -> LeftBox
       "]" -> RightBox
-      _ -> panic as { "unexpected object" <> c }
+      "@" -> Robot
+      _ -> panic
     }
   })
 }
 
-fn parse_steps(input: String) {
+fn parse_steps(input: String) -> List(Direction) {
   case input {
     "" -> []
     "\n" <> rest -> parse_steps(rest)
@@ -53,73 +57,8 @@ fn parse_steps(input: String) {
     "v" <> rest -> [Down, ..parse_steps(rest)]
     "<" <> rest -> [Left, ..parse_steps(rest)]
     ">" <> rest -> [Right, ..parse_steps(rest)]
-    _ -> panic as "unexpected instruction"
+    _ -> panic
   }
-}
-
-fn next_step_simple(
-  robot: Coord,
-  map: Dict(Coord, Tile),
-  steps: List(Direction),
-) -> Dict(Coord, Tile) {
-  use <- bool.guard(list.is_empty(steps), map)
-  let assert [next, ..rest] = steps
-  let delta = to_delta(next)
-  let maybe = coord.go(robot, delta)
-  case dict.get(map, maybe) {
-    Ok(Nothing) -> move_boxes_simple([], map, robot, maybe, rest)
-    Ok(Box) ->
-      case check_box(maybe, map, delta, []) {
-        Ok(boxes) -> move_boxes_simple(boxes, map, robot, maybe, rest)
-        Error(_) -> next_step_simple(robot, map, rest)
-      }
-    Ok(Wall) -> next_step_simple(robot, map, rest)
-    _ -> panic as "robot tried to do something invalid"
-  }
-}
-
-fn check_box(
-  coord: Coord,
-  map: Dict(Coord, Tile),
-  delta: Coord,
-  acc: List(Coord),
-) -> Result(List(Coord), Nil) {
-  let beyond = coord.go(coord, delta)
-  case dict.get(map, beyond) {
-    Ok(Nothing) -> Ok([beyond, ..acc])
-    Ok(Box) -> check_box(coord.go(coord, delta), map, delta, [beyond, ..acc])
-    Ok(Wall) -> Error(Nil)
-    _ -> panic as "ran out of things to check beyond box"
-  }
-}
-
-fn move_boxes_simple(
-  boxes: List(Coord),
-  map: Dict(Coord, Tile),
-  current: Coord,
-  destination: Coord,
-  next_steps: List(Direction),
-) -> Dict(Coord, Tile) {
-  list.fold(boxes, map, fn(acc, b) { dict.insert(acc, b, Box) })
-  |> dict.insert(current, Nothing)
-  |> dict.insert(destination, Robot)
-  |> next_step_simple(destination, _, next_steps)
-}
-
-pub fn pt_1(input: String) {
-  let assert [map, steps] = string.split(input, "\n\n")
-  let map = parse_map(map)
-  let steps = parse_steps(steps)
-
-  let assert [robot] = dict.filter(map, fn(_, v) { v == Robot }) |> dict.keys
-
-  next_step_simple(robot, map, steps)
-  |> dict.fold(0, fn(acc, k, v) {
-    case v {
-      Box -> k.c + 100 * k.r + acc
-      _ -> acc
-    }
-  })
 }
 
 fn next_step(
@@ -128,125 +67,115 @@ fn next_step(
   steps: List(Direction),
 ) -> Dict(Coord, Tile) {
   use <- bool.guard(list.is_empty(steps), map)
-
   let assert [next, ..rest] = steps
   let delta = to_delta(next)
   let maybe = coord.go(robot, delta)
-  case dict.get(map, maybe) {
-    Ok(Nothing) ->
-      map
-      |> dict.insert(robot, Nothing)
-      |> dict.insert(maybe, Robot)
-      |> next_step(maybe, _, rest)
-    Ok(LeftBox) | Ok(RightBox) -> {
-      let boxes = case next {
-        Left | Right ->
-          check_double_box_horiz(robot, map, delta, [#(robot, Robot)])
-        Up | Down ->
-          check_double_box_vert(robot, map, delta, Ok([#(robot, Robot)]))
+  let assert Ok(at_destination) = dict.get(map, maybe)
+  case at_destination {
+    Nothing -> move_boxes([Found(robot, Robot)], map, maybe, rest, delta)
+    LeftBox | RightBox | Box -> {
+      let boxes = case next, at_destination {
+        Left, _ | Right, _ | _, Box ->
+          check_horiz_box(robot, map, delta, [Found(robot, Robot)])
+        Up, _ | Down, _ ->
+          check_vert_box(robot, map, delta, Ok([Found(robot, Robot)]))
       }
       case boxes {
         Ok(found_boxes) -> move_boxes(found_boxes, map, maybe, rest, delta)
         Error(_) -> next_step(robot, map, rest)
       }
     }
-    Ok(Wall) -> next_step(robot, map, rest)
-    Ok(Robot) -> panic as "robot has achieved enlightenment by finding itself"
-    _ -> panic as "robot left the grid somehow"
+    _wall -> next_step(robot, map, rest)
   }
 }
 
-fn check_double_box_horiz(
+fn check_horiz_box(
   coord: Coord,
   map: Dict(Coord, Tile),
   delta: Coord,
-  acc: List(#(Coord, Tile)),
-) -> Result(List(#(Coord, Tile)), Nil) {
+  acc: List(Found),
+) -> Result(List(Found), Nil) {
   let beyond = coord.go(coord, delta)
   let assert Ok(tile) = dict.get(map, coord)
   case dict.get(map, beyond) {
-    Ok(Nothing) -> Ok([#(coord, tile), ..acc])
-    Ok(LeftBox) | Ok(RightBox) ->
-      check_double_box_horiz(beyond, map, delta, [#(coord, tile), ..acc])
-    Ok(Wall) -> Error(Nil)
-    _ -> panic as "ran out of things to check beyond box horizontally"
+    Ok(Nothing) -> Ok([Found(coord, tile), ..acc])
+    Ok(LeftBox) | Ok(RightBox) | Ok(Box) ->
+      check_horiz_box(beyond, map, delta, [Found(coord, tile), ..acc])
+    _wall -> Error(Nil)
   }
 }
 
-fn check_double_box_vert(
+fn check_vert_box(
   coord: Coord,
   map: Dict(Coord, Tile),
   delta: Coord,
-  acc: Result(List(#(Coord, Tile)), Nil),
-) -> Result(List(#(Coord, Tile)), Nil) {
+  acc: Result(List(Found), Nil),
+) -> Result(List(Found), Nil) {
   let beyond = coord.go(coord, delta)
-  let assert Ok(tile) = dict.get(map, coord)
-  case dict.get(map, beyond) {
-    Ok(Nothing) ->
-      result.map(acc, fn(b) { list.prepend(b, #(coord, tile)) |> list.unique })
-    Ok(LeftBox as kind) | Ok(RightBox as kind) -> {
-      let dir = case kind {
+  let assert Ok(at_beyond) = dict.get(map, beyond)
+  case at_beyond {
+    Nothing -> acc
+    LeftBox | RightBox -> {
+      let dir = case at_beyond {
         LeftBox -> Right
         RightBox -> Left
         _ -> panic
       }
       list.try_map([beyond, coord.go(beyond, to_delta(dir))], fn(b) {
         let assert Ok(t) = dict.get(map, b)
-        result.map(acc, list.prepend(_, #(b, t)))
-        |> check_double_box_vert(b, map, delta, _)
+        acc
+        |> result.map(list.prepend(_, Found(b, t)))
+        |> check_vert_box(b, map, delta, _)
       })
       |> result.map(list.flatten)
     }
-    Ok(Wall) -> Error(Nil)
-    _ -> panic as "ran out of things to check beyond box vertically:"
+    _wall -> Error(Nil)
   }
 }
 
 fn move_boxes(
-  boxes: List(#(Coord, Tile)),
+  bs: List(Found),
   map: Dict(Coord, Tile),
-  destination: Coord,
-  next_steps: List(Direction),
-  delta: Coord,
+  dest: Coord,
+  next: List(Direction),
+  d: Coord,
 ) -> Dict(Coord, Tile) {
-  list.append(
-    list.map(boxes, fn(b) { #(b.0, Nothing) }),
-    list.map(boxes, fn(b) { #(coord.go(b.0, delta), b.1) }),
-  )
-  |> list.fold(map, fn(acc, b) { dict.insert(acc, b.0, b.1) })
-  |> next_step(destination, _, next_steps)
+  bs
+  |> list.fold(map, fn(m, b) { dict.insert(m, b.pos, Nothing) })
+  |> list.fold(bs, _, fn(m, b) { dict.insert(m, coord.go(b.pos, d), b.tile) })
+  |> next_step(dest, _, next)
 }
 
-fn preprocess(input: String) {
+fn preprocess(input: String) -> String {
   input
-  |> string.split("\n")
-  |> list.map(preprocess_line)
-  |> string.join("\n")
+  |> string.replace("#", "##")
+  |> string.replace("O", "[]")
+  |> string.replace(".", "..")
+  |> string.replace("@", "@.")
 }
 
-fn preprocess_line(line: String) {
-  case line {
-    "" -> ""
-    "@" <> rest -> "@." <> preprocess_line(rest)
-    "." <> rest -> ".." <> preprocess_line(rest)
-    "O" <> rest -> "[]" <> preprocess_line(rest)
-    "#" <> rest -> "##" <> preprocess_line(rest)
-    _ -> panic as { "unexpected object" <> line }
+fn update_coordinate_sum(acc: Int, k: Coord, v: Tile) -> Int {
+  case v {
+    Box | LeftBox -> k.c + 100 * k.r + acc
+    _ -> acc
   }
 }
 
-pub fn pt_2(input: String) {
+pub fn pt_1(input: String) -> Int {
   let assert [map, steps] = string.split(input, "\n\n")
-  let map = map |> preprocess |> parse_map
-
-  let assert [robot] = dict.filter(map, fn(_, v) { v == Robot }) |> dict.keys
+  let map = parse_map(map)
   let steps = parse_steps(steps)
 
-  next_step(robot, map, steps)
-  |> dict.fold(0, fn(acc, k, v) {
-    case v {
-      LeftBox -> k.c + 100 * k.r + acc
-      _ -> acc
-    }
-  })
+  let assert [robot] = map |> dict.filter(fn(_, v) { v == Robot }) |> dict.keys
+
+  dict.fold(next_step(robot, map, steps), 0, update_coordinate_sum)
+}
+
+pub fn pt_2(input: String) -> Int {
+  let assert [map, steps] = string.split(input, "\n\n")
+  let map = map |> preprocess |> parse_map
+  let steps = parse_steps(steps)
+  let assert [robot] = map |> dict.filter(fn(_, v) { v == Robot }) |> dict.keys
+
+  dict.fold(next_step(robot, map, steps), 0, update_coordinate_sum)
 }
