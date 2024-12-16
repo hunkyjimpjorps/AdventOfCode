@@ -155,7 +155,7 @@ pub fn pt_2(input: Dict(Coord, Tile)) {
       seen: set.new(),
       costs: dict.new(),
       starting_best: 1_000_000_000,
-      destinations: [#(start, West), #(start, South)],
+      destinations: [#(start, West), #(start, East)],
     )
 
   coming.1
@@ -163,7 +163,8 @@ pub fn pt_2(input: Dict(Coord, Tile)) {
   |> list.count(fn(k) {
     let assert Ok(to) = dict.get(going.1, k)
     let from = result.unwrap(dict.get(coming.1, k), 0)
-    // I don't know why this works!
+    // This accounts for the need for some of the paths coming back to the start 
+    // to make a final turn to reach the correct initial orientation
     to + from == going.0 || to + from + 1000 == going.0
   })
 }
