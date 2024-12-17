@@ -47,53 +47,54 @@ fn as_combo(operand: Int, register: Register) -> Int {
 }
 
 fn do_op(instruction: Int, operand: Int, register: Register) {
+  let Register(a:, b:, c:, pointer:, output:, ..) = register
   case instruction {
     0 ->
       Register(
         ..register,
-        a: register.a / math.pow(2, as_combo(operand, register)),
-        pointer: register.pointer + 2,
+        a: a / math.pow(2, as_combo(operand, register)),
+        pointer: pointer + 2,
       )
     1 ->
       Register(
         ..register,
-        b: int.bitwise_exclusive_or(register.b, operand),
-        pointer: register.pointer + 2,
+        b: int.bitwise_exclusive_or(b, operand),
+        pointer: pointer + 2,
       )
     2 ->
       Register(
         ..register,
         b: as_combo(operand, register) % 8,
-        pointer: register.pointer + 2,
+        pointer: pointer + 2,
       )
     3 ->
       case register.a {
-        0 -> Register(..register, pointer: register.pointer + 2)
+        0 -> Register(..register, pointer: pointer + 2)
         _ -> Register(..register, pointer: operand)
       }
     4 ->
       Register(
         ..register,
-        b: int.bitwise_exclusive_or(register.b, register.c),
-        pointer: register.pointer + 2,
+        b: int.bitwise_exclusive_or(b, c),
+        pointer: pointer + 2,
       )
     5 ->
       Register(
         ..register,
-        output: [as_combo(operand, register) % 8, ..register.output],
-        pointer: register.pointer + 2,
+        output: [as_combo(operand, register) % 8, ..output],
+        pointer: pointer + 2,
       )
     6 ->
       Register(
         ..register,
-        b: register.a / math.pow(2, as_combo(operand, register)),
-        pointer: register.pointer + 2,
+        b: a / math.pow(2, as_combo(operand, register)),
+        pointer: pointer + 2,
       )
     7 ->
       Register(
         ..register,
-        c: register.a / math.pow(2, as_combo(operand, register)),
-        pointer: register.pointer + 2,
+        c: a / math.pow(2, as_combo(operand, register)),
+        pointer: pointer + 2,
       )
     _ -> panic
   }
