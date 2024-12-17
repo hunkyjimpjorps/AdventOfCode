@@ -1,5 +1,6 @@
 import gary.{type ErlangArray}
 import gary/array
+import gleam/bool
 import gleam/int
 import gleam/list
 import gleam/option
@@ -126,26 +127,18 @@ fn is_prefix_of(prefix: List(a), source: List(a)) {
 }
 
 fn search_for_a(goal, acc, register) {
-  case acc {
-    [] -> Error(Nil)
-    [next, ..rest] -> {
-      let trial_quine =
-        Register(..register, a: next) |> run_program |> list.reverse
-      case trial_quine == goal {
-        True -> Ok(next)
-        False -> {
-          case is_prefix_of(trial_quine, goal) {
-            True -> {
-              list.range(0, 7)
-              |> list.map(fn(n) { next * 8 + n })
-              |> list.append(rest)
-              |> search_for_a(goal, _, register)
-            }
-            False -> search_for_a(goal, rest, register)
-          }
-        }
-      }
+  use <- bool.guard(list.is_empty(acc), Error(Nil))
+  let assert [next, ..rest] = acc
+  let trial_quine = Register(..register, a: next) |> run_program |> list.reverse
+  use <- bool.guard(trial_quine == goal, Ok(next))
+  case is_prefix_of(trial_quine, goal) {
+    True -> {
+      list.range(0, 7)
+      |> list.map(fn(n) { next * 8 + n })
+      |> list.append(rest)
+      |> search_for_a(goal, _, register)
     }
+    False -> search_for_a(goal, rest, register)
   }
 }
 
