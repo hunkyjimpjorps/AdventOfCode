@@ -5,6 +5,7 @@ import gleam/io
 import gleam/list
 import gleam/option
 import gleam/regexp
+import gleam/result
 import gleam/string
 import my_utils/math
 import my_utils/to
@@ -105,8 +106,7 @@ fn run_program(register: Register) {
   let operand = array.get(program, pointer + 1)
 
   case op, operand {
-    Ok(-1), _ | _, Ok(-1) ->
-      output |> list.reverse |> list.map(int.to_string) |> string.join(",")
+    Ok(-1), _ | _, Ok(-1) -> output |> list.reverse
     Ok(op), Ok(operand) -> do_op(op, operand, register) |> run_program
     _, _ -> panic
   }
@@ -114,31 +114,48 @@ fn run_program(register: Register) {
 
 pub fn pt_1(input: Register) {
   run_program(input)
-}
-
-fn format_program(program: ErlangArray(Int)) -> String {
-  program
-  |> array.to_list
-  |> list.reverse
   |> list.map(int.to_string)
   |> string.join(",")
 }
 
-fn a_quine_is_fine(
-  register: Register,
-  new_a: Int,
-  program: String,
-  length: Int,
-) -> Int {
-  let attempt = run_program(Register(..register, a: new_a |> io.debug))
-  case string.length(attempt) < length, attempt == program {
-    True, _ -> a_quine_is_fine(register, new_a * 2, program, length)
-    _, False -> a_quine_is_fine(register, new_a + 1, program, length)
-    _, True -> new_a
+fn is_prefix_of(prefix: List(a), source: List(a)) {
+  case prefix, source {
+    [], _ -> True
+    [a, ..a_rest], [b, ..b_rest] if a == b -> is_prefix_of(a_rest, b_rest)
+    _, _ -> False
+  }
+}
+
+fn search_for_a(goal, acc, register) {
+  case acc {
+    [] -> Error(Nil)
+    [#(next, result), ..rest] -> {
+      case result == goal {
+        True -> Ok(next)
+        False -> {
+          list.range(0, 7)
+          |> list.filter_map(fn(n) {
+            let trial_a = next * 8 + n
+            let trial_quine =
+              Register(..register, a: trial_a)
+              |> run_program
+              |> list.reverse
+            case is_prefix_of(trial_quine, goal) {
+              True -> Ok(#(trial_a, trial_quine))
+              False -> Error(Nil)
+            }
+          })
+          |> list.append(rest)
+          |> search_for_a(goal, _, register)
+        }
+      }
+    }
   }
 }
 
 pub fn pt_2(input: Register) {
-  let goal = format_program(input.program)
-  a_quine_is_fine(input, 1, goal, string.length(goal))
+  input.program
+  |> array.to_list
+  |> list.reverse
+  |> search_for_a([#(0, [])], input)
 }
