@@ -1,14 +1,13 @@
 import gary.{type ErlangArray}
 import gary/array
 import gleam/int
-import gleam/io
 import gleam/list
 import gleam/option
 import gleam/regexp
-import gleam/result
 import gleam/string
 import my_utils/math
 import my_utils/to
+import pocket_watch
 
 pub type Register {
   Register(
@@ -129,24 +128,21 @@ fn is_prefix_of(prefix: List(a), source: List(a)) {
 fn search_for_a(goal, acc, register) {
   case acc {
     [] -> Error(Nil)
-    [#(next, result), ..rest] -> {
-      case result == goal {
+    [next, ..rest] -> {
+      let trial_quine =
+        Register(..register, a: next) |> run_program |> list.reverse
+      case trial_quine == goal {
         True -> Ok(next)
         False -> {
-          list.range(0, 7)
-          |> list.filter_map(fn(n) {
-            let trial_a = next * 8 + n
-            let trial_quine =
-              Register(..register, a: trial_a)
-              |> run_program
-              |> list.reverse
-            case is_prefix_of(trial_quine, goal) {
-              True -> Ok(#(trial_a, trial_quine))
-              False -> Error(Nil)
+          case is_prefix_of(trial_quine, goal) {
+            True -> {
+              list.range(0, 7)
+              |> list.map(fn(n) { next * 8 + n })
+              |> list.append(rest)
+              |> search_for_a(goal, _, register)
             }
-          })
-          |> list.append(rest)
-          |> search_for_a(goal, _, register)
+            False -> search_for_a(goal, rest, register)
+          }
         }
       }
     }
@@ -157,5 +153,5 @@ pub fn pt_2(input: Register) {
   input.program
   |> array.to_list
   |> list.reverse
-  |> search_for_a([#(0, [])], input)
+  |> search_for_a(list.range(0, 7), input)
 }
