@@ -5,7 +5,6 @@ import gleam/result
 import gleam_community/maths/elementary
 import my_utils/math
 import my_utils/to
-import pocket_watch
 import rememo/memo
 
 pub fn parse(input: String) {
@@ -45,11 +44,9 @@ fn blink_a_lot(input: List(Int), times: Int) -> Int {
 }
 
 pub fn pt_1(input: List(Int)) -> Int {
-  use <- pocket_watch.simple("Part 1")
   blink_a_lot(input, 25)
 }
 
 pub fn pt_2(input: List(Int)) -> Int {
-  use <- pocket_watch.simple("Part 2")
   blink_a_lot(input, 75)
 }
