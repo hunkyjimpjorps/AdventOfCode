@@ -25,8 +25,7 @@
 (for ([obstacle (in-list (take input 1024))])
   (remove-vertex! starting-graph obstacle))
 
-(define-values (distances _predecessors) (dijkstra starting-graph (cons 0 0)))
-(hash-ref distances (cons 70 70))
+(~> starting-graph (fewest-vertices-path (cons 0 0) (cons MAX-SIZE MAX-SIZE)) length sub1)
 
 ;; part 2
 (define obstacles (drop input 1024))
