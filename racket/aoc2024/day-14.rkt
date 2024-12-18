@@ -5,7 +5,7 @@
          struct-update)
 
 (struct Robot (posn vel))
-(struct Posn (x y) #:transparent)
+(struct Posn (x y))
 (define-struct-updaters Robot)
 (define-struct-updaters Posn)
 
