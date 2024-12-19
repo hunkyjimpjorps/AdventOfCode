@@ -1,6 +1,5 @@
 import gleam/dict.{type Dict}
 import gleam/int
-import gleam/io
 import gleam/list
 import gleam/result
 import gleam/set.{type Set}
@@ -86,7 +85,6 @@ pub fn pt_2(input: List(#(Int, Int))) {
   input
   |> list.drop(1024)
   |> list.try_fold(starting_map, fn(acc, next) {
-    io.debug(next)
     let acc = dict.insert(acc, next, Corrupted)
     let result =
       pq.new(compare_points)
