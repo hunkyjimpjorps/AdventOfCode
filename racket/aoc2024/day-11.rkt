@@ -1,7 +1,7 @@
 #lang racket
 
 (require advent-of-code
-         memoize
+         memo
          threading)
 
 (define STONES
@@ -14,7 +14,7 @@
 (define (split n)
   (call-with-values (λ () (quotient/remainder n (expt 10 (quotient (digits n) 2)))) list))
 
-(define/memo
+(define/memoize
  (transform-stone stone blinks)
  (cond
    [(= blinks 0) 1]
