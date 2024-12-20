@@ -1,3 +1,4 @@
+import gleam/int
 import gleam/list
 
 pub type Coord {
@@ -18,6 +19,10 @@ pub fn go(coord: Coord, direction: Coord) {
 
 pub fn dist(a: Coord, b: Coord) -> Coord {
   Coord(b.r - a.r, b.c - a.c)
+}
+
+pub fn manhattan_dist(a: Coord, b: Coord) -> Int {
+  int.absolute_value(b.r - a.r) + int.absolute_value(b.c - a.c)
 }
 
 pub const origin = Coord(0, 0)
