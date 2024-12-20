@@ -14,11 +14,15 @@ pub fn list_of_list_of_ints(input: String, delimiter: String) -> List(List(Int))
   |> list.map(to.ints(_, delimiter))
 }
 
-pub fn grid(input: String, parser: fn(String) -> a) -> Dict(Coord, a) {
+pub fn grid(
+  input: String,
+  constructor: fn(Int, Int) -> a,
+  parser: fn(String) -> b,
+) -> Dict(a, b) {
   {
     use row, r <- list.index_map(string.split(input, "\n"))
     use col, c <- list.index_map(string.to_graphemes(row))
-    #(Coord(r, c), parser(col))
+    #(constructor(r, c), parser(col))
   }
   |> list.flatten
   |> dict.from_list

@@ -12,7 +12,7 @@ pub type Grid =
 const max = 140
 
 pub fn parse(input: String) -> Grid {
-  from.grid(input, fn(c) { c })
+  from.grid(input, Coord, fn(c) { c })
 }
 
 fn count_xmases(grid: Grid, coord: Coord, acc: Int) -> Int {

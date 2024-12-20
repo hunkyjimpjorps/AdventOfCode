@@ -2,8 +2,8 @@ import gleam/dict.{type Dict}
 import gleam/int
 import gleam/list
 import gleam/set
-import my_utils/coord.{type Coord, Coord}
 import my_utils/from
+import my_utils/xy.{type XY, XY}
 
 pub type Tile {
   Start
@@ -12,8 +12,8 @@ pub type Tile {
   Path
 }
 
-pub fn parse(input: String) -> Dict(Coord, Tile) {
-  from.grid(input, fn(c) {
+pub fn parse(input: String) -> Dict(XY, Tile) {
+  from.grid(input, xy.from_input, fn(c) {
     case c {
       "S" -> Start
       "E" -> End
@@ -27,7 +27,7 @@ pub fn parse(input: String) -> Dict(Coord, Tile) {
 fn enumerate_path(position, acc, grid, index, seen) {
   let assert [next] =
     position
-    |> coord.neighbors(coord.cardinal_directions)
+    |> xy.neighbors(xy.cardinal_directions)
     |> list.filter(fn(n) {
       !set.contains(seen, n) && dict.get(grid, n) != Ok(Wall)
     })
@@ -41,12 +41,12 @@ fn enumerate_path(position, acc, grid, index, seen) {
   }
 }
 
-fn reachable_nodes(p: Coord, distance: Int) -> List(Coord) {
-  let Coord(r, c) = p
+fn reachable_nodes(p: XY, distance: Int) -> List(XY) {
+  let XY(r, c) = p
   list.range(-distance, distance)
   |> list.flat_map(fn(y) {
     let span_size = distance - int.absolute_value(y)
-    list.range(-span_size, span_size) |> list.map(fn(x) { Coord(x + r, y + c) })
+    list.range(-span_size, span_size) |> list.map(fn(x) { XY(x + r, y + c) })
   })
 }
 
@@ -54,7 +54,7 @@ fn search_for_shortcuts(numbered_path, reach) {
   {
     use outer_acc, a <- list.fold(dict.keys(numbered_path), 0)
     use inner_acc, b <- list.fold(reachable_nodes(a, reach), outer_acc)
-    let dist = coord.manhattan_dist(a, b)
+    let dist = xy.manhattan_dist(a, b)
     case dict.get(numbered_path, a), dict.get(numbered_path, b) {
       Ok(n), Ok(m) if m - n - dist >= 100 -> inner_acc + 1
       _, _ -> inner_acc
@@ -62,7 +62,7 @@ fn search_for_shortcuts(numbered_path, reach) {
   }
 }
 
-pub fn pt_1(input: Dict(Coord, Tile)) {
+pub fn pt_1(input: Dict(XY, Tile)) {
   let assert [start] =
     input |> dict.filter(fn(_, v) { v == Start }) |> dict.keys
   let path = dict.new() |> dict.insert(start, 0)
@@ -71,7 +71,7 @@ pub fn pt_1(input: Dict(Coord, Tile)) {
   |> search_for_shortcuts(2)
 }
 
-pub fn pt_2(input: Dict(Coord, Tile)) {
+pub fn pt_2(input: Dict(XY, Tile)) {
   let assert [start] =
     input |> dict.filter(fn(_, v) { v == Start }) |> dict.keys
   let path = dict.new() |> dict.insert(start, 0)

@@ -1,7 +1,12 @@
+import gleam/int
 import gleam/list
 
 pub type XY {
   XY(x: Int, y: Int)
+}
+
+pub fn from_input(row: Int, col: Int) {
+  XY(x: col, y: row)
 }
 
 pub fn next_col(coord: XY) {
@@ -18,6 +23,10 @@ pub fn go(coord: XY, direction: XY) {
 
 pub fn dist(a: XY, b: XY) -> XY {
   XY(b.x - a.x, b.y - a.y)
+}
+
+pub fn manhattan_dist(a: XY, b: XY) -> Int {
+  int.absolute_value(b.x - a.x) + int.absolute_value(b.y - a.y)
 }
 
 pub const origin = XY(0, 0)

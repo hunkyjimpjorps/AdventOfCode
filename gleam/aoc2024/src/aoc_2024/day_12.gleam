@@ -6,7 +6,7 @@ import my_utils/coord.{type Coord, Coord}
 import my_utils/from
 
 pub fn parse(input: String) -> Dict(Coord, String) {
-  from.grid(input, fn(c) { c })
+  from.grid(input, Coord, fn(c) { c })
 }
 
 fn find_contiguous_regions(

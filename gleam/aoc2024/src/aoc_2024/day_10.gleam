@@ -7,7 +7,7 @@ import my_utils/from
 import my_utils/to
 
 pub fn parse(input: String) -> Dict(Coord, Int) {
-  from.grid(input, to.int)
+  from.grid(input, Coord, to.int)
 }
 
 fn look_for_summit(current: Coord, grid: Dict(Coord, Int), summits: List(Coord)) {

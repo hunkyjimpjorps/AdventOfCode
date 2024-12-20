@@ -36,7 +36,7 @@ fn to_delta(dir: Direction) -> Coord {
 }
 
 fn parse_map(input: String) -> Dict(Coord, Tile) {
-  from.grid(input, fn(c) {
+  from.grid(input, Coord, fn(c) {
     case c {
       "." -> Nothing
       "O" -> Box
