@@ -125,17 +125,16 @@ fn direction_directions(code: List(DirectionalButton)) {
 
 fn count_presses(move, remaining, cache) {
   use <- memo.memoize(cache, #(move, remaining))
-  let f = fn(acc, move) { acc + count_presses(move, remaining - 1, cache) }
+  let count_subsequent = fn(x) {
+    list.fold(direction_directions(x), 0, fn(acc, move) {
+      acc + count_presses(move, remaining - 1, cache)
+    })
+  }
   case remaining, move {
     0, [last] -> list.length(last)
     0, [last_a, last_b] -> int.min(list.length(last_a), list.length(last_b))
-    _, [one] -> list.fold(direction_directions(one), 0, f)
-    _, [a, b] -> {
-      int.min(
-        list.fold(direction_directions(a), 0, f),
-        list.fold(direction_directions(b), 0, f),
-      )
-    }
+    _, [one] -> count_subsequent(one)
+    _, [a, b] -> int.min(count_subsequent(a), count_subsequent(b))
     _, _ -> panic
   }
 }
