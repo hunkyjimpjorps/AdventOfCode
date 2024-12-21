@@ -24,6 +24,7 @@ pub fn a_star(
   start start: #(Int, Int),
   goal goal: #(Int, Int),
   obstacles obstacles: List(#(Int, Int)),
+  bounds bounds: #(#(Int, Int), #(Int, Int)),
 ) {
   let open_set = [start]
 
@@ -31,7 +32,7 @@ pub fn a_star(
 
   let f_score = dict.new() |> dict.insert(start, heuristic(start, goal))
 
-  do_a_star(open_set, f_score, g_score, goal, dict.new(), obstacles)
+  do_a_star(open_set, f_score, g_score, goal, dict.new(), obstacles, bounds)
 }
 
 fn infinity() {
@@ -83,7 +84,10 @@ fn open_set_sorted_by_f_score(open_set, f_score: dict.Dict(#(Int, Int), Float)) 
   })
 }
 
-fn get_neighbors_of_current(current: #(Int, Int), goal: #(Int, Int)) {
+fn get_neighbors_of_current(
+  current: #(Int, Int),
+  bounds: #(#(Int, Int), #(Int, Int)),
+) {
   [
     #(current.0, current.1 - 1),
     #(current.0 - 1, current.1),
@@ -91,7 +95,7 @@ fn get_neighbors_of_current(current: #(Int, Int), goal: #(Int, Int)) {
     #(current.0, current.1 + 1),
   ]
   |> list.filter(fn(tup) {
-    tup.0 >= 0 && tup.1 >= 0 && tup.0 <= goal.0 && tup.1 <= goal.1
+    tup.0 >= bounds.0.0 && tup.1 >= bounds.0.1 && tup.0 <= bounds.1.0 && tup.1 <= bounds.1.1
   })
 }
 
@@ -121,6 +125,7 @@ fn handle_neighbors_of_current(
   goal,
   open_set,
   obstacles: List(#(Int, Int)),
+  bounds
 ) {
   case neighbors {
     [neighbor, ..rest] -> {
@@ -134,6 +139,7 @@ fn handle_neighbors_of_current(
           goal,
           open_set,
           obstacles,
+          bounds
         )
       })
 
@@ -177,6 +183,7 @@ fn handle_neighbors_of_current(
             goal,
             open_set,
             obstacles,
+            bounds
           )
         }
         False ->
@@ -189,10 +196,12 @@ fn handle_neighbors_of_current(
             goal,
             open_set,
             obstacles,
+            bounds
           )
       }
     }
-    [] -> do_a_star(open_set, f_score, g_score, goal, came_from, obstacles)
+    [] ->
+      do_a_star(open_set, f_score, g_score, goal, came_from, obstacles, bounds)
   }
 }
 
@@ -203,6 +212,7 @@ fn do_a_star(
   goal: #(Int, Int),
   came_from: dict.Dict(#(Int, Int), #(Int, Int)),
   obstacles: List(#(Int, Int)),
+  bounds: #(#(Int, Int), #(Int, Int)),
 ) {
   case list.is_empty(open_set) {
     False -> {
@@ -223,7 +233,7 @@ fn do_a_star(
       let open_set = list.filter(open_set, fn(value) { value != current })
 
       handle_neighbors_of_current(
-        get_neighbors_of_current(current, goal),
+        get_neighbors_of_current(current, bounds),
         f_score,
         g_score,
         came_from,
@@ -231,6 +241,7 @@ fn do_a_star(
         goal,
         open_set,
         obstacles,
+        bounds
       )
     }
     True -> Error(Nil)

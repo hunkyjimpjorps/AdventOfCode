@@ -29,7 +29,12 @@ const take = 1024
 pub fn pt_1(input: List(#(Int, Int))) {
   input
   |> list.take(take)
-  |> a_star.a_star(start: #(0, 0), goal: #(size, size), obstacles: _)
+  |> a_star.a_star(
+    start: #(0, 0),
+    goal: #(size, size),
+    obstacles: _,
+    bounds: #(#(0, 0), #(size, size)),
+  )
   |> result.map(list.length)
   |> result.unwrap(0)
 }
