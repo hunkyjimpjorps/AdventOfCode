@@ -69,9 +69,8 @@ fn to_next_numeric(pair: #(NumericButton, NumericButton)) {
   let move_cols = make_move(ac, bc, Right, Left)
 
   case posns {
-    _ if ar - br == 0 || ac - bc == 0 -> [
-      list.flatten([move_rows, move_cols, [Push]]),
-    ]
+    _ if ar - br == 0 -> [list.append(move_cols, [Push])]
+    _ if ac - bc == 0 -> [list.append(move_rows, [Push])]
     // If you start in the third row and move to the first column, 
     // that could pass you through the gap if you move left first
     #(#(3, _), #(_, 1)) -> [list.flatten([move_rows, move_cols, [Push]])]
