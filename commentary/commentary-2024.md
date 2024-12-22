@@ -50,10 +50,58 @@
    
    *Antennas make resonance points. Find them all.* Another grid problem, and a pretty straightforward one too. Not much to say about this one; the only real difficulty was making sure that I understood the rules of the game before I started on it.
 
-9.   [Disk Fragmenter](https://adventofcode.com/2024/day/9) ([Gleam](/gleam/aoc2024/src/aoc_2024/day_9.gleam), [Racket](/racket/aoc2024/day-09.rkt)) ⭐⭐⭐ ♥️♥️♥️
+9. [Disk Fragmenter](https://adventofcode.com/2024/day/9) ([Gleam](/gleam/aoc2024/src/aoc_2024/day_9.gleam), [Racket](/racket/aoc2024/day-09.rkt)) ⭐⭐⭐ ♥️♥️♥️
     
-     *Defragment a hard drive, first by moving blocks, then by moving entire files.* Coming up with a working algorithm for achieving this took some thought, but once I had the outline of what I wanted to, putting the pieces together wasn't too bad, especially with the help of Gleam's static types to keep all the list operations straight. I probably should've done this with an array instead, but this is about the part of AoC where I start focusing more on just getting a solution than getting something elegant or efficient.
+   *Defragment a hard drive, first by moving blocks, then by moving entire files.* Coming up with a working algorithm for achieving this took some thought, but once I had the outline of what I wanted to, putting the pieces together wasn't too bad, especially with the help of Gleam's static types to keep all the list operations straight. I probably should've done this with an array instead, but this is about the part of AoC where I start focusing more on just getting a solution than getting something elegant or efficient.
 
 10.  [Hoof It](https://adventofcode.com/2024/day/10) ([Gleam](/gleam/aoc2024/src/aoc_2024/day_10.gleam), [Racket](/racket/aoc2024/day-10.rkt)) ⭐⭐ ♥️♥️♥️
     
      *Rate hiking trails in various ways.* I think I've finally done depth-first searches in AoC enough that I know how to do them right off the bat instead of having to fumble around online trying to translate pseudocode.  Another pretty standard "find something interesting about a grid of numbers" problem.
+
+11.  [Plutonian Pebbles](https://adventofcode.com/2024/day/11) ([Gleam](/gleam/aoc2024/src/aoc_2024/day_11.gleam), [Racket](/racket/aoc2024/day-11.rkt)) ⭐ ♥️
+    
+     *Rocks split.* The standard "you can directly count part 1 but you can't count part 2" question that appears this time each year.
+
+12.  [Garden Groups](https://adventofcode.com/2024/day/12) ([Gleam](/gleam/aoc2024/src/aoc_2024/day_12.gleam), [Racket](/racket/aoc2024/day-12.rkt)) ⭐⭐⭐ ♥️♥️♥️♥️
+    
+     *Find the geometric properties of farm plots.* This one was a neat combination of a few subproblems -- identifying and tagging irregular areas in a grid, then figuring out their perimeters and number of sides.  I got a little stuck on writing the flood fill, but once I figured that out it all clicked.
+     
+13.  [Claw Contraption](https://adventofcode.com/2024/day/13) ([Gleam](/gleam/aoc2024/src/aoc_2024/day_13.gleam), [Racket](/racket/aoc2024/day-13.rkt)) ⭐⭐ ♥️♥️
+    
+     *How much does it cost to win the prize in every claw machine?* This looked like a complicated optimization problem at the start, but it ends up just being a lot of independent systems of linear equations, each with one solution.
+
+14.  [Restroom Redoubt](https://adventofcode.com/2024/day/14) ([Gleam](/gleam/aoc2024/src/aoc_2024/day_14.gleam), [Racket](/racket/aoc2024/day-14.rkt)) ⭐⭐ ♥️♥️♥️♥️
+    
+     *Robots do Christmas choreography.* Part 2 for this one was really divisive online.  The problem statement's fairly open-ended, so it requires some guessing at what heuristics could tease out the solution.  After poking at the output for a while, I went with "find times when all the robots alone at their coordinates" and that got it in the first shot.
+
+15.  [Warehouse Woes](https://adventofcode.com/2024/day/15) ([Gleam](/gleam/aoc2024/src/aoc_2024/day_15.gleam)) ⭐⭐⭐ ♥️♥️♥️
+    
+     *A robot pushes 1 $\times$ 2 boxes.* It's weird Sokoban!
+
+16.  [Reindeer Maze](https://adventofcode.com/2024/day/16) ([Gleam](/gleam/aoc2024/src/aoc_2024/day_16.gleam)) ⭐⭐⭐⭐ ♥️♥️♥️
+    
+     *Where should people sit to watch a reindeer race?* I'm getting more comfortable with search algorithms.  My end solution is a little hacky since I didn't account in my method for a final turn that some of the optimal paths need to make, but this is the point in the year where I start worrying less about elegance and just concentrate on getting a solution.
+
+17.  [Chronospatial Computer](https://adventofcode.com/2024/day/17) ([Gleam](/gleam/aoc2024/src/aoc_2024/day_17.gleam), [Racket](/racket/aoc2024/day-17.rkt)) ⭐⭐⭐⭐ ♥️♥️♥️
+    
+     *Make a octal computer produce a [quine](https://en.wikipedia.org/wiki/Quine_(computing)).* Part 1 is a "read the instructions" problem, and then Part 2 stubbornly resists any kind of naive search.  I didn't make much progress with it until I got the hint about how each octal digit of the initial register corresponds to one byte in the output, and wrote a DFS to build up the register value from there.
+ 
+ 18.  [RAM Run](https://adventofcode.com/2024/day/18) ([Gleam](/gleam/aoc2024/src/aoc_2024/day_18.gleam), [Racket](/racket/aoc2024/day-18.rkt)) ⭐ ♥️♥️
+    
+      *Avoid falling bytes until you can't any more.* There is probably a more optimal way of solving part 2 but a brute-force search adding each byte in sequence to the map was fast enough for me.  This was a weirdly underwhelming part 2; I expected the historians would have to move as the bytes fell instead of waiting until they'd all fallen.
+ 
+19.  [Linen Layout](https://adventofcode.com/2024/day/19) ([Gleam](/gleam/aoc2024/src/aoc_2024/day_19.gleam), [Racket](/racket/aoc2024/day-19.rkt)) ⭐ ♥️♥️♥️
+
+      *Make aesthetically-appealing towel arrangements.* I remember seeing an equivalent problem to this in a "intro to dynamic programming" video I watched last year.  The two parts have an almost-identical solution based on the same memoized search function.
+ 
+20.  [Race Condition](https://adventofcode.com/2024/day/20) ([Gleam](/gleam/aoc2024/src/aoc_2024/day_20.gleam), [Racket](/racket/aoc2024/day-20.rkt)) ⭐⭐ ♥️♥️
+
+      *Cheat as much as you can in a race.* Looks like it's going to be a grid search problem, but ends up just being a fairly straightforward fold over a set of points.  I got stuck on Part 2 for a bit because I thought cheating could only move you through walls; the actual mechanism's a lot more permissive.
+
+21.  [Keypad Conundrum](https://adventofcode.com/2024/day/21) ([Gleam](/gleam/aoc2024/src/aoc_2024/day_21.gleam), [Racket](/racket/aoc2024/day-21.rkt)) ⭐⭐⭐⭐⭐ ♥️♥️♥️
+
+      *Tell a robot to tell a robot to tell a robot to ... to tell a robot to enter a passcode.* The first one this year where I had to look at other people's solutions to figure out a working method to pick and evaluate the robot arm motion paths, the latest that's happened for me during AoC.  Once I had that, it was a pretty straightforward recursive search.
+
+22.  [Monkey Market](https://adventofcode.com/2024/day/22) ([Gleam](/gleam/aoc2024/src/aoc_2024/day_22.gleam), [Racket](/racket/aoc2024/day-22.rkt)) ⭐ ♥️♥️♥️
+
+      *Deputize a monkey to buy you as many bananas as possible by selling hiding spots at the best time.* Another problem that looks like it'll be an optimization problem with an exploding search space, but just making a bunch of dicts/hashmaps and folding them into each other produces the result in a couple seconds.
