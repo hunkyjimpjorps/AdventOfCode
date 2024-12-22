@@ -6,3 +6,7 @@ pub fn pow(base: Int, exponent: Int) {
     n -> base * pow(base, n - 1)
   }
 }
+
+pub fn divide(numerator: Int, denominator: Int) {
+  numerator / denominator
+}
