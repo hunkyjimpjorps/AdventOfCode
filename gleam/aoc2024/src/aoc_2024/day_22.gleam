@@ -32,10 +32,7 @@ pub fn pt_1(input: List(Int)) {
 fn generate_prices(number, index, acc) {
   case index {
     0 -> list.reverse(acc)
-    i -> {
-      let last_digit = number % 10
-      generate_prices(evolve(number), i - 1, [last_digit, ..acc])
-    }
+    i -> generate_prices(evolve(number), i - 1, [number % 10, ..acc])
   }
 }
 
@@ -46,16 +43,20 @@ fn calculate_deltas(price_list) {
   |> list.map(fn(tup) { tup.1 - tup.0 })
 }
 
+fn window_by_4(xs, acc) {
+  case xs {
+    [a, b, c, d] -> [#(a, b, c, d), ..acc] |> list.reverse
+    [a, b, c, d, ..rest] ->
+      window_by_4([b, c, d, ..rest], [#(a, b, c, d), ..acc])
+    _ -> panic
+  }
+}
+
 fn make_buyer_stats(initial) {
   let price_list = generate_prices(initial, 2000, [])
-  let signals_list = calculate_deltas(price_list) |> list.window(4)
-  let signals =
-    list.map(signals_list, fn(xs) {
-      let assert [a, b, c, d] = xs
-      #(a, b, c, d)
-    })
+  let signals_list = calculate_deltas(price_list) |> window_by_4([])
 
-  list.zip(signals, price_list |> list.drop(6))
+  list.zip(signals_list, price_list |> list.drop(6))
   |> list.reverse
   |> dict.from_list
 }
