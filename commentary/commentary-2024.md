@@ -105,3 +105,7 @@
 22.  [Monkey Market](https://adventofcode.com/2024/day/22) ([Gleam](/gleam/aoc2024/src/aoc_2024/day_22.gleam), [Racket](/racket/aoc2024/day-22.rkt)) ⭐ ♥️♥️♥️
 
       *Deputize a monkey to buy you as many bananas as possible by selling hiding spots at the best time.* Another problem that looks like it'll be an optimization problem with an exploding search space, but just making a bunch of dicts/hashmaps and folding them into each other produces the result in a couple seconds.
+
+23.  [LAN Party](https://adventofcode.com/2024/day/23) ([Gleam](/gleam/aoc2024/src/aoc_2024/day_23.gleam), [Racket](/racket/aoc2024/day-23.rkt)) ⭐⭐⭐ ♥️
+
+      *Find the biggest clique in a network.* One of those graph problems that's trivial if you're using a language like Python with a library like `networkx`, but I did not have that luxury.  I don't really know much graph theory so I'm surprised I managed to make this one work.
