@@ -62,7 +62,7 @@
     
      *Rocks split.* The standard "you can directly count part 1 but you can't count part 2" question that appears this time each year.
 
-12.  [Garden Groups](https://adventofcode.com/2024/day/12) ([Gleam](/gleam/aoc2024/src/aoc_2024/day_12.gleam), [Racket](/racket/aoc2024/day-12.rkt)) ⭐⭐⭐ ♥️♥️♥️♥️
+12.  [Garden Groups](https://adventofcode.com/2024/day/12) ([Gleam](/gleam/aoc2024/src/aoc_2024/day_12.gleam), [Racket](/racket/aoc2024/day-12.rkt)) ⭐⭐⭐ ♥️♥️♥️♥️♥️
     
      *Find the geometric properties of farm plots.* This one was a neat combination of a few subproblems -- identifying and tagging irregular areas in a grid, then figuring out their perimeters and number of sides.  I got a little stuck on writing the flood fill, but once I figured that out it all clicked.
      
