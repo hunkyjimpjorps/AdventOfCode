@@ -55,9 +55,7 @@ td-yn")
 ;; part 2
 (define (bron-kerbosch acc P [R (set)] [X (set)])
   (cond
-    [(and (empty? P) (set-empty? X))
-     (println R)
-     (cons R acc)]
+    [(and (empty? P) (set-empty? X)) (cons R acc)]
     [(empty? P) acc]
     [else
      (match-define (list* vertex remaining) P)
