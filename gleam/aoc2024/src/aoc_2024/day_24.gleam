@@ -189,7 +189,9 @@ fn find_mismatched_gates(gates: List(Gate)) {
       !list.any(type_3, fn(j3) { { j3.left == j0.out || j3.right == j0.out } })
     })
 
-  // find the OR gate that the bad gate 
+  // find the OR gate that the bad gate ought to be connected to
+  // the bad gate should take xAA and yAA as inputs, so the output should go to
+  // a gate that outputs zAA
   let assert Ok(match) =
     list.find(gates, fn(j) {
       j.out == "z" <> { bad_gate.left |> string.drop_start(1) }
