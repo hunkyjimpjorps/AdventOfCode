@@ -1,0 +1,32 @@
+name = "aoc"
+version = "1.0.0"
+
+# Fill out these fields if you intend to generate HTML documentation or publish
+# your project to the Hex package manager.
+#
+# description = ""
+# licences = ["Apache-2.0"]
+# repository = { type = "github", user = "", repo = "" }
+# links = [{ title = "Website", href = "" }]
+#
+# For a full reference of all the available options, you can have a look at
+# https://gleam.run/writing-gleam/gleam-toml/.
+
+[dependencies]
+gleam_stdlib = ">= 0.49.0 and < 1.0.0"
+gleam_community_maths = ">= 1.1.1 and < 2.0.0"
+rememo = ">= 3.2.0 and < 4.0.0"
+gleam_json = ">= 2.1.0 and < 3.0.0"
+gleam_regexp = ">= 1.0.0 and < 2.0.0"
+gary = ">= 1.1.0 and < 2.0.0"
+tote = ">= 1.0.2 and < 2.0.0"
+gleam_otp = ">= 0.16.0 and < 1.0.0"
+gleam_erlang = ">= 0.33.0 and < 1.0.0"
+gleamy_structures = ">= 1.1.0 and < 2.0.0"
+parallel_map = ">= 2.1.0 and < 3.0.0"
+gleam_yielder = ">= 1.1.0 and < 2.0.0"
+gleam_deque = ">= 1.0.0 and < 2.0.0"
+
+[dev-dependencies]
+gleeunit = ">= 1.0.0 and < 2.0.0"
+gladvent = ">= 2.2.0 and < 3.0.0"
