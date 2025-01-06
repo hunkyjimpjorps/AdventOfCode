@@ -4,6 +4,7 @@
 import gleam/int
 import gleam/list
 import gleam/string
+import tote/bag
 
 pub fn int(str: String) -> Int {
   let assert Ok(n) = int.parse(str)
@@ -18,6 +19,14 @@ pub fn delimited_list(
   str |> string.split(delimiter) |> list.map(f)
 }
 
+pub fn lists_of_graphemes(input: String) {
+  delimited_list(input, "\n", string.to_graphemes)
+}
+
 pub fn ints(str: String, split_on delimiter: String) -> List(Int) {
   delimited_list(str, delimiter, int)
+}
+
+pub fn frequencies(xs: List(a)) -> List(#(a, Int)) {
+  xs |> bag.from_list |> bag.to_list
 }
