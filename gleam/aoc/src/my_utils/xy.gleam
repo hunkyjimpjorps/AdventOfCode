@@ -5,6 +5,49 @@ pub type XY {
   XY(x: Int, y: Int)
 }
 
+pub type Direction {
+  Up
+  Down
+  Left
+  Right
+}
+
+pub fn turn_left(dir: Direction) {
+  case dir {
+    Up -> Left
+    Left -> Down
+    Down -> Right
+    Right -> Up
+  }
+}
+
+pub fn turn_right(dir: Direction) {
+  case dir {
+    Up -> Right
+    Right -> Down
+    Down -> Left
+    Left -> Up
+  }
+}
+
+pub fn reverse(dir: Direction) {
+  case dir {
+    Up -> Down
+    Down -> Up
+    Left -> Right
+    Right -> Left
+  }
+}
+
+pub fn step(coord: XY, direction: Direction) {
+  case direction {
+    Up -> XY(..coord, y: coord.y - 1)
+    Down -> XY(..coord, y: coord.y + 1)
+    Left -> XY(..coord, x: coord.x - 1)
+    Right -> XY(..coord, x: coord.x + 1)
+  }
+}
+
 pub fn from_input(row: Int, col: Int) {
   XY(x: col, y: row)
 }
