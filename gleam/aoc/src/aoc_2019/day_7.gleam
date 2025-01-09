@@ -22,7 +22,3 @@ pub fn pt_1(input: Computer) {
     |> result.unwrap(0)
   })
 }
-
-pub fn pt_2(input: Computer) {
-  todo as "part 2 not implemented"
-}
