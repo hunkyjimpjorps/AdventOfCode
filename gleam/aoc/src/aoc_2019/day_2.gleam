@@ -4,7 +4,7 @@ import gleam/int
 import gleam/list
 import gleam/result
 import gleam/string
-import my_utils/intcode.{Computer}
+import my_utils/intcode
 
 pub fn parse(input: String) -> ErlangArray(Int) {
   input
@@ -18,8 +18,8 @@ pub fn parse(input: String) -> ErlangArray(Int) {
 pub fn pt_1(input: ErlangArray(Int)) {
   input
   |> edit_starting_intcodes(12, 2)
-  |> Computer(intcode: _, inputs: [], outputs: [])
-  |> intcode.run_intcode(starting_at: 0)
+  |> intcode.initialize_computer()
+  |> intcode.run_intcode()
   |> intcode.read_position(0)
 }
 
@@ -29,10 +29,10 @@ pub fn pt_2(input: ErlangArray(Int)) {
   let result =
     input
     |> edit_starting_intcodes(noun, verb)
-    |> Computer(intcode: _, inputs: [], outputs: [])
-    |> intcode.run_intcode(starting_at: 0)
+    |> intcode.initialize_computer()
+    |> intcode.run_intcode()
     |> intcode.read_position(0)
-  case result == Ok(19_690_720) {
+  case result == 19_690_720 {
     True -> Ok(noun * 100 + verb)
     False -> Error(Nil)
   }

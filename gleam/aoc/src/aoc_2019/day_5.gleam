@@ -8,12 +8,16 @@ pub fn parse(input: String) -> ErlangArray(Int) {
 
 pub fn pt_1(input: ErlangArray(Int)) {
   input
-  |> Computer(intcode: _, inputs: [1], outputs: [])
-  |> intcode.run_intcode(starting_at: 0)
+  |> Computer(intcode: _, inputs: [1], outputs: [], pointer: 0)
+  |> intcode.run_intcode()
   |> intcode.read_outputs
   |> list.first
 }
 
 pub fn pt_2(input: ErlangArray(Int)) {
-  todo as "part 2 not implemented"
+  input
+  |> Computer(intcode: _, inputs: [5], outputs: [], pointer: 0)
+  |> intcode.run_intcode()
+  |> intcode.read_outputs
+  |> list.first
 }
