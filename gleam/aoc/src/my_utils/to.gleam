@@ -4,6 +4,7 @@
 import gleam/int
 import gleam/list
 import gleam/string
+import my_utils/xy.{type XY, XY}
 import tote/bag
 
 pub fn int(str: String) -> Int {
@@ -25,6 +26,13 @@ pub fn lists_of_graphemes(input: String) {
 
 pub fn ints(str: String, split_on delimiter: String) -> List(Int) {
   delimited_list(str, delimiter, int)
+}
+
+pub fn list_of_xys(input: String, split_on delimeter: String) -> List(XY) {
+  delimited_list(input, "\n", fn(line) {
+    let assert Ok(#(x, y)) = string.split_once(line, delimeter)
+    XY(int(x), int(y))
+  })
 }
 
 pub fn frequencies(xs: List(a)) -> List(#(a, Int)) {
