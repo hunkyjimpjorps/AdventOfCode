@@ -1,5 +1,6 @@
 {
   "cSpell.words": [
     "posn"
-  ]
+  ],
+  "julia.environmentPath": "/home/wsl/AdventOfCode"
 }
