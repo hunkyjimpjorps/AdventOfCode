@@ -1,3 +1,4 @@
+import gleam/int
 import gleam/list
 import gleam/string
 import my_utils/to
@@ -21,9 +22,9 @@ pub fn pt_1(input: List(Int)) {
 pub fn pt_2(input: List(Int)) {
   list.scan([0, ..input], 50, fn(acc, next) { acc + next })
   |> list.window_by_2
-  |> list.flat_map(fn(tup) {
+  |> list.map(fn(tup) {
     let assert [_, ..rest] = list.range(tup.0, tup.1)
-    rest
+    list.count(rest, fn(n) { n % 100 == 0 })
   })
-  |> list.count(fn(n) { n % 100 == 0 })
+  |> int.sum()
 }
