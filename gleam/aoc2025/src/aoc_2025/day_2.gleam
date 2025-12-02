@@ -1,7 +1,9 @@
 import gleam/int
 import gleam/list
 import gleam/regexp
+import gleam/result
 import my_utils/to
+import parallel_map
 
 pub fn parse(input: String) {
   use range <- to.delimited_list(input, ",")
@@ -20,13 +22,21 @@ pub fn pt_2(input: List(#(Int, Int))) {
 }
 
 fn sum_of_nonsense(input, re) {
-  use outer_acc, tup <- list.fold(input, 0)
-  let #(from, to) = tup
-  use inner_acc, n <- list.fold(list.range(from, to), outer_acc)
-  case is_nonsense(n, re) {
-    True -> inner_acc + n
-    False -> inner_acc
-  }
+  input
+  |> parallel_map.list_pmap(
+    fn(tup) {
+      let #(from, to) = tup
+      use acc, n <- list.fold(list.range(from, to), 0)
+      case is_nonsense(n, re) {
+        True -> acc + n
+        False -> acc
+      }
+    },
+    parallel_map.MatchSchedulersOnline,
+    1000,
+  )
+  |> result.values
+  |> int.sum
 }
 
 fn is_nonsense(n: Int, re: regexp.Regexp) {
