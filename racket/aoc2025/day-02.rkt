@@ -1,16 +1,13 @@
 #lang racket
 
 (require advent-of-code
-         threading
-         rebellion/base/comparator
-         rebellion/base/range
-         rebellion/collection/range-set)
+         threading)
 
 (define id-ranges
-  (for/range-set
-   #:comparator natural<=>
-   ([rng (~> (fetch-aoc-input (find-session) 2025 2 #:cache #true) (string-trim) (string-split ","))])
-   (~> rng (string-split "-") (map string->number _) (apply closed-range _ #:comparator natural<=>))))
+  (for/list ([rng (~> (fetch-aoc-input (find-session) 2025 2 #:cache #true)
+                      (string-trim)
+                      (string-split ","))])
+    (~> rng (string-split "-") (map string->number _))))
 
 (define (repeat n times)
   (define shift (expt 10 (add1 (order-of-magnitude n))))
@@ -20,11 +17,15 @@
       [else (do-repeat (+ n (* acc shift)) (sub1 t))]))
   (do-repeat n times))
 
+(define (in-range? n range-def)
+  (match-define (list lo hi) range-def)
+  (< lo n hi))
+
 ;; part 1
 
 (for/sum ([n (in-inclusive-range 1 99999)] ;
           #:do [(define nn (repeat n 2))]
-          #:when (range-set-contains? id-ranges nn))
+          #:when (ormap (λ (r) (in-range? nn r)) id-ranges))
          nn)
 
 ;; part 2
@@ -36,4 +37,4 @@
                       [t (in-inclusive-range 2 times)])
              (repeat l t)))))
 
-(for/sum ([n (in-set additional-nonsense)] #:when (range-set-contains? id-ranges n)) n)
+(for/sum ([n (in-set additional-nonsense)] #:when (ormap (λ (r) (in-range? n r)) id-ranges)) n)
