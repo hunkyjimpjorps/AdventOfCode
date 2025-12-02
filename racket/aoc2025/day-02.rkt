@@ -19,7 +19,7 @@
 
 (define (in-range? n range-def)
   (match-define (list lo hi) range-def)
-  (< lo n hi))
+  (<= lo n hi))
 
 ;; part 1
 

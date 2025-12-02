@@ -19,7 +19,6 @@ pub fn floor_div(n, m) {
   q
 }
 
-
 pub fn mod(numerator: Int, denominator: Int) {
   let assert Ok(q) = int.modulo(numerator, denominator)
   q
@@ -33,4 +32,11 @@ pub fn min(xs: List(Int)) {
 pub fn max(xs: List(Int)) {
   let assert Ok(max) = list.reduce(xs, int.max)
   max
+}
+
+pub fn length(x: Int) {
+  case x {
+    0 -> 0
+    n -> 1 + length(n / 10)
+  }
 }
