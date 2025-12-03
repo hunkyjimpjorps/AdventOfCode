@@ -1,4 +1,7 @@
 *.beam
 *.ez
 /build
+/input
 erl_crash.dump
+/.lsp
+/.clj-kondo
