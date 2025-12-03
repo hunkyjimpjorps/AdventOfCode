@@ -21,7 +21,7 @@
     [(zero? remaining) acc]
     [else
      (define next (findf (λ (b) (>= (- PACK-LENGTH (Battery-index b)) remaining)) batteries))
-     (define candidates (filter (λ (b) (> (Battery-index b) (Battery-index next))) batteries))
+     (define candidates (dropf batteries (λ (b) (<= (Battery-index b) (Battery-index next)))))
      (get-best-combo candidates (sub1 remaining) (+ (* 10 acc) (Battery-joltage next)))]))
 
 (define (get-total-joltage size)
