@@ -2,7 +2,6 @@ import gleam/int
 import gleam/list
 import gleam/order
 import gleam/string
-import my_utils/math
 import my_utils/to
 
 type Parsed =
