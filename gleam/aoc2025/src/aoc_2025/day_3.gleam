@@ -15,6 +15,8 @@ pub type Battery {
   Battery(joltage: Int, index: Int)
 }
 
+const pack_length = 100
+
 pub fn parse(input: String) -> Parsed {
   use c <- to.delimited_list(input, "\n")
   c
@@ -37,10 +39,7 @@ fn get_best_combo(
     0 -> math.undigits(acc)
     _ -> {
       let assert Ok(Battery(joltage, index)) =
-        list.find(batteries, fn(batt) {
-          list.count(batteries, fn(candidate) { candidate.index > batt.index })
-          >= remaining - 1
-        })
+        list.find(batteries, fn(batt) { pack_length - batt.index >= remaining })
       let candidates = list.drop_while(batteries, fn(b) { b.index <= index })
       get_best_combo(candidates, remaining - 1, [joltage, ..acc])
     }
