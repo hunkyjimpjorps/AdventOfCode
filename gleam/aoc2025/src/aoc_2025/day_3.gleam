@@ -30,28 +30,24 @@ pub fn parse(input: String) -> Parsed {
   })
 }
 
-fn get_best_combo(
-  batteries: List(Battery),
-  remaining: Int,
-  acc: List(Int),
-) -> Int {
+fn get_best_combo(batteries: List(Battery), remaining: Int, acc: Int) -> Int {
   case remaining {
-    0 -> math.undigits(acc)
+    0 -> acc
     _ -> {
       let assert Ok(Battery(joltage, index)) =
         list.find(batteries, fn(batt) { pack_length - batt.index >= remaining })
       let candidates = list.drop_while(batteries, fn(b) { b.index <= index })
-      get_best_combo(candidates, remaining - 1, [joltage, ..acc])
+      get_best_combo(candidates, remaining - 1, acc * 10 + joltage)
     }
   }
 }
 
 pub fn pt_1(input: Parsed) -> Int {
   use acc, batteries <- list.fold(input, 0)
-  acc + get_best_combo(batteries, 2, [])
+  acc + get_best_combo(batteries, 2, 0)
 }
 
 pub fn pt_2(input: Parsed) -> Int {
   use acc, batteries <- list.fold(input, 0)
-  acc + get_best_combo(batteries, 12, [])
+  acc + get_best_combo(batteries, 12, 0)
 }
