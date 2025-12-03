@@ -11,8 +11,6 @@ pub fn parse(input: String) {
   #(from, to)
 }
 
-
-
 pub fn pt_1(input: List(#(Int, Int))) {
   let assert Ok(re) = regexp.from_string("^(\\d+)\\1$")
   sum_of_nonsense(input, re)

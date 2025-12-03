@@ -40,3 +40,7 @@ pub fn length(x: Int) {
     n -> 1 + length(n / 10)
   }
 }
+
+pub fn undigits(xs: List(Int)) {
+  list.fold_right(xs, 0, fn(acc, x) { 10 * acc + x })
+}
