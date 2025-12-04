@@ -2,6 +2,7 @@
 
 (provide (struct-out Posn)
          string->posn-grid
+         string->posn-set
          posn-add
          posn-diff
          next-row
@@ -17,6 +18,12 @@
   (for*/hash ([(row y) (in-indexed (string-split str))]
               [(col x) (in-indexed row)])
     (values (Posn x y) (f col))))
+
+(define (string->posn-set str [f identity])
+  (for*/set ([(row y) (in-indexed (string-split str))]
+             [(col x) (in-indexed row)]
+             #:when (f col))
+    (Posn x y)))
 
 (define (posn-add a delta)
   (Posn (+ (Posn-x a) (Posn-x delta)) (+ (Posn-y a) (Posn-y delta))))
