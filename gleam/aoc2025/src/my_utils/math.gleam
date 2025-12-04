@@ -42,5 +42,5 @@ pub fn length(x: Int) {
 }
 
 pub fn undigits(xs: List(Int)) {
-  list.fold_right(xs, 0, fn(acc, x) { 10 * acc + x })
+  list.fold(xs, 0, fn(acc, x) { 10 * acc + x })
 }
