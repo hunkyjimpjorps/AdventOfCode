@@ -3,40 +3,36 @@ import gleam/set.{type Set}
 import my_utils/from
 import my_utils/xy.{type XY}
 
-type Grid =
-  Set(XY)
-
-pub fn parse(input: String) {
+pub fn parse(input: String) -> Set(XY) {
   from.try_point_set(input, fn(ch) { ch == "@" })
 }
 
-fn count_nearby_rolls(p: XY, grid: Grid) {
-  p
-  |> xy.neighbors(xy.eight_directions)
-  |> list.count(fn(l) { set.contains(grid, l) })
+fn can_be_removed(p: XY, room: Set(XY)) -> Bool {
+  let neighboring_rolls =
+    p
+    |> xy.neighbors(xy.eight_directions)
+    |> list.count(fn(l) { set.contains(room, l) })
+
+  neighboring_rolls < 4
 }
 
-fn can_be_removed(p: XY, grid: Grid) {
-  count_nearby_rolls(p, grid) < 4
-}
-
-pub fn pt_1(input: Grid) {
+pub fn pt_1(input: Set(XY)) -> Int {
   input
   |> set.filter(can_be_removed(_, input))
   |> set.size
 }
 
-fn keep_removing(grid: Grid, acc: Int) {
-  let removable_rolls = set.filter(grid, can_be_removed(_, grid))
+fn keep_removing(room: Set(XY), acc: Int) -> Int {
+  let removable_rolls = set.filter(room, can_be_removed(_, room))
   case set.is_empty(removable_rolls) {
     True -> acc
     False ->
       removable_rolls
-      |> set.fold(grid, fn(acc, roll) { set.delete(acc, roll) })
+      |> set.difference(room, _)
       |> keep_removing(acc + set.size(removable_rolls))
   }
 }
 
-pub fn pt_2(input: Grid) {
+pub fn pt_2(input: Set(XY)) -> Int {
   keep_removing(input, 0)
 }
