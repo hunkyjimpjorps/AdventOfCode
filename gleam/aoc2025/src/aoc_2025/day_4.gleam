@@ -11,7 +11,7 @@ fn can_be_removed(p: XY, room: Set(XY)) -> Bool {
   let neighboring_rolls =
     p
     |> xy.neighbors(xy.eight_directions)
-    |> list.count(fn(l) { set.contains(room, l) })
+    |> list.count(set.contains(room, _))
 
   neighboring_rolls < 4
 }
