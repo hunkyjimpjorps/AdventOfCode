@@ -4,13 +4,6 @@ import gleam/regexp
 import gleam/string
 import my_utils/to
 
-pub type Op {
-  Adding(Int)
-  Multiplying(Int)
-  And(Int)
-  Go
-}
-
 pub fn pt_1(input: String) {
   let assert Ok(re) = regexp.from_string("\\s+")
   input
@@ -40,26 +33,21 @@ pub fn pt_2(input: String) {
 }
 
 fn parse_ops(col) {
-  let tup =
-    col
-    |> list.filter(fn(ch) { ch != " " })
-    |> list.partition(fn(ch) { ch == "*" || ch == "+" })
-  case tup {
-    #([], []) -> Go
-    #([], xs) -> And(make_int(xs))
-    #(["+"], xs) -> Adding(make_int(xs))
-    #(["*"], xs) -> Multiplying(make_int(xs))
-    _ -> panic
-  }
+  col
+  |> list.filter(fn(ch) { ch != " " })
+  |> list.partition(fn(ch) { ch == "*" || ch == "+" })
 }
 
 fn do_math(ops, acc, current_op, register) {
   case ops {
     [] -> acc + current_op(register)
-    [Adding(x), ..rest] -> do_math(rest, acc, int.sum, [x])
-    [Multiplying(x), ..rest] -> do_math(rest, acc, int.product, [x])
-    [And(x), ..rest] -> do_math(rest, acc, current_op, [x, ..register])
-    [Go, ..rest] -> do_math(rest, acc + current_op(register), current_op, [])
+    [#([], []), ..rest] ->
+      do_math(rest, acc + current_op(register), current_op, [])
+    [#(["+"], xs), ..rest] -> do_math(rest, acc, int.sum, [make_int(xs)])
+    [#(["*"], xs), ..rest] -> do_math(rest, acc, int.product, [make_int(xs)])
+    [#([], xs), ..rest] ->
+      do_math(rest, acc, current_op, [make_int(xs), ..register])
+    _ -> panic
   }
 }
 
