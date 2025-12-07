@@ -21,9 +21,9 @@ pub fn grid(
   parser: fn(String) -> b,
 ) -> Dict(a, b) {
   {
-    use row, r <- list.index_map(string.split(input, "\n"))
-    use col, c <- list.index_map(string.to_graphemes(row))
-    #(constructor(r, c), parser(col))
+    use col, c <- list.index_map(string.split(input, "\n"))
+    use row, r <- list.index_map(string.to_graphemes(col))
+    #(constructor(r, c), parser(row))
   }
   |> list.flatten
   |> dict.from_list
@@ -46,10 +46,7 @@ pub fn try_grid(
   |> dict.from_list
 }
 
-pub fn try_point_set(
-  input: String,
-  parser: fn(String) -> Bool,
-) -> Set(XY) {
+pub fn try_point_set(input: String, parser: fn(String) -> Bool) -> Set(XY) {
   {
     use row, r <- list.index_map(string.split(input, "\n"))
     use col, c <- list.index_map(string.to_graphemes(row))
