@@ -37,3 +37,11 @@
 5. [Cafeteria](https://adventofcode.com/2025/day/5) ([Gleam](/gleam/aoc2025/src/aoc_2025/day_5.gleam), [Racket](/racket/aoc2025/day-05.rkt)) ⭐ ♥️♥️
 
    *How many of these provided values fall within these ranges?  How many values are in these ranges in all?*   The first part 2 this year where the values are too big to just iterate over, but otherwise I can't think of anything notable to mention.
+
+6. [Trash Compactor](https://adventofcode.com/2025/day/6) ([Gleam](/gleam/aoc2025/src/aoc_2025/day_6.gleam), [Racket](/racket/aoc2025/day-06.rkt)) ⭐ ♥️
+
+   *Read these math problems. Read them a different way.* What if a problem was just parsing? 😔
+
+7. [Laboratories](https://adventofcode.com/2025/day/7) ([Gleam](/gleam/aoc2025/src/aoc_2025/day_7.gleam), [Racket](/racket/aoc2025/day-07.rkt)) ⭐⭐ ♥️♥️♥️♥️
+
+   *How many splitters does this tachyon beam touch? How many possible paths can one tachyon travel?*   This is one of those problems where the part 2 solution is just a little tweak to the part 1 solution, which feels pretty satisfying to spot in the moment.  Also, it's a grid movement problem, which I've got my battle-tested suite of tools written over prior years ready for, so it feels good to get to apply those.
