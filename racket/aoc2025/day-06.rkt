@@ -20,7 +20,7 @@
 
 ;;part 2
 (define (undigits strs)
-  (~> strs (apply string _) (string-trim " " #:repeat? #t) string->number))
+  (~>> strs (filter-not (curry equal? #\space)) (apply string) string->number))
 
 (define (math2 cols [acc 0] [register '()] [op #f])
   (match cols
