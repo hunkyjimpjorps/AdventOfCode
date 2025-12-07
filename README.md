@@ -8,9 +8,11 @@ I started participating in AoC in 2021.  Previous years' solutions were done lat
 * __2022__: Racket
 * __2023__: Racket first, then [Gleam](https://gleam.run/) 
 * __2024__: Gleam first, then Racket
+* __2025__: Gleam and Racket
 
 
 ## Commentary
 * [2022 commentary](commentary/commentary-2022.md)
 * [2023 commentary](commentary/commentary-2023.md)
 * [2024 commentary](commentary/commentary-2024.md)
+* [2025 commentary](commentary/commentary-2025.md)
