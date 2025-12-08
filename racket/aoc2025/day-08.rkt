@@ -32,9 +32,11 @@
 (~> pt1-wiring-network cc (map length _) (sort >) (take 3) (apply * _))
 
 ;; part 2
-(time (define pt2-wiring-network (unweighted-graph/undirected '()))
+(define seen-points (list->mutable-set points))
+(define pt2-wiring-network (unweighted-graph/undirected '()))
 (for/first ([pair (in-heap pairs)]
-            #:do [(add-edge! pt2-wiring-network (first pair) (second pair))]
-            #:when (and (~> pt2-wiring-network get-vertices length (= 1000))
-                        (~> pt2-wiring-network cc first length (= 1000))))
-  (* (Posn-x (first pair)) (Posn-x (second pair)))))
+            #:do [(add-edge! pt2-wiring-network (first pair) (second pair))
+                  (set-remove! seen-points (first pair))
+                  (set-remove! seen-points (second pair))]
+            #:when (and (set-empty? seen-points) (~> pt2-wiring-network cc first length (= 1000))))
+  (* (Posn-x (first pair)) (Posn-x (second pair))))
