@@ -45,3 +45,7 @@
 7. [Laboratories](https://adventofcode.com/2025/day/7) ([Gleam](/gleam/aoc2025/src/aoc_2025/day_7.gleam), [Racket](/racket/aoc2025/day-07.rkt)) ⭐⭐ ♥️♥️♥️♥️
 
    *How many splitters does this tachyon beam touch? How many possible paths can one tachyon travel?*   This is one of those problems where the part 2 solution is just a little tweak to the part 1 solution, which feels pretty satisfying to spot in the moment.  Also, it's a grid movement problem, which I've got my battle-tested suite of tools written over prior years ready for, so it feels good to get to apply those.
+
+8. [Playground](https://adventofcode.com/2025/day/8) ([Gleam](/gleam/aoc2025/src/aoc_2025/day_8.gleam), [Racket (graph version)](/racket/aoc2025/day-08.rkt), [Racket (hashmap version)](/racket/aoc2025/day-08-alt.rkt)) ⭐⭐⭐ ♥️♥️♥️♥️
+
+   *Hook up the nearest junction boxes 1,000 times. Hook up junction boxes until all 1,000 are connected.*   The key part to this problem is figuring out how to represent two networks of junction boxes being linked together.  Once I had a good process for that (explicitly using a graph in Racket, using a pair of `Dict`s in Gleam), everything else came quickly.
