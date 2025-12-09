@@ -35,12 +35,10 @@ fn rectangle_intersects(rect: #(XY, XY), poly_sides) {
 
   use poly_side <- list.any(poly_sides)
   let #(XY(px1, py1), XY(px2, py2)) = poly_side
-  !{
-    int.max(px1, px2) <= rect_min_x
-    || int.min(px1, px2) >= rect_max_x
-    || int.max(py1, py2) <= rect_min_y
-    || int.min(py1, py2) >= rect_max_y
-  }
+  int.max(px1, px2) > rect_min_x
+  && int.min(px1, px2) < rect_max_x
+  && int.max(py1, py2) > rect_min_y
+  && int.min(py1, py2) < rect_max_y
 }
 
 fn find_first_rectangle(candidates, poly_sides) {
