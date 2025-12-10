@@ -84,6 +84,7 @@ fn solve_with_z3(machine: Machine) -> Int {
     <> minimize_sum_of_variables(machine)
     <> check_satisfiability
   let assert Ok(Ok(res)) = send_file_to_z3(sat)
+  echo res
   let assert [_, " " <> n, ..] = string.split(res, ")")
   to.int(n)
 }
