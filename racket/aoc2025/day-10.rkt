@@ -21,12 +21,12 @@
 
 ;; part 1
 
-(define (minimize-lights machine [n 1])
+(define (minimize-lights machine)
   (match-define (Machine lights buttons _) machine)
-  (if (for/or ([bs (in-combinations buttons n)])
-        (set-empty? (foldl set-symmetric-difference lights bs)))
-      n
-      (minimize-lights machine (add1 n))))
+  (for*/first ([n (in-naturals)]
+               [bs (in-combinations buttons n)]
+               #:when (set-empty? (foldl set-symmetric-difference lights bs)))
+    (length bs)))
 
 (~>> machines (map minimize-lights) (apply +))
 
