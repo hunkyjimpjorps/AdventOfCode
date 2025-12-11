@@ -2,14 +2,13 @@
 
 (require advent-of-code
          algorithms
-         graph
          memo
          threading)
 
 (define GRAPH
-  (unweighted-graph/adj
-   (for/list ([line (in-lines (open-aoc-input (find-session) 2025 11 #:cache #true))])
-     (string-split line #rx":? "))))
+  (for/hash ([line (in-lines (open-aoc-input (find-session) 2025 11 #:cache #true))])
+    (define nodes (~> line (string-split #rx":? ") (map string->symbol _)))
+    (values (first nodes) (rest nodes))))
 
 (define/match (count-paths _pair)
   [((list from to)) (do-count-paths from to 0)])
@@ -18,11 +17,11 @@
                 (cond
                   [(equal? from to) 1]
                   [else
-                   (for/fold ([acc n]) ([neighbor (get-neighbors GRAPH from)])
+                   (for/fold ([acc n]) ([neighbor (hash-ref GRAPH from '())])
                      (+ acc (do-count-paths neighbor to n)))]))
 
 ;; part 1
-(count-paths '("you" "out"))
+(count-paths '(you out))
 
 ;; part 2
-(~> (list "svr" "fft" "dac" "out") (sliding 2) (map count-paths _) (apply * _))
+(+ (~> '(svr fft dac out) (sliding 2) (map count-paths _) (apply * _)))
