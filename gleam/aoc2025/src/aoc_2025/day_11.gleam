@@ -37,10 +37,13 @@ fn do_count_paths(
 }
 
 fn count_paths(
-  from source: Atom,
-  to destination: Atom,
+  from source: String,
+  to destination: String,
   over graph: Dict(Atom, List(Atom)),
 ) -> Int {
+  let assert Ok(source) = atom.get(source)
+  let assert Ok(destination) = atom.get(destination)
+
   use cache <- memo.create()
   do_count_paths(
     from: source,
@@ -52,16 +55,11 @@ fn count_paths(
 }
 
 pub fn pt_1(input: Dict(Atom, List(Atom))) {
-  let assert [you, out] = ["you", "out"] |> list.map(atom.get) |> result.values
-
-  count_paths(from: you, to: out, over: input)
+  count_paths(from: "you", to: "out", over: input)
 }
 
 pub fn pt_2(input: Dict(Atom, List(Atom))) {
-  let assert [svr, fft, dac, out] =
-    ["svr", "fft", "dac", "out"] |> list.map(atom.get) |> result.values
-
-  count_paths(from: svr, to: fft, over: input)
-  * count_paths(from: fft, to: dac, over: input)
-  * count_paths(from: dac, to: out, over: input)
+  count_paths(from: "svr", to: "fft", over: input)
+  * count_paths(from: "fft", to: "dac", over: input)
+  * count_paths(from: "dac", to: "out", over: input)
 }
