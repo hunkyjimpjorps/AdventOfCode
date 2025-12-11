@@ -3,7 +3,7 @@
 (require advent-of-code
          algorithms
          graph
-         memoize
+         memo
          threading)
 
 (define GRAPH
@@ -14,12 +14,12 @@
 (define/match (count-paths _pair)
   [((list from to)) (do-count-paths from to 0)])
 
-(define/memo (do-count-paths from to n)
-             (cond
-               [(equal? from to) 1]
-               [else
-                (for/fold ([acc n]) ([neighbor (get-neighbors GRAPH from)])
-                  (+ acc (do-count-paths neighbor to n)))]))
+(define/memoize (do-count-paths from to n)
+                (cond
+                  [(equal? from to) 1]
+                  [else
+                   (for/fold ([acc n]) ([neighbor (get-neighbors GRAPH from)])
+                     (+ acc (do-count-paths neighbor to n)))]))
 
 ;; part 1
 (count-paths '("you" "out"))
