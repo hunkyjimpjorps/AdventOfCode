@@ -60,20 +60,26 @@
 
       This is one of those problems where the part 2 solution is just a little tweak to the part 1 solution, which feels pretty satisfying to spot in the moment.  Also, it's a grid movement problem, which I've got my battle-tested suite of tools written over prior years ready for, so it feels good to get to apply those.
 
-8. [Playground](https://adventofcode.com/2025/day/8) ([Gleam](/gleam/aoc2025/src/aoc_2025/day_8.gleam), [Racket (graph version)](/racket/aoc2025/day-08.rkt), [Racket (hashmap version)](/racket/aoc2025/day-08-alt.rkt)) ⭐⭐⭐ ♥️♥️♥️♥️
+8. [Playground](https://adventofcode.com/2025/day/8) ([Gleam](/gleam/aoc2025/src/aoc_2025/day_8.gleam), [Racket (graph version)](/racket/aoc2025/day-08.rkt), [Racket (hashmap version)](/racket/aoc2025/day-08-alt.rkt)) ⭐⭐⭐ ♥️♥️♥️
 
       *Hook up the nearest junction boxes 1,000 times. Hook up junction boxes until all 1,000 are connected.*   
 
       The key part to this problem is figuring out how to represent two networks of junction boxes being linked together.  Once I had a good process for that (explicitly using a graph in Racket, using a pair of `Dict`s in Gleam), everything else came quickly.
 
-9. [Movie Theater](https://adventofcode.com/2025/day/8) ([Gleam](/gleam/aoc2025/src/aoc_2025/day_9.gleam), [Racket](/racket/aoc2025/day-09.rkt)) ⭐⭐⭐ ♥️♥️♥️
+9. [Movie Theater](https://adventofcode.com/2025/day/9) ([Gleam](/gleam/aoc2025/src/aoc_2025/day_9.gleam), [Racket](/racket/aoc2025/day-09.rkt)) ⭐⭐⭐ ♥️♥️♥️
 
       *Draw the biggest box between points on this list.  Draw the biggest box that fits in the polygon these points define.*   
 
       Priority queues are pretty useful for problems like this, with big solutions that can be ranked by some heuristic.  The geometry in this one was pretty basic since everything's orthogonal lines.
 
-10. [Playground](https://adventofcode.com/2025/day/8) ([Gleam](/gleam/aoc2025/src/aoc_2025/day_10.gleam), [Racket](/racket/aoc2025/day-10.rkt)) ⭐⭐⭐⭐ ♥️♥️♥️
+10. [Playground](https://adventofcode.com/2025/day/10) ([Gleam](/gleam/aoc2025/src/aoc_2025/day_10.gleam), [Racket](/racket/aoc2025/day-10.rkt)) ⭐⭐⭐⭐ ♥️♥️♥️
     
       *Push buttons to turn off lights.  Push buttons to turn on electricity.*   
 
       Part 1 looks like it should've been a BFS, but a brute force search was easier and still pretty fast.  Part 2 is a linear optimization problem, and while there were some ways to cut down the solution space with linear algebra, everyone on the Gleam server decided it'd be more fun to just generate Z3 code and parse its output.  It's a pretty good trick to remember for future years (or at least until there's a better matrix math library for the BEAM).  I used [Rosette](https://docs.racket-lang.org/rosette-guide/index.html) for Racket and I think I'm finally starting to get a handle on how it works.
+
+11. [Reactor](https://adventofcode.com/2025/day/11) ([Gleam](/gleam/aoc2025/src/aoc_2025/day_11.gleam), [Racket](/racket/aoc2025/day-11.rkt)) ⭐ ♥️♥️
+    
+      *Count how many ways your signal can travel to the end.  Count how many ways your signal can travel through three pieces of equipment.*   
+
+      Surprisingly gentle after yesterday's; the problem description is very straightforward, the graph doesn't hide anything particularly nasty in it (there are a lot of paths, but it's a directed graph with no cycles, so no backtracking protection or cycle detection is necessary), and part 2 is just part 1's solution applied three times.  The one pitfall is that it needs memoization to complete in reasonable time, but at this point in AOC I'm applying memoization reflexively already.
