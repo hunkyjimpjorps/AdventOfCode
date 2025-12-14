@@ -53,5 +53,4 @@
                       (constraints machine)
                       (bounds machine 0 'posinf)
                       (integer-vars machine)))
-         (println (~a (Machine-joltages machine) "->" (inexact->exact total)))
          (inexact->exact total))
