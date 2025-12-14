@@ -65,7 +65,7 @@
       ; divide the remaining goal by half and solve the new smaller goal
       (for/fold ([result 1000])
                 ([(pattern cost) (in-hash pattern-costs)]
-                 #:when (andmap (λ (p g) (and (<= p g) (= (modulo p 2) (modulo g 2)))) pattern goal))
+                 #:when (andmap <= pattern goal))
         (define new-goal (map (λ (p g) (quotient (- g p) 2)) pattern goal))
         (min result (+ cost (* 2 (do-minimize-presses new-goal)))))]))
   (do-minimize-presses (Machine-joltages machine)))
