@@ -4,7 +4,7 @@
          threading
          memo)
 
-(struct Machine (lights buttons joltages) #:transparent)
+(struct Machine (lights buttons joltages))
 
 (define machines
   (for/list ([line (string-split (fetch-aoc-input (find-session) 2025 10 #:cache #true) "\n")])
