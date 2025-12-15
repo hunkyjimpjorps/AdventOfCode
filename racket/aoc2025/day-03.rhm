@@ -1,0 +1,46 @@
+#lang rhombus
+
+import:
+  "utils/aoc.rhm"
+  
+class Battery(joltage :: Int, index :: Int):
+  private implements Comparable
+  private override method compare_to(other):
+    cond
+    | other.joltage < joltage: -1
+    | index < other.index: -1
+    | ~else: 1
+    
+def input:
+  for List:
+    each line in aoc.get_day(3).trim().split("\n")
+    let pairs = for List:
+      each: 
+        ch in line.to_sequence()
+        i in 0..
+      Battery(to_string(ch).to_int(), i)
+    pairs.sort((_ < _))
+
+let pack_length = input.first.length()
+
+fun 
+| get_combo(_, 0, acc): acc
+| get_combo(batteries, remaining, acc):
+    let Battery(joltage, index): 
+      List.find(batteries, (pack_length - _.index >= remaining))
+    let candidates:
+      List.filter(batteries, ~keep: (_.index > index))
+    get_combo(candidates, remaining - 1, acc * 10 + joltage)
+
+fun solve(n):
+  for math.sum:
+    each batteries in input
+    get_combo(batteries, n, 0)
+
+// part 1
+
+solve(2)
+
+// part 2
+
+solve(12)
