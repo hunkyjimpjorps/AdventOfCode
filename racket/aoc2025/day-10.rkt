@@ -1,12 +1,10 @@
-#lang rosette
+#lang racket
 
 (require advent-of-code
          threading
-         rosette/solver/smt/z3)
+         memo)
 
-(current-solver (z3 #:path (find-executable-path "z3") #:logic 'QF_LIA))
-
-(struct Machine (lights buttons joltages) #:transparent)
+(struct Machine (lights buttons joltages))
 
 (define machines
   (for/list ([line (string-split (fetch-aoc-input (find-session) 2025 10 #:cache #true) "\n")])
@@ -30,20 +28,46 @@
 
 ;; part 2
 
-(for/sum ([machine (in-list machines)])
-         (match-define (Machine _ buttons joltages) machine)
-         (define-symbolic* n integer? #:length (length buttons))
-         (define sol
-           (optimize #:minimize (list (foldl + 0 n))
-                     #:guarantee (begin
-                                   (for ([v (in-list n)])
-                                     (assert (>= v 0)))
-                                   (for ([total (in-list joltages)]
-                                         [index (in-naturals)])
-                                     (define valid-n
-                                       (for/list ([b (in-list buttons)]
-                                                  [var (in-list n)]
-                                                  #:when (set-member? b index))
-                                         var))
-                                     (assert (= total (foldl + 0 valid-n)))))))
-         (evaluate (foldl + 0 n) sol))
+(define (parity xs [acc 0])
+  (if (empty? xs)
+      acc
+      (parity (rest xs) (+ (* 2 acc) (modulo (first xs) 2)))))
+
+(define (make-patterns machine)
+  (match-define (Machine _ buttons joltages) machine)
+
+  (define pattern-cost
+    (for*/fold ([acc (hash)])
+               ([combination-length (in-inclusive-range (length buttons) 0 -1)]
+                ; make sure that the shortest combination that gives a particular joltage result
+                ; is the one that's recorded in the end by folding from longest to shortest
+                [buttons (in-combinations buttons combination-length)])
+      (define key
+        (hash-values (for*/fold ([acc (for/hash ([k (in-range (length joltages))])
+                                        (values k 0))])
+                                ([button (in-list buttons)]
+                                 [modified (in-set button)])
+                       (hash-update acc modified add1))))
+      (hash-set acc key combination-length)))
+
+  (for/fold ([acc (hash)]) ([(pattern cost) (in-hash pattern-cost)])
+    (hash-update acc (parity pattern) (λ~> (hash-set _ pattern cost)) (hash))))
+
+(define (minimize-presses machine)
+  (define parity-pattern-costs (make-patterns machine))
+  (define/memoize
+   (do-minimize-presses goal)
+   (cond
+     [(andmap zero? goal) 0]
+     [else
+      (define pattern-costs (hash-ref parity-pattern-costs (parity goal) (hash)))
+      ; if a particular button combination gives us the right parity, subtract it from the goal
+      ; divide the remaining goal by half and solve the new smaller goal
+      (for/fold ([result 1000])
+                ([(pattern cost) (in-hash pattern-costs)]
+                 #:when (andmap <= pattern goal))
+        (define new-goal (map (λ (p g) (quotient (- g p) 2)) pattern goal))
+        (min result (+ cost (* 2 (do-minimize-presses new-goal)))))]))
+  (do-minimize-presses (Machine-joltages machine)))
+
+(for/sum ([machine (in-list machines)]) (minimize-presses machine))
