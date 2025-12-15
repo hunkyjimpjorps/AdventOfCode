@@ -1,0 +1,40 @@
+#lang rhombus
+
+import:
+  "utils/aoc.rhm"
+  lib("racket/math.rkt"):
+    as m
+    only #{order-of-magnitude} as magnitude
+
+def input:
+  for List: 
+    each line in aoc.get_day(2).trim().split(",")
+    keep_let [from, to] = line.split("-").map(String.to_int)
+    from..=to
+
+fun repeat(n :: Int, times :: Int):
+  let shift = 10 ** (m.magnitude(n) + 1) 
+  recur do_repeat (acc = n, t = times):
+    match t 
+    | 1: acc
+    | ~else: do_repeat(n + (acc * shift), t - 1)
+
+// part 1
+
+for math.sum (n in 1 ..= 99999):  
+  let nn = repeat(n, 2)
+  guard List.find(input, (nn in _)) | 0 
+  nn
+
+// part 2
+
+for math.sum:
+  each n in for Set:
+    each [length, repeats] in [[1, 10], [2, 5], [3, 3], [4, 2], [5, 2]]
+    each val in for List:
+      each n in (10 ** (length - 1)) .. (10 ** length)
+      each r in 2 ..= repeats 
+      repeat(n, r)
+    val
+  final_when List.find(input, (n in _))
+  n
