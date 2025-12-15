@@ -1,0 +1,10 @@
+#lang rhombus
+
+import:
+  lib("advent-of-code/main.rkt") as aoc
+
+export:
+  get_day
+
+fun get_day(day):
+  aoc.#{fetch-aoc-input}(aoc.#{find-session}(), 2025, day, ~cache: #true)
