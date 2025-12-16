@@ -39,8 +39,13 @@ fun solve(n):
 
 // part 1
 
-solve(2)
+fun part_1():
+  solve(2)
 
 // part 2
 
-solve(12)
+fun part_2():
+  solve(12)
+
+module main:
+  aoc.run(part_1, part_2)

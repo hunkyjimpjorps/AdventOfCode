@@ -1,0 +1,45 @@
+#lang rhombus
+
+import:
+  rhombus/rx open
+  "utils/aoc.rhm"
+
+let parse_rx = rx'($dir:"R"||"L") ($num: digit+)'
+
+def input = for List:
+  each line in aoc.get_day(1).split("\n")
+  match parse_rx.match(line).captures
+  | ["R", n]: n.to_int()
+  | ["L", n] : -n.to_int()
+
+// part 1
+               
+fun part_1():
+  def values(_, part_1):
+    for values(pointer = 50, acc = 0):
+      each turn in input
+      let pointer = pointer + turn
+      let acc = cond
+      | pointer mod 100 == 0: acc + 1
+      | ~else: acc
+      values(pointer, acc)
+  part_1
+
+// part 2
+
+fun part_2():
+  def values(_, part_2):
+    for values(pointer = 50, acc = 0):
+      each turn in input
+      let dest = pointer + turn
+      let passes = for math.sum:
+        each n in math.min(pointer, dest) ..= math.max(pointer, dest)
+        skip_when n == pointer
+        keep_when n mod 100 == 0
+        1
+      values(dest, acc + passes)
+  part_2
+
+module main:
+  aoc.run(part_1, part_2)
+  
