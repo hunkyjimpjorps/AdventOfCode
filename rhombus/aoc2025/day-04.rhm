@@ -1,0 +1,46 @@
+#lang rhombus
+
+import:
+  "utils/aoc.rhm"
+  "utils/posn.rhm" open
+
+def input:
+  for Set:
+    each:
+      line in aoc.get_day(4).trim().split("\n")
+      col in 0..
+    each:
+      char in line
+      row in 0..
+    keep_when char == Char"@"
+    Posn(row, col)
+  
+fun removable(roll, room):
+  roll 
+    |> Posn.all_neighbors(_) 
+    |> List.filter(_, ~keep: (_ in room)) 
+    |> List.length(_) 
+    |> (_ < 4)
+
+// part 1
+
+fun part_1():
+  for math.sum:
+    each roll in input
+    keep_when removable(roll, input)
+    1
+
+// part 2
+    
+fun part_2():
+  recur remove_next(acc = input, removed = 0):
+    let to_remove = for Set (r in acc):
+      keep_when removable(r, acc)
+      r
+    guard to_remove.length() != 0 | removed
+    remove_next(acc.subtract(to_remove), removed + to_remove.length())
+    
+
+module main:
+  aoc.run(part_1, part_2)
+  
