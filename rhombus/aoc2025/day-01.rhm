@@ -10,7 +10,7 @@ def input = for List:
   each line in aoc.get_day(1).split("\n")
   match parse_rx.match(line).captures
   | ["R", n]: n.to_int()
-  | ["L", n] : -n.to_int()
+  | ["L", n]: -n.to_int()
 
 // part 1
                

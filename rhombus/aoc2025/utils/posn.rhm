@@ -15,4 +15,7 @@ class Posn(row, col):
       each:
         [dx, dy] in [[0, 1], [0, -1], [1, 0], [-1, 0]]
       skip_when dx == 0 && dy == 0
-      Posn(col + dx, row + dy)
+      Posn(row + dx, col + dy)
+  method move(r, c):
+      Posn(row + r, col + c)
+  
