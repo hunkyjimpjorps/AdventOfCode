@@ -1,0 +1,49 @@
+#lang rhombus
+
+import:
+  "utils/aoc.rhm"
+
+def input:
+  aoc.get_day(6)
+
+fun transpose(xss, acc = []):
+  match xss
+  | []: []
+  | [[], ...]: acc
+  | [[h, & t], ...]: transpose([t, ...], [& acc, [h, ...]])
+
+fun part_1():
+  let columns:
+    input
+      |> String.split(_, "\n")
+      |> List.map(_, fun (str): str.split(" ", ~repeat: #true))
+      |> transpose(_)
+
+  for fold(acc = 0) (column in columns):
+    let [xs, ..., op] = column
+    let xs = [xs.to_int(), ...]
+    match op
+    | "*": acc + math.product(& xs)
+    | "+": acc + math.sum(& xs)
+
+fun part_2():
+  let characters:
+    for List (line in String.split(input, "\n")):
+      for List (char in line):
+        char
+
+  transpose(characters)
+
+  recur do_math(
+    ops = transpose(characters),
+    acc = 0, 
+    current_op = Function.pass,
+    register = []):
+    let [op, & rest] = ops
+    let (number, value) = op.filter((_ != Char" ")).partition((_ in [Char"*", Char"+"]))
+
+    match [number, value]
+    | []: acc + current_op(register)
+    | []: do_math(rest, acc + current_op(register), current_op, [])
+module main:
+  aoc.run(part_1, part_2)
