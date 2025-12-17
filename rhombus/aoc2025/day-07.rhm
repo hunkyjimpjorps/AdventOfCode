@@ -1,0 +1,69 @@
+#lang rhombus
+
+import:
+  "utils/aoc.rhm"
+  "utils/posn.rhm" open
+
+enum Cell
+| empty
+| start
+| splitter
+
+def input:
+  for Map:
+    each:
+      row in aoc.get_day(7).trim().split("\n")
+      r in 0..
+    each:
+      col in row
+      c in 0..
+    let cell:
+      match col
+      | Char"^": Cell.splitter
+      | Char"S": Cell.start
+      | ~else: Cell.empty
+    values(Posn(r, c), cell)
+    
+def start:
+  for values(_ = #false):
+    each (k, v) in input
+    final_when v == Cell.start
+    k
+
+fun update(map, k, f, a):
+  match Map.get(map, k, #false)
+  | #false: map.set(k, f(a))
+  | v: map.set(k, f(v))
+
+fun trace_beams(beams = Map{start: 1}, hits = 0):
+  let values(new_beams, new_hits):
+    for fold(acc = Map{}, count = hits):
+      each (b_posn, b_paths) in beams
+      let new_posn = b_posn.move(2, 0)
+      match Map.get(input, new_posn, #false)
+      | #false: values(acc, count)
+      | Cell.empty: values(update(acc, new_posn, (b_paths + _), 0), count)
+      | Cell.splitter: values(
+            acc 
+              |> update(_, new_posn.move(0, 1), (b_paths + _), 0) 
+              |> update(_, new_posn.move(0, -1), (b_paths + _), 0),
+            count + 1)
+  if new_beams.length() == 0
+  | values(hits, math.sum(& beams.values()))
+  | trace_beams(new_beams, new_hits)
+    
+// part 1
+
+fun part_1():
+  let (hits, _) = trace_beams()
+  hits
+
+// part 2
+    
+fun part_2():
+  let (_, beams) = trace_beams()
+  beams
+    
+module main:
+  aoc.run(part_1, part_2)
+  
