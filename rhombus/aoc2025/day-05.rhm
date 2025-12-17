@@ -1,0 +1,43 @@
+#lang rhombus
+
+import:
+  "utils/aoc.rhm"
+  
+class Range(from :: Int, to :: Int):
+  private implements Comparable
+  private override method compare_to(other): from - other.from
+  
+let [ranges, ingredients] = aoc.get_day(5).trim().split("\n\n")
+  
+let ranges:
+  def [[from, to], ...] = ranges.split("\n").map(String.split(_, "-"))
+  [Range(from.to_int(), to.to_int()), ...]
+
+let ingredients:
+  def [ingredient, ...] = ingredients.split("\n")
+  [ingredient.to_int(), ...]
+
+fun is_fresh(ingredient):
+  List.find(ranges, fun(r): r.from <= ingredient && ingredient <= r.to)
+
+// part 1 
+  
+fun part_1():
+  for math.sum (i in ingredients): keep_when is_fresh(i); 1
+
+// part 2
+
+fun
+| cover_range([], _, acc): acc
+| cover_range([h, & t], prev_end, acc):
+    cond
+    | h.to <= prev_end: cover_range([& t], prev_end, acc)
+    | h.from <= prev_end: cover_range([& t], h.to, acc + h.to - prev_end)
+    | ~else: cover_range([& t], h.to, acc + h.to - h.from + 1)
+
+fun part_2():
+  cover_range(ranges.sort((_ < _)), 0, 0)
+                
+module main:
+  aoc.run(part_1, part_2)
+  
