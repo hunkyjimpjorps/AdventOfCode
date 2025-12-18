@@ -55,9 +55,25 @@ fun make_patterns(machine):
     for fold(acc = {}):
       each n in List.iota(machine.buttons + 1).reverse()
       each bs in list.combinations(machine.buttons, n)
-      
-    
+      let unpushed_buttons:
+        for Map:
+          each k in 0..machine.joltages.length()
+          values(k, 0)
+      let press_result:
+        for fold(inner = unpushed_buttons):
+          each button in machine.buttons 
+          each modified in button
+          Map.set(inner, modified, inner[modified] + 1)
+      Map.set(acc, press_result.values())
+  for fold(acc = {}):
+    each (patt, cost) in pattern_cost
+    let par = parity(patt)
+    Map.set(acc, par, Map.set(Map.get(acc, par, {}), patt, cost))
 
+fun minimize_presses(machine):
+  let parity_pattern_costs = make_patterns(machine)
+  
+    
 fun part_2():
   #void
 
