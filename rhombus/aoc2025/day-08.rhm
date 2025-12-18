@@ -29,23 +29,61 @@ def pairs:
 def starting_room:
   Room(
     for Map:
-      each posn in posns_list
-      each i in 0..
+      each: 
+        posn in posns_list
+        i in 0..
       values(posn, i),
     for Map:
-      each posn in posns_list
-      each i in 0..
+      each:
+        posn in posns_list
+        i in 0..
       values(i, {posn}),
     Set{}
   )
 
 
 fun unify(room, pair):
-  if room.boxes[pair.posn1] == room.boxes[pair.posn2]
+  let circuit_a = room.boxes[pair.posn1]
+  let circuit_b = room.boxes[pair.posn2]
+  if circuit_a == circuit_b
   | room
-  | let boxes_a = room.circuits[room.boxes[pair.posn1]]
-    let boxes_b = room.circuits[room.boxes[pair.posn2]]
+  | let boxes_a = room.circuits[circuit_a]
+    let boxes_b = room.circuits[circuit_b]
     Room(
-      
+      for fold(acc = room.boxes):
+        each box in boxes_b 
+        Map.set(acc, box, circuit_a),
+      room.circuits
+        |> Map.remove(_, circuit_b)
+        |> Map.set(_, circuit_a, Set.union(boxes_a, boxes_b)),
+      room.seen
+        |> Set.add(_, pair.posn1)
+        |> Set.add(_, pair.posn2)
     )
-            
+
+// part 1
+    
+fun part_1():
+  let room:
+    for fold(acc = starting_room):
+      each:
+        pair in pairs
+        _ in 0..1000
+      unify(acc, pair)
+  let [set, ...] = room.circuits.values()
+  math.product(& [Set.length(set), ...].sort((_ > _)).take(3))
+
+fun part_2():
+  let values(_, pair):
+    for fold(acc = starting_room, last_pair = #false):
+      each pair in pairs 
+      break_when acc.seen.length() == 1000 
+        && acc.circuits.values().length() == 1
+      let new_room = unify(acc, pair)
+      values(new_room, pair)
+  
+  pair.posn1.x * pair.posn2.x
+  
+module main:
+  aoc.run(part_1, part_2)
+  
