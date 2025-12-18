@@ -1,0 +1,51 @@
+#lang rhombus
+
+import:
+  "utils/aoc.rhm"
+  lib("racket/list.rkt"):
+    only #{combinations} as combinations
+
+class Posn(x :: Int, y :: Int, z :: Int)
+class Room(boxes, circuits, seen)
+
+class PosnPair(posn1 :: Posn, posn2 :: Posn):
+  private implements Comparable
+  method dist():
+    ((posn1.x - posn2.x) ** 2 
+       + (posn1.y - posn2.y) ** 2
+       + (posn1.z - posn2.z) ** 2)
+  private override method compare_to(other): this.dist() - other.dist()
+                                             
+def [posn, ...] = aoc.get_day(8).trim().split("\n")
+def posns_list = PairList[Posn(& List.map(posn.split(","), String.to_int)), ...]
+
+def pairs:
+  let posn_pairs:
+    for List:
+      each PairList[posn1, posn2] in list.combinations(posns_list, 2)
+      PosnPair(posn1, posn2)
+  posn_pairs.to_list().sort((_ < _))
+
+def starting_room:
+  Room(
+    for Map:
+      each posn in posns_list
+      each i in 0..
+      values(posn, i),
+    for Map:
+      each posn in posns_list
+      each i in 0..
+      values(i, {posn}),
+    Set{}
+  )
+
+
+fun unify(room, pair):
+  if room.boxes[pair.posn1] == room.boxes[pair.posn2]
+  | room
+  | let boxes_a = room.circuits[room.boxes[pair.posn1]]
+    let boxes_b = room.circuits[room.boxes[pair.posn2]]
+    Room(
+      
+    )
+            
