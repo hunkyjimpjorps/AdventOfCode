@@ -61,10 +61,11 @@ fun make_patterns(machine):
       each n in List.iota(machine.buttons.length() + 1).reverse()
       each bs in list.combinations(machine.buttons, n)
       let press_result:
+        let PairList[{b, ...}, ...] = bs
+        let modified = [b, ..., ...]
         for fold(inner = empty):
-          each b in bs
-          each pressed in b 
-          update(inner, pressed, (_ + 1), 0)
+          each b in modified 
+          update(inner, b, (_ + 1), 0)
       values(press_result.values(), n)
 
   for fold(acc = {}):
