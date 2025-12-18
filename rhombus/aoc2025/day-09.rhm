@@ -1,0 +1,66 @@
+#lang rhombus
+
+import:
+  rhombus/rx open
+  lib("racket/list.rkt"): only combinations
+  "utils/aoc.rhm"
+  "utils/posn.rhm" open
+
+class Line(p1 :: Posn, p2 :: Posn):
+  nonfinal
+  method intersects(side):
+    let [min_x, max_x] = [p1.x, p2.x].sort((_ < _))
+    let [min_y, max_y] = [p1.y, p2.y].sort((_ < _))
+    let [side_min_x, side_max_x] = [side.p1.x, side.p2.x].sort((_ < _))
+    let [side_min_y, side_max_y] = [side.p1.y, side.p2.y].sort((_ < _))
+
+    !(side_max_x <= min_x || side_min_x >= max_x
+        || side_max_y <= min_y || side_min_y >= max_y )
+    
+class Diagonal():
+  extends Line
+  private implements Comparable
+  private override method compare_to(other):
+    this.diagonal_area() - other.diagonal_area()
+  method diagonal_area():
+    (math.abs(p1.x - p2.x) + 1) * (math.abs(p1.y - p2.y) + 1)
+
+def red_tiles:
+  for PairList:
+    each line in aoc.get_day(9).split("\n")
+    let [n, ...] = line.split(",")
+    Posn(& [n.to_int(), ...])
+
+def rectangles:
+  let diagonals:
+    for List:
+      each PairList[p1, p2] in list.combinations(red_tiles, 2)
+      Diagonal(p1, p2)
+  
+  diagonals.sort((_ > _))
+
+// part 1
+  
+fun part_1():
+  rectangles.first.diagonal_area()
+
+// part 2
+  
+def polygon_sides:
+  for List:
+    each: 
+      left in red_tiles
+      right in red_tiles.drop(1)
+    Line(left, right)
+
+fun rectangle_avoids_polygon(rect):
+  for values(_ = #true):
+    each side in polygon_sides
+    final_when rect.intersects(side)
+    #false
+
+fun part_2():
+  rectangles.find(rectangle_avoids_polygon(_))
+
+module main:
+  aoc.run(part_1, part_2)
