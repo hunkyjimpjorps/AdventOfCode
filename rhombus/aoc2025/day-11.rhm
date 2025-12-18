@@ -1,0 +1,35 @@
+#lang rhombus
+
+import:
+  rhombus/rx open
+  "utils/aoc.rhm"
+  "utils/memo.rhm"
+
+def graph:
+  for Map:
+    each line in aoc.get_day(11).split("\n")
+    let [from, & to] = line.split(rx'":"? space')
+    values(from, to)
+
+fun count_paths(from, to): do_count_paths(from, to, 0)
+
+memo.fun do_count_paths(from, to, n):
+  guard from != to | 1
+  for fold(acc = n):
+    each neighbor in Map.get(graph, from, [])
+    acc + do_count_paths(neighbor, to, n)
+
+// part 1
+    
+fun part_1():
+  count_paths("you", "out")
+
+// part 2
+
+fun part_2():
+  count_paths("svr", "fft") 
+    * count_paths("fft", "dac")
+    * count_paths("dac", "out")
+
+module main:
+  aoc.run(part_1, part_2)
