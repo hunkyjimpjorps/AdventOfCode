@@ -1,0 +1,102 @@
+#lang rhombus
+
+import:
+  rhombus/rx open
+  lib("racket/list.rkt"): only combinations
+  "utils/aoc.rhm"
+  "utils/memo.rhm"
+
+class Machine(lights, buttons, joltages)
+
+fun extract_lights(str):
+  for Set:
+    each:
+      ch in str.trim(rx'"[" || "]"')
+      i in 0..
+    keep_when ch == Char"#"
+    i
+
+fun extract_digits(str):
+  rx_in'digit+'.matches(str).map(String.to_int)
+
+fun to_set(xs): for Set (x in xs): x
+
+def machines:
+  let [input, ...] = aoc.get_day(10).trim().split("\n")
+  let [[lights, buttons, ..., joltages], ...] = [input.split(" "), ...]
+  [Machine(
+    extract_lights(lights),
+    PairList[to_set(extract_digits(buttons)), ...],
+    extract_digits(joltages)
+ ), ...]
+
+// part 1
+
+fun part_1():
+  for math.sum:
+    each machine in machines
+    for values(_ = #false):
+      each n in 0..
+      each bs in list.combinations(machine.buttons, n)
+      final_when Set{} == for fold(acc = machine.lights):
+        each b in bs
+        Set.subtract(Set.union(acc, b), Set.intersect(acc, b))
+      bs.length()
+
+// part 2
+
+fun
+| parity(xs): parity(xs, 0)
+| parity([], acc): acc
+| parity([h, & t], acc): parity(t, 2 * acc + h mod 2)
+
+fun make_patterns(machine):
+  let empty:
+    for Map:
+      each k in 0..machine.joltages.length()
+      values(k, 0)
+
+  def pattern_cost:
+    for Map:
+      each n in List.iota(machine.buttons.length() + 1).reverse()
+      each bs in list.combinations(machine.buttons, n)
+      let press_result:
+        let PairList[{b, ...}, ...] = bs
+        let modified = [b, ..., ...]
+        for fold(inner = empty):
+          each b in modified 
+          update(inner, b, (_ + 1), 0)
+      values(press_result.values(), n)
+
+  for fold(acc = {}):
+    each (patt, cost) in pattern_cost
+    update(acc, parity(patt), (Map.set(_, patt, cost)), Map{})
+
+fun update(map, k, f, a):
+  match Map.get(map, k, #false)
+  | #false: map.set(k, f(a))
+  | v: map.set(k, f(v))
+
+fun minimize_presses(machine):
+  let patterns =  make_patterns(machine)
+
+  memo.fun do_minimize_presses(goals):
+    let [goal, ...] = goals
+    if goals matches [0, ...]
+    | 0
+    | let pattern_costs = Map.get(patterns, parity(goals), {})
+      for fold(result = 1000):
+        each ([patt, ...], cost) in pattern_costs
+        keep_when [patt <= goal, ...] matches [#true, ...]
+        let new_goals = [(goal - patt) div 2, ...]
+        math.min(result, (cost + (2 * do_minimize_presses(new_goals))))
+
+  do_minimize_presses(machine.joltages)
+
+fun part_2():
+  for math.sum:
+    each machine in machines
+    minimize_presses(machine)
+
+module main:
+  aoc.run(part_1, part_2)

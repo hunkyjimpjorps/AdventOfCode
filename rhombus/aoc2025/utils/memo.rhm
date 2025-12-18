@@ -1,0 +1,34 @@
+#lang rhombus/static/and_meta
+
+export rename _fun as fun
+
+class Sentinel()
+def sentinel = Sentinel()
+
+class Absent()
+def absent = Absent()
+
+// XXX: handle return annotations
+defn.macro '_fun $(name :: Identifier)($(arg :: bind_meta.Parsed), ...):
+                $body
+                ...':
+  def [vars, ...]:
+    for List (v: [arg, ...]): Syntax.make_temp_id()
+  'def $name:
+      block:
+        let memo = MutableMap()
+        fun inner($arg, ...):
+          $body
+          ...
+        fun($vars, ...):
+          def k = Array($vars, ...).snapshot()
+          match memo.get(k, absent)
+          | _ :: Sentinel:
+              error(~who: #'$name, "memoized function has cycle")
+          | _ :: Absent:
+              memo[k] := sentinel
+              // XXX: an error in inner would leave a sentinel
+              def val = inner($vars, ...)
+              memo[k] := val
+              val
+          | val: val'
