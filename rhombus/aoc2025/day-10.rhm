@@ -1,10 +1,10 @@
-#lang rhombus 
+#lang rhombus
 
 import:
   rhombus/rx open
-  lib("racket/list.rkt") only combinations
-  lib("racket/set.rkt") only #{set-symmetric-difference} as symm_diff
+  lib("racket/list.rkt"): only combinations
   "utils/aoc.rhm"
+  "utils/memo.rhm"
 
 class Machine(lights, buttons, joltages)
 
@@ -28,10 +28,10 @@ def machines:
     extract_lights(lights),
     PairList[to_set(extract_digits(buttons)), ...],
     extract_digits(joltages)
-  ), ...]
-  
+ ), ...]
+
 // part 1
-  
+
 fun part_1():
   for math.sum:
     each machine in machines
@@ -47,35 +47,55 @@ fun part_1():
 
 fun
 | parity(xs): parity(xs, 0)
-| parity([], acc): acc 
-| parity([h, & t], acc): parity(t, (2 * acc + h mod 2))
-                         
+| parity([], acc): acc
+| parity([h, & t], acc): parity(t, 2 * acc + h mod 2)
+
 fun make_patterns(machine):
+  let empty:
+    for Map:
+      each k in 0..machine.joltages.length()
+      values(k, 0)
+
   def pattern_cost:
-    for fold(acc = {}):
-      each n in List.iota(machine.buttons + 1).reverse()
+    for Map:
+      each n in List.iota(machine.buttons.length() + 1).reverse()
       each bs in list.combinations(machine.buttons, n)
-      let unpushed_buttons:
-        for Map:
-          each k in 0..machine.joltages.length()
-          values(k, 0)
       let press_result:
-        for fold(inner = unpushed_buttons):
-          each button in machine.buttons 
-          each modified in button
-          Map.set(inner, modified, inner[modified] + 1)
-      Map.set(acc, press_result.values())
+        for fold(inner = empty):
+          each b in bs
+          each pressed in b 
+          update(inner, pressed, (_ + 1), 0)
+      values(press_result.values(), n)
+
   for fold(acc = {}):
     each (patt, cost) in pattern_cost
-    let par = parity(patt)
-    Map.set(acc, par, Map.set(Map.get(acc, par, {}), patt, cost))
+    update(acc, parity(patt), (Map.set(_, patt, cost)), Map{})
+
+fun update(map, k, f, a):
+  match Map.get(map, k, #false)
+  | #false: map.set(k, f(a))
+  | v: map.set(k, f(v))
 
 fun minimize_presses(machine):
-  let parity_pattern_costs = make_patterns(machine)
-  
-    
+  let patterns =  make_patterns(machine)
+
+  memo.fun do_minimize_presses(goals):
+    let [goal, ...] = goals
+    if goals matches [0, ...]
+    | 0
+    | let pattern_costs = Map.get(patterns, parity(goals), {})
+      for fold(result = 1000):
+        each ([patt, ...], cost) in pattern_costs
+        keep_when [patt <= goal, ...] matches [#true, ...]
+        let new_goals = [(goal - patt) div 2, ...]
+        math.min(result, (cost + (2 * do_minimize_presses(new_goals))))
+
+  do_minimize_presses(machine.joltages)
+
 fun part_2():
-  #void
+  for math.sum:
+    each machine in machines
+    minimize_presses(machine)
 
 module main:
   aoc.run(part_1, part_2)
