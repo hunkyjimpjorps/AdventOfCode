@@ -28,6 +28,7 @@ fun part_1():
 // part 2
 
 fun
+| cover_range(range): cover_range(range, 0, 0)
 | cover_range([], _, acc): acc
 | cover_range([h, & t], prev_end, acc):
     cond
@@ -36,7 +37,7 @@ fun
     | ~else: cover_range([& t], h.to, acc + h.to - h.from + 1)
 
 fun part_2():
-  cover_range(ranges.sort((_ < _)), 0, 0)
+  cover_range(ranges.sort((_ < _)))
                 
 module main:
   aoc.run(part_1, part_2)

@@ -1,0 +1,26 @@
+#lang rhombus
+
+import:
+  rhombus/rx open
+  "utils/aoc.rhm"
+
+class Region(width, height, presents)
+
+def regions:
+  let [_shapes, ..., regions] =  aoc.get_day(12).split("\n\n")
+
+  for List:
+    each line in regions.split("\n")
+    let [width, height, & presents] = rx'digit+'.matches(line).map(String.to_int)
+    Region(width, height, presents)                                        
+
+// part 1
+    
+fun part_1():
+  for math.sum:
+    each region in regions
+    keep_when (region.width * region.height) >= 9 * math.sum(& region.presents)
+    1
+
+module main:
+  aoc.run(part_1, fun(): "🎅")

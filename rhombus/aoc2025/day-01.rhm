@@ -19,9 +19,7 @@ fun part_1():
     for values(pointer = 50, acc = 0):
       each turn in input
       let pointer = pointer + turn
-      let acc = cond
-      | pointer mod 100 == 0: acc + 1
-      | ~else: acc
+      let acc = if pointer mod 100 == 0 | acc + 1 | acc
       values(pointer, acc)
   part_1
 

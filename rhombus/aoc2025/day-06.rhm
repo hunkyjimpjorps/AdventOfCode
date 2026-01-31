@@ -32,8 +32,6 @@ fun part_2():
       for List (char in line):
         char
 
-  transpose(characters)
-
   recur do_math(
     ops = transpose(characters),
     acc = 0, 
@@ -45,5 +43,6 @@ fun part_2():
     match [number, value]
     | []: acc + current_op(register)
     | []: do_math(rest, acc + current_op(register), current_op, [])
+          
 module main:
   aoc.run(part_1, part_2)

@@ -24,6 +24,7 @@ def input:
 let pack_length = input.first.length()
 
 fun 
+| get_combo(batteries, remaining): get_combo(batteries, remaining, 0)
 | get_combo(_, 0, acc): acc
 | get_combo(batteries, remaining, acc):
     let Battery(joltage, index): 
@@ -35,7 +36,7 @@ fun
 fun solve(n):
   for math.sum:
     each batteries in input
-    get_combo(batteries, n, 0)
+    get_combo(batteries, n)
 
 // part 1
 
