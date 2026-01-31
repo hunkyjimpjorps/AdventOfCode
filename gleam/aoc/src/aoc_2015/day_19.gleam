@@ -55,22 +55,6 @@ pub fn pt_1(input: String) {
   check_all_atoms(rules, [], split_to_elements(base), set.new())
 }
 
-fn do_next_replacement(
-  molecule: String,
-  rules: List(#(String, String)),
-  count: Int,
-) -> Int {
-  case molecule {
-    "e" -> count
-    mol -> {
-      let assert Ok(#(to, from)) =
-        rules |> list.find(fn(rule) { string.contains(mol, rule.1) })
-      let assert Ok(#(left, right)) = mol |> string.split_once(from)
-      do_next_replacement(left <> to <> right, rules, count + 1)
-    }
-  }
-}
-
 fn count_terminals(elements, total, outer, inner) {
   case elements {
     [] -> total - outer - 2 * inner - 1

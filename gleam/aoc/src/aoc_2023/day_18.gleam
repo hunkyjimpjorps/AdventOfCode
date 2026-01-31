@@ -1,7 +1,7 @@
 import gleam/int
 import gleam/list
 import gleam/option.{Some}
-import gleam/regexp.{type Match, Match}
+import gleam/regexp.{Match}
 import gleam/string
 import my_utils/xy.{type XY, XY}
 

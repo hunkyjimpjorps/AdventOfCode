@@ -2,7 +2,7 @@ import gleam/bool
 import gleam/dict.{type Dict}
 import gleam/list
 import gleam/option.{Some}
-import gleam/regexp.{type Match, Match}
+import gleam/regexp.{Match}
 import gleam/string
 import gleam/yielder.{type Yielder, Next}
 import gleam_community/maths/arithmetics

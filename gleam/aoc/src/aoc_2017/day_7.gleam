@@ -2,7 +2,7 @@ import gleam/dict.{type Dict}
 import gleam/int
 import gleam/list
 import gleam/option.{Some}
-import gleam/regexp.{type Match, Match}
+import gleam/regexp.{Match}
 import gleam/set
 import gleam/string
 
@@ -10,7 +10,7 @@ pub type Program {
   Program(name: String, weight: Int, supporting: List(String))
 }
 
-pub fn parse(input: String) {
+pub fn parse(input: String) -> List(Program) {
   let assert Ok(re) = regexp.from_string("([a-z]+) \\(([0-9]+)\\)(?> -> (.*))?")
 
   use match <- list.map(string.split(input, "\n"))
@@ -28,7 +28,7 @@ fn to_int(str: String) -> Int {
   n
 }
 
-pub fn pt_1(input: List(Program)) {
+pub fn pt_1(input: List(Program)) -> String {
   let supporters = input |> list.map(fn(p) { p.name }) |> set.from_list()
   let supporting =
     input |> list.flat_map(fn(p) { p.supporting }) |> set.from_list()
@@ -37,7 +37,7 @@ pub fn pt_1(input: List(Program)) {
   base
 }
 
-pub fn pt_2(input: List(Program)) {
+pub fn pt_2(input: List(Program)) -> Int {
   let weights =
     input |> list.map(fn(p) { #(p.name, p.weight) }) |> dict.from_list
 

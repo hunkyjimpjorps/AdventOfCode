@@ -3,7 +3,7 @@ import gleam/list
 import gleam/option.{None, Some}
 import gleam/set
 import my_utils/from
-import my_utils/xy.{type XY, XY}
+import my_utils/xy.{type XY}
 
 pub type Cell {
   Open

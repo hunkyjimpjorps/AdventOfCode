@@ -3,7 +3,7 @@ import gleam/int
 import gleam/list
 import gleam/option.{Some}
 import gleam/order.{type Order, Gt, Lt}
-import gleam/regexp.{type Match, Match}
+import gleam/regexp.{Match}
 import gleam/string
 
 type Rating {

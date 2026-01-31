@@ -1,6 +1,6 @@
 import gleam/int
 import gleam/list
-import gleam/regexp.{type Match, Match}
+import gleam/regexp.{Match}
 import gleam/string
 
 pub fn pt_1(input: String) {
