@@ -1,6 +1,6 @@
 import gleam/dict
 import gleam/list
-import gleam/option.{None, Some}
+import gleam/option.{Some}
 import gleam/regexp
 import gleam/string
 import my_utils/to
