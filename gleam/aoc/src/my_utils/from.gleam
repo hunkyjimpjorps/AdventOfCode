@@ -5,7 +5,6 @@ import gleam/dict.{type Dict}
 import gleam/list
 import gleam/result
 import gleam/string
-import my_utils/coord.{type Coord, Coord}
 import my_utils/to
 
 pub fn list_of_list_of_ints(input: String, delimiter: String) -> List(List(Int)) {
@@ -30,13 +29,14 @@ pub fn grid(
 
 pub fn try_grid(
   input: String,
-  parser: fn(String) -> Result(a, b),
-) -> Dict(Coord, a) {
+  constructor: fn(Int, Int) -> a,
+  parser: fn(String) -> Result(b, c),
+) -> Dict(a, b) {
   {
     use row, r <- list.index_map(string.split(input, "\n"))
     use col, c <- list.index_map(string.to_graphemes(row))
     case parser(col) {
-      Ok(result) -> Ok(#(Coord(r, c), result))
+      Ok(result) -> Ok(#(constructor(r, c), result))
       Error(_) -> Error(Nil)
     }
   }

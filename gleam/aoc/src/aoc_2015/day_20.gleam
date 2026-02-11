@@ -1,11 +1,11 @@
 import gleam/int
 import gleam/list
-import gleam_community/maths/arithmetics
+import gleam_community/maths
 
 const target = 29_000_000
 
 fn best_house_infinite(address: Int) {
-  let presents = address |> arithmetics.divisors |> int.sum |> int.multiply(10)
+  let presents = address |> maths.divisors |> int.sum |> int.multiply(10)
 
   case presents >= target {
     True -> address
@@ -20,7 +20,7 @@ pub fn pt_1(_input: String) {
 fn best_house_limited(address: Int) {
   let presents =
     address
-    |> arithmetics.divisors
+    |> maths.divisors
     |> list.filter(fn(n) { n * 50 >= address })
     |> int.sum
     |> int.multiply(11)

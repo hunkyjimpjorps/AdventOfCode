@@ -90,3 +90,7 @@ pub const cardinal_directions = [XY(1, 0), XY(-1, 0), XY(0, 1), XY(0, -1)]
 pub fn neighbors(p: XY, dirs: List(XY)) {
   list.map(dirs, go(p, _))
 }
+
+pub fn slope(p1: XY, p2: XY) -> Float {
+  int.to_float(p2.y - p1.y) /. int.to_float(p2.x - p1.x)
+}

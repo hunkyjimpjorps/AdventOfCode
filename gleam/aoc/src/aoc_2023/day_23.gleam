@@ -152,7 +152,7 @@ fn solve_using(
   let max_row = list.length(string.split(input, "\n")) - 1
 
   let trails =
-    from.try_grid(input, first_parse_path(_))
+    from.try_grid(input, Coord, first_parse_path(_))
     |> mark_junctions
 
   let junctions =

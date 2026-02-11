@@ -53,7 +53,7 @@ pub type Reindeer {
 }
 
 pub fn parse(input: String) -> Dict(Coord, Tile) {
-  from.try_grid(input, fn(c) {
+  from.try_grid(input, Coord, fn(c) {
     case c {
       "." -> Ok(Path)
       "S" -> Ok(Start)

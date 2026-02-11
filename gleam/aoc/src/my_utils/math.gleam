@@ -10,6 +10,15 @@ pub fn pow(base: Int, exponent: Int) {
   }
 }
 
+pub fn pow_f(base: Float, exponent: Int) {
+  case exponent {
+    0 -> 1.0
+    1 -> base
+    n if n % 2 == 0 -> pow_f(base *. base, n / 2)
+    n -> base *. pow_f(base, n - 1)
+  }
+}
+
 pub fn divide(numerator: Int, denominator: Int) {
   numerator / denominator
 }

@@ -2,7 +2,7 @@ import gleam/float
 import gleam/int
 import gleam/list
 import gleam/result
-import gleam_community/maths/elementary
+import gleam_community/maths
 import my_utils/math
 import my_utils/to
 import rememo/memo
@@ -27,7 +27,7 @@ fn blink(stone: Int, blinks: Int, cache) {
 fn digits(n: Int) -> Int {
   n
   |> int.to_float
-  |> elementary.logarithm_10
+  |> maths.logarithm_10
   |> result.unwrap(0.0)
   |> float.add(1.0)
   |> float.floor

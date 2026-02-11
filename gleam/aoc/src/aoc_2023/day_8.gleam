@@ -5,7 +5,7 @@ import gleam/option.{Some}
 import gleam/regexp.{Match}
 import gleam/string
 import gleam/yielder.{type Yielder, Next}
-import gleam_community/maths/arithmetics
+import gleam_community/maths
 
 pub type Paths {
   Paths(to_left: String, to_right: String)
@@ -69,6 +69,6 @@ pub fn pt_2(input: Input) {
     False -> acc
     True ->
       to_next_step(name, "Z", 0, input.directions, input.maze)
-      |> arithmetics.lcm(acc)
+      |> maths.lcm(acc)
   }
 }
